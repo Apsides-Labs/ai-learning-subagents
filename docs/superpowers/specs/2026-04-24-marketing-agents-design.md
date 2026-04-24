@@ -97,8 +97,8 @@ Topic teaser articles are a dual-purpose content type: they rank for topic-speci
 | Tool | Cost | Research Agent | SEO Agent | Writing Agent |
 |---|---|---|---|---|
 | Jina AI Reader (`r.jina.ai/[url]`) | Free | ✓ reads competitor pages | — | — |
-| Brave Search API | Free (2k/mo) | ✓ competitor discovery, trends | ✓ SERP analysis | — |
-| SerpAPI | Free (100/mo) | — | ✓ People Also Ask, ranking data | — |
+| Tavily Search API (`TavilySearchResults`) | Free tier | ✓ competitor discovery, pain points | ✓ SERP analysis, keyword research | — |
+| SerpAPI | Free (100/mo) | — | ✓ People Also Ask extraction | — |
 | pytrends | Free | — | ✓ Google Trends interest | — |
 
 ---
@@ -407,18 +407,25 @@ Like B, but with bi-directional agent communication. The Writing Agent can signa
 
 ---
 
-## Open Questions / Decisions Before Implementation
+## Decisions Resolved
 
-1. **Tech stack:** Anthropic Claude SDK directly (recommended — clean, no framework overhead) vs LangGraph (already used in main app). Recommend Claude SDK here since this system is independent and agent coordination is simple enough not to need a graph framework.
+1. **Tech stack:** LangChain + LangGraph, matching the main repo's architecture. Project structure mirrors `app/ai/graphs/` and `app/ai/chains/` patterns. Same package manager (uv), Python 3.12+, pytest.
 
-2. **Brave Search API key:** Sign up at brave.com/search/api — free tier is 2,000 queries/month.
+2. **Search tool:** Tavily replaces Brave Search. Tavily is purpose-built for AI agents, has a native LangChain tool (`TavilySearchResults`), free tier with no credit card required. Used by both Research Agent and SEO Agent.
 
-3. **SerpAPI key:** Sign up at serpapi.com — free tier is 100 searches/month.
+3. **SerpAPI:** Kept alongside Tavily — they serve different purposes. Tavily = general web search. SerpAPI = structured Google SERP data, specifically "People Also Ask" extraction which Tavily cannot provide. Both are needed. SerpAPI free tier: 100 searches/month (serpapi.com).
 
-4. **Trigger mechanism:** How does the weekly batch run? Options: cron job, manual CLI command, scheduled Claude Code agent. Recommend starting with a manual CLI command (`uv run python main.py --mode weekly`) and adding scheduling later.
+4. **Trigger mechanism:** Manual CLI command. Run with `uv run python main.py --mode weekly` (batch) or `uv run python main.py --mode article` (single article). Scheduling can be added later.
 
-5. **Blog platform:** What CMS does Draft and Arc's blog run on? (Ghost, WordPress, custom?) This affects whether the Writing Agent's markdown output needs any transformation before publishing.
+5. **Blog platform:** Not yet decided (not WordPress). Writing Agent outputs clean markdown. Publishing integration is a future concern — the output format will not need to change regardless of CMS choice.
 
-6. **Medium import:** Medium supports importing articles via their editor. The canonical URL is set in Medium's import flow. No API needed — this is a manual step.
+6. **Medium import — manual publishing process:**
+   1. Publish the article on the Draft and Arc blog first (blog is source of truth)
+   2. Copy the live blog URL
+   3. Go to medium.com → New Story → Import a Story
+   4. Paste the blog URL — Medium imports the content automatically
+   5. Before publishing on Medium, scroll to the bottom of the editor → Advanced Settings → set Canonical URL to the blog post URL
+   6. Publish on Medium
+   This ensures Google credits the blog, not Medium, as the original source.
 
-7. **Competitor seed list URL resolution:** Some competitors (alice.tech, Arist, 5Mins.ai) may have changed their URLs or rebranded. Research Agent should verify URLs on first run and update the list.
+7. **Competitor URLs:** Research Agent verifies all seed URLs on first run, updates any that have changed, and searches for new competitors in the AI-native micro-learning space to add to the list.
