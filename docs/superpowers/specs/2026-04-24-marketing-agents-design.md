@@ -18,6 +18,79 @@ Draft and Arc is an AI-powered personalized learning platform (Alpha/Beta) that 
 
 ---
 
+## Architecture Principles
+
+This system mirrors the structure and conventions of the main `ai-learning` repo. Anyone familiar with that codebase should feel at home here immediately.
+
+### Project structure
+
+```
+ai-learning-subagents/
+├── main.py                      # CLI entry point — --mode weekly | article
+├── agents/                      # LangGraph agent graphs (mirrors app/ai/graphs/)
+│   ├── orchestrator.py
+│   ├── research_agent.py
+│   ├── seo_agent.py
+│   └── writing_agent.py
+├── chains/                      # LCEL chains, one per AI operation (mirrors app/ai/chains/)
+│   ├── research_chain.py
+│   ├── seo_chain.py
+│   ├── writing_chain.py
+│   └── fact_check_chain.py
+├── prompts/                     # LangChain prompt templates (mirrors app/ai/prompts/)
+│   ├── research.py
+│   ├── seo.py
+│   ├── writing.py
+│   └── fact_check.py
+├── models/                      # Pydantic domain models (mirrors app/models/)
+│   ├── article.py               # ContentCalendarEntry, ArticleStatus
+│   ├── research.py              # ResearchBrief, ProductFact, Competitor
+│   └── seo.py                   # KeywordPlan, ArticlePlan
+├── output_schemas.py            # LLM output schemas — _StrictModel pattern (mirrors app/ai/output_schemas.py)
+├── services/                    # Business logic, no LLM calls (mirrors app/services/)
+│   ├── calendar_service.py      # content_calendar.json CRUD
+│   ├── file_service.py          # knowledge store read/write
+│   └── llm.py                   # get_llm() singleton
+└── data/                        # Knowledge store (gitignored)
+    ├── research_brief.md
+    ├── product_facts.md
+    ├── content_calendar.json
+    └── drafts/
+```
+
+### Coding conventions
+
+**Pydantic everywhere.** Every structured value that crosses a boundary — LLM output, file storage, inter-agent data, CLI arguments — is a Pydantic model. No raw dicts passed between functions.
+
+**LCEL for all LLM calls.** Every chain follows the exact same pattern as the main repo:
+
+```python
+chain = prompt | get_llm().with_structured_output(OutputSchema, method="function_calling")
+result: OutputSchema = await chain.ainvoke({...})
+```
+
+Never call the LLM directly. Always pipe through a prompt template. Always bind to a typed output schema.
+
+**`_StrictModel` base for all LLM output schemas.** Mirrors `app/ai/output_schemas.py`:
+
+```python
+class _StrictModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")  # rejects unexpected fields from LLM
+
+class ResearchBriefOutput(_StrictModel):
+    competitors: list[CompetitorOutput]
+    pain_points: list[str]
+    content_opportunities: list[ContentOpportunityOutput]
+```
+
+**Services own business logic, chains own LLM interaction.** A service function may call a chain, but a chain never calls a service. No business logic inside a chain — it only invokes the LLM and returns a typed result.
+
+**LangGraph for orchestration.** The Orchestrator and each agent are LangGraph graphs. State is a typed Pydantic model passed between nodes. Agents are nodes; tool calls are edges.
+
+**Async throughout.** All chains use `.ainvoke()`. All file I/O that could block uses `asyncio` or `aiofiles`.
+
+---
+
 ## Architecture Overview
 
 ```
