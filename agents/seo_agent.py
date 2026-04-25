@@ -3,7 +3,11 @@ from langchain_core.messages import HumanMessage
 
 from models.article import ArticleType, ContentCalendarEntry
 from output_schemas import SEOOutput
-from prompts.seo import SEO_AGENT_SYSTEM_PROMPT, SEO_KICKOFF, seo_synthesis_prompt
+from prompts.loader import load_prompt, load_system_prompt
+
+SEO_AGENT_SYSTEM_PROMPT = load_system_prompt("seo_system.md")
+SEO_KICKOFF             = load_system_prompt("seo_kickoff.md")
+seo_synthesis_prompt    = load_prompt("seo_synthesis.md")
 from services.llm import get_llm
 from tools import tavily_search_tool, people_also_ask, google_trends
 

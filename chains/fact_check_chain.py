@@ -1,6 +1,8 @@
 from output_schemas import FactCheckOutput
-from prompts.fact_check import fact_check_prompt
+from prompts.loader import load_prompt
 from services.llm import get_llm
+
+fact_check_prompt = load_prompt("fact_check.md")
 
 
 async def run_fact_check_chain(product_facts: str, draft_content: str) -> FactCheckOutput:

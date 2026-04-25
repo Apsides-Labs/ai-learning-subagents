@@ -1,6 +1,8 @@
 from output_schemas import ArticleOutput
-from prompts.writing import writing_prompt
+from prompts.loader import load_prompt
 from services.llm import get_llm
+
+writing_prompt = load_prompt("writing.md")
 from models.article import ContentCalendarEntry
 
 
