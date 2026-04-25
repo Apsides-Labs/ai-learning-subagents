@@ -28,7 +28,7 @@ async def test_research_agent_returns_product_facts_and_brief():
         ],
     )
 
-    with patch("agents.research_agent.create_react_agent") as mock_create:
+    with patch("agents.research_agent.create_agent") as mock_create:
         mock_agent = AsyncMock()
         mock_agent.ainvoke = AsyncMock(return_value=fake_gather_result)
         mock_create.return_value = mock_agent
@@ -113,7 +113,7 @@ async def test_seo_agent_returns_calendar_entries():
 
     research_brief = "Competitors: Duolingo, Coursera. Pain points: no personalised pacing."
 
-    with patch("agents.seo_agent.create_react_agent") as mock_create:
+    with patch("agents.seo_agent.create_agent") as mock_create:
         mock_agent = AsyncMock()
         mock_agent.ainvoke = AsyncMock(return_value=fake_gather_result)
         mock_create.return_value = mock_agent
@@ -233,7 +233,7 @@ async def test_research_agent_run_market_research():
         ],
     )
 
-    with patch("agents.research_agent.create_react_agent") as mock_create:
+    with patch("agents.research_agent.create_agent") as mock_create:
         mock_agent = AsyncMock()
         mock_agent.ainvoke = AsyncMock(return_value=fake_gather_result)
         mock_create.return_value = mock_agent

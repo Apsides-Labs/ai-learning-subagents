@@ -1,4 +1,4 @@
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
 
 from models.article import ArticleType, ContentCalendarEntry
@@ -31,7 +31,7 @@ def _to_calendar_entry(plan) -> ContentCalendarEntry:
 async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[ContentCalendarEntry]:
     """Run the SEO agent. Returns 4 new ContentCalendarEntry items."""
     tools = [tavily_search_tool, people_also_ask, google_trends]
-    agent = create_react_agent(get_llm(), tools=tools, state_modifier=SEO_AGENT_SYSTEM_PROMPT)
+    agent = create_agent(get_llm(), tools=tools, system_prompt=SEO_AGENT_SYSTEM_PROMPT)
 
     result = await agent.ainvoke({
         "messages": [HumanMessage(content=f"{research_brief}\n\n{SEO_KICKOFF.format(existing_ids=existing_ids or 'none')}")]
