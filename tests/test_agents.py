@@ -4,13 +4,13 @@ from langchain_core.messages import AIMessage
 
 
 async def test_research_agent_returns_product_facts_and_brief():
-    from agents.research_agent import run_research_agent
+    from agents.research_agent import run_setup_research
 
     gathered_data = "Codebase: courses have knowledge_level, daily_minutes. Competitor Duolingo: gamified language app."
     fake_gather_result = {"messages": [AIMessage(content=gathered_data)]}
 
-    from output_schemas import ResearchOutput, CompetitorOutput, ContentOpportunityOutput, ProductFactOutput
-    fake_synthesis = ResearchOutput(
+    from output_schemas import ResearchSetupOutput, CompetitorOutput, ProductFactOutput
+    fake_synthesis = ResearchSetupOutput(
         competitors=[
             CompetitorOutput(
                 name="Duolingo",
@@ -18,14 +18,6 @@ async def test_research_agent_returns_product_facts_and_brief():
                 positioning="gamified language",
                 target_audience="casual learners",
                 content_gaps=["no custom topics"],
-            )
-        ],
-        pain_points=["no personalised pacing"],
-        content_opportunities=[
-            ContentOpportunityOutput(
-                angle="Feynman technique",
-                rationale="gap in competitor content",
-                target_audience="programmers",
             )
         ],
         product_facts=[
@@ -48,13 +40,12 @@ async def test_research_agent_returns_product_facts_and_brief():
             mock_llm.with_structured_output.return_value = mock_llm
             mock_llm_fn.return_value = mock_llm
 
-            with patch("agents.research_agent.research_synthesis_prompt") as mock_prompt:
+            with patch("agents.research_agent.research_setup_synthesis_prompt") as mock_prompt:
                 mock_prompt.__or__ = MagicMock(return_value=mock_chain)
-                product_facts, research_brief = await run_research_agent("/fake/codebase")
+                product_facts, competitor_profiles = await run_setup_research("/fake/codebase")
 
     assert "Users set daily learning time" in product_facts
-    assert "Duolingo" in research_brief
-    assert "Feynman technique" in research_brief
+    assert "Duolingo" in competitor_profiles
 
 
 async def test_seo_agent_returns_calendar_entries():
@@ -212,3 +203,164 @@ async def test_writing_agent_strips_em_dashes_from_saved_draft(tmp_data_dir, sam
     content = draft_path.read_text()
     assert "—" not in content
     assert "Learn fast, and remember more, every day." in content
+
+
+async def test_research_agent_run_market_research():
+    from agents.research_agent import run_market_research
+    from output_schemas import MarketBriefOutput, ContentOpportunityOutput
+
+    gathered_data = "Pain: no personalised pacing. Opportunity: Feynman for programmers."
+    fake_gather_result = {"messages": [AIMessage(content=gathered_data)]}
+
+    fake_synthesis = MarketBriefOutput(
+        pain_points=["no personalised pacing"],
+        content_opportunities=[
+            ContentOpportunityOutput(
+                angle="Feynman technique for programmers",
+                rationale="gap in competitor content",
+                target_audience="developers",
+            )
+        ],
+    )
+
+    with patch("agents.research_agent.create_react_agent") as mock_create:
+        mock_agent = AsyncMock()
+        mock_agent.ainvoke = AsyncMock(return_value=fake_gather_result)
+        mock_create.return_value = mock_agent
+
+        with patch("agents.research_agent.get_llm") as mock_llm_fn:
+            mock_llm = MagicMock()
+            mock_chain = MagicMock()
+            mock_chain.ainvoke = AsyncMock(return_value=fake_synthesis)
+            mock_llm.with_structured_output.return_value = mock_llm
+            mock_llm_fn.return_value = mock_llm
+
+            with patch("agents.research_agent.research_market_synthesis_prompt") as mock_prompt:
+                mock_prompt.__or__ = MagicMock(return_value=mock_chain)
+                market_brief = await run_market_research("**Duolingo** competitor profile")
+
+    assert "no personalised pacing" in market_brief
+    assert "Feynman technique for programmers" in market_brief
+
+
+async def test_orchestrator_setup(tmp_data_dir, monkeypatch):
+    from agents.orchestrator import run_setup
+    from services import file_service
+
+    monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "COMPETITOR_PROFILES_PATH", tmp_data_dir / "competitor_profiles.md")
+
+    with patch("agents.orchestrator.run_setup_research", new_callable=AsyncMock) as mock_setup:
+        mock_setup.return_value = ("- Users set daily learning time", "**Duolingo** (duolingo.com)")
+        await run_setup()
+
+    assert (tmp_data_dir / "product_facts.md").exists()
+    assert "Users set daily learning time" in (tmp_data_dir / "product_facts.md").read_text()
+    assert (tmp_data_dir / "competitor_profiles.md").exists()
+
+
+async def test_orchestrator_weekly_batch(tmp_data_dir, monkeypatch):
+    from agents.orchestrator import run_weekly_batch
+    from services import calendar_service, file_service
+
+    monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
+    monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "COMPETITOR_PROFILES_PATH", tmp_data_dir / "competitor_profiles.md")
+    monkeypatch.setattr(file_service, "MARKET_BRIEF_PATH", tmp_data_dir / "market_brief.md")
+
+    await file_service.write_text(tmp_data_dir / "product_facts.md", "- fact")
+    await file_service.write_text(tmp_data_dir / "competitor_profiles.md", "**Duolingo**")
+
+    from models.article import ArticleType, ContentCalendarEntry
+    fake_entries = [
+        ContentCalendarEntry(
+            id=f"article-{i}", title=f"Article {i}", primary_keyword=f"kw {i}",
+            article_type=ArticleType.standard, target_audience="learners",
+            angle="angle", meta_description="desc",
+        )
+        for i in range(4)
+    ]
+
+    with patch("agents.orchestrator.run_market_research", new_callable=AsyncMock) as mock_market:
+        mock_market.return_value = "## Market Brief\n- pain point"
+        with patch("agents.orchestrator.run_seo_agent", new_callable=AsyncMock) as mock_seo:
+            mock_seo.return_value = fake_entries
+            titles = await run_weekly_batch()
+
+    assert len(titles) == 4
+    assert (tmp_data_dir / "market_brief.md").exists()
+    calendar = await calendar_service.load_calendar()
+    assert len(calendar) == 4
+
+
+async def test_orchestrator_weekly_batch_auto_setup(tmp_data_dir, monkeypatch):
+    from agents.orchestrator import run_weekly_batch
+    from services import calendar_service, file_service
+
+    monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
+    monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "COMPETITOR_PROFILES_PATH", tmp_data_dir / "competitor_profiles.md")
+    monkeypatch.setattr(file_service, "MARKET_BRIEF_PATH", tmp_data_dir / "market_brief.md")
+
+    from models.article import ArticleType, ContentCalendarEntry
+    fake_entries = [
+        ContentCalendarEntry(
+            id=f"a-{i}", title=f"A {i}", primary_keyword=f"kw {i}",
+            article_type=ArticleType.standard, target_audience="learners",
+            angle="angle", meta_description="desc",
+        )
+        for i in range(4)
+    ]
+
+    with patch("agents.orchestrator.run_setup_research", new_callable=AsyncMock) as mock_setup:
+        mock_setup.return_value = ("- fact", "**Competitor**")
+        with patch("agents.orchestrator.run_market_research", new_callable=AsyncMock) as mock_market:
+            mock_market.return_value = "## Market Brief"
+            with patch("agents.orchestrator.run_seo_agent", new_callable=AsyncMock) as mock_seo:
+                mock_seo.return_value = fake_entries
+                titles = await run_weekly_batch()
+
+    mock_setup.assert_called_once()
+    assert len(titles) == 4
+
+
+async def test_orchestrator_article_mode_clean(tmp_data_dir, sample_calendar_entry, sample_product_facts, monkeypatch):
+    from agents.orchestrator import run_article
+    from services import calendar_service, file_service
+    from output_schemas import ArticleOutput, FactCheckOutput
+
+    monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
+    monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "DRAFTS_DIR", tmp_data_dir / "drafts")
+
+    await file_service.write_text(tmp_data_dir / "product_facts.md", sample_product_facts)
+    await calendar_service.add_entries([sample_calendar_entry])
+
+    fake_article = ArticleOutput(
+        title=sample_calendar_entry.title,
+        primary_keyword=sample_calendar_entry.primary_keyword,
+        meta_description=sample_calendar_entry.meta_description,
+        markdown_content="# Feynman Technique\n\nLearn anything.",
+    )
+    fake_fact_check = FactCheckOutput(passed=True, items=[])
+
+    with patch("agents.orchestrator.run_writing_agent", new_callable=AsyncMock) as mock_write:
+        mock_write.return_value = (tmp_data_dir / "drafts" / "draft.md", fake_article)
+        with patch("agents.orchestrator.run_fact_check_chain", new_callable=AsyncMock) as mock_fc:
+            mock_fc.return_value = fake_fact_check
+            status, draft_path = await run_article()
+
+    from models.article import ArticleStatus
+    assert status == ArticleStatus.ready_for_review
+    calendar = await calendar_service.load_calendar()
+    assert calendar[0].status == ArticleStatus.ready_for_review
+
+
+async def test_orchestrator_article_mode_no_planned(tmp_data_dir, monkeypatch):
+    from agents.orchestrator import run_article
+    from services import calendar_service
+
+    monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
+    status, draft_path = await run_article()
+    assert status is None
+    assert draft_path is None

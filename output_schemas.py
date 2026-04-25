@@ -66,3 +66,13 @@ class FactCheckItemOutput(_StrictModel):
 class FactCheckOutput(_StrictModel):
     passed: bool
     items: list[FactCheckItemOutput]
+
+
+class ResearchSetupOutput(_StrictModel):
+    product_facts: list[ProductFactOutput]
+    competitors: list[CompetitorOutput]
+
+
+class MarketBriefOutput(_StrictModel):
+    pain_points: list[str]
+    content_opportunities: list[ContentOpportunityOutput]

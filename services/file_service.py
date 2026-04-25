@@ -3,8 +3,9 @@ import aiofiles
 
 DATA_DIR = Path("data")
 DRAFTS_DIR = DATA_DIR / "drafts"
-RESEARCH_BRIEF_PATH = DATA_DIR / "research_brief.md"
 PRODUCT_FACTS_PATH = DATA_DIR / "product_facts.md"
+COMPETITOR_PROFILES_PATH = DATA_DIR / "competitor_profiles.md"
+MARKET_BRIEF_PATH = DATA_DIR / "market_brief.md"
 
 
 async def read_text(path: Path) -> str:

@@ -3,7 +3,7 @@ from langchain_core.messages import HumanMessage
 
 from models.article import ArticleType, ContentCalendarEntry
 from output_schemas import SEOOutput
-from prompts.seo import SEO_AGENT_SYSTEM_PROMPT, seo_synthesis_prompt
+from prompts.seo import SEO_AGENT_SYSTEM_PROMPT, SEO_KICKOFF, seo_synthesis_prompt
 from services.llm import get_llm
 from tools import tavily_search_tool, people_also_ask, google_trends
 
@@ -30,11 +30,7 @@ async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[Con
     agent = create_react_agent(get_llm(), tools=tools, state_modifier=SEO_AGENT_SYSTEM_PROMPT)
 
     result = await agent.ainvoke({
-        "messages": [HumanMessage(content=(
-            f"Research keywords and SERP data for 4 article ideas. "
-            f"Avoid these existing topics: {existing_ids or 'none'}. "
-            "Use People Also Ask and Google Trends to validate each idea."
-        ))]
+        "messages": [HumanMessage(content=SEO_KICKOFF.format(existing_ids=existing_ids or "none"))]
     })
     gathered_data = result["messages"][-1].content
 
