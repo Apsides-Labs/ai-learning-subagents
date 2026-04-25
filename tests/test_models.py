@@ -90,7 +90,8 @@ from output_schemas import (
     CompetitorOutput,
     ContentOpportunityOutput,
     ProductFactOutput,
-    ResearchOutput,
+    ResearchSetupOutput,
+    MarketBriefOutput,
     ArticlePlanOutput,
     SEOOutput,
     ArticleOutput,
@@ -112,8 +113,8 @@ def test_strict_model_rejects_extra_fields():
         )
 
 
-def test_research_output_valid():
-    output = ResearchOutput(
+def test_research_setup_output_valid():
+    output = ResearchSetupOutput(
         competitors=[
             CompetitorOutput(
                 name="Duolingo",
@@ -121,14 +122,6 @@ def test_research_output_valid():
                 positioning="gamified",
                 target_audience="casual",
                 content_gaps=["no custom topics"],
-            )
-        ],
-        pain_points=["no personalised pacing"],
-        content_opportunities=[
-            ContentOpportunityOutput(
-                angle="Feynman technique for programmers",
-                rationale="competitors don't cover this",
-                target_audience="developers",
             )
         ],
         product_facts=[
@@ -139,6 +132,22 @@ def test_research_output_valid():
         ],
     )
     assert len(output.competitors) == 1
+    assert len(output.product_facts) == 1
+
+
+def test_market_brief_output_valid():
+    output = MarketBriefOutput(
+        pain_points=["no personalised pacing"],
+        content_opportunities=[
+            ContentOpportunityOutput(
+                angle="Feynman technique for programmers",
+                rationale="competitors don't cover this",
+                target_audience="developers",
+            )
+        ],
+    )
+    assert len(output.pain_points) == 1
+    assert len(output.content_opportunities) == 1
 
 
 def test_fact_check_output_passed():

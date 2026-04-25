@@ -25,13 +25,6 @@ class ProductFactOutput(_StrictModel):
     source_file: str
 
 
-class ResearchOutput(_StrictModel):
-    competitors: list[CompetitorOutput]
-    pain_points: list[str]
-    content_opportunities: list[ContentOpportunityOutput]
-    product_facts: list[ProductFactOutput]
-
-
 class ArticlePlanOutput(_StrictModel):
     id: str
     title: str
