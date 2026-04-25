@@ -81,7 +81,7 @@ async def run_market_research(competitor_profiles: str) -> str:
     agent = create_react_agent(get_llm(), tools=tools, state_modifier=RESEARCH_MARKET_SYSTEM_PROMPT)
 
     result = await agent.ainvoke({
-        "messages": [HumanMessage(content=RESEARCH_MARKET_KICKOFF)]
+        "messages": [HumanMessage(content=f"COMPETITOR CONTEXT:\n{competitor_profiles}\n\n{RESEARCH_MARKET_KICKOFF}")]
     })
     gathered_data = result["messages"][-1].content
 
