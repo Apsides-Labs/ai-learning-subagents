@@ -20,8 +20,8 @@ How to rank candidates:
 
 # ARTICLE TYPES
 
-- **standard** — concept, strategy, or skill articles where the reader wants to *understand* something. Examples: a study technique, a learning principle, a habit framework. Ends with a soft Draft and Arc mention. No `cta_prompt` field needed.
-- **topic_teaser** — articles framed as "how to learn [specific topic] in [timeframe or context]" where the reader wants to *do* something and could plausibly enroll in a course on it. Ends with a direct CTA pointing to a course prompt. Requires a `cta_prompt` field — a one-sentence course request the reader could paste into Draft and Arc, e.g. *"Build me a 4-week plan to learn conversational Spanish for travel."*
+- **standard** — concept, strategy, or skill articles where the reader wants to *understand* something. Examples: a study technique, a learning principle, a habit framework. Ends with a soft Draft and Arc mention. No course prompt needed.
+- **topic_teaser** — articles framed as "how to learn [specific topic] in [timeframe or context]" where the reader wants to *do* something and could plausibly enroll in a course on it. Ends with a direct CTA pointing to a course prompt. Requires a one-sentence course request the reader could paste into Draft and Arc, e.g. *"Build me a 4-week plan to learn conversational Spanish for travel."*
 
 Mix required: exactly 2 standard + 2 topic_teaser. No exceptions.
 
