@@ -7,7 +7,7 @@ load_dotenv(Path(__file__).parent / ".env")
 
 class Settings(BaseSettings):
     openai_api_key: str
-    openai_model: str = "gpt-4o-mini"
+    openai_model: str = "gpt-5.4-mini"
     tavily_api_key: str
     serpapi_api_key: str
     codebase_path: str = "/Users/ilirgruda/Repo/Python/ai-learning"
