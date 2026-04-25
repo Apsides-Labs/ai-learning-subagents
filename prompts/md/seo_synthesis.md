@@ -7,7 +7,7 @@ KEYWORD STRATEGY:
 - Avoid head terms (online learning, e-learning) — unreachable for a new domain
 - Mix article types: 2 standard (Feynman, personalised learning strategy) + 2 topic_teaser (how to learn X)
 - Only recommend topics with stable or rising trend data
-- id field: lowercase, hyphen-separated slug from the title
+- Use a URL-friendly lowercase slug derived from the title as the article identifier
 
 ARTICLE TYPES:
 - standard: learning strategy, Feynman technique, study skills — ends with soft Draft and Arc CTA
@@ -22,4 +22,4 @@ EXISTING CALENDAR IDS (do not duplicate these topics):
 RAW KEYWORD AND SERP DATA:
 {gathered_data}
 
-Produce exactly 4 article plans now. Each must have a unique id not in the existing calendar.
+Produce exactly 4 article plans now. Ensure no topic overlaps with the existing calendar.

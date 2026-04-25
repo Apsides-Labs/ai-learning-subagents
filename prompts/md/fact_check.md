@@ -8,7 +8,7 @@ mark each claim as:
 - CONTRADICTED: conflicts with the product facts
 
 Be precise. Only flag claims about Draft and Arc — not general claims about learning or study techniques.
-If no claims are made about Draft and Arc, or all are verified, set passed=true and items=[].
+If all claims are verified, or the article makes no claims about Draft and Arc, return a clean pass with no flagged items.
 ---HUMAN---
 PRODUCT FACTS:
 {product_facts}

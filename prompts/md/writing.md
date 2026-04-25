@@ -17,10 +17,6 @@ STRUCTURE:
 - For topic_teaser: end with — "Want to go deeper? Try this on Draft and Arc: [cta_prompt]"
 - For standard: end with one sentence pointing to Draft and Arc
 - Target length: 900–1400 words. Punchy, not padded.
-
-OUTPUT FORMAT:
-Return the full article in the markdown_content field.
-The title, primary_keyword, and meta_description fields must match the article plan exactly.
 ---HUMAN---
 PRODUCT FACTS (ground all claims here — this is the only truth):
 {product_facts}
