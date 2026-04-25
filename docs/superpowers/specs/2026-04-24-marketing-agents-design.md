@@ -254,6 +254,8 @@ status: draft
 
 Target length: 900–1,400 words. Structure: hook → body (follows suggested headings, rewritten to sound human) → CTA.
 
+**Post-processing rule (applied before saving, not by the LLM):** All em dashes (`—`) are replaced with commas. Pattern: `\s*—\s*` → `, `. This runs on the markdown body only, not on frontmatter fields.
+
 ---
 
 ### Fact-Check Pass

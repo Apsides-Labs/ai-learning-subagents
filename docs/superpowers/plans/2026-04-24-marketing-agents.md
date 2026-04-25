@@ -1895,7 +1895,7 @@ git commit -m "feat: SEO agent — create_react_agent + LCEL synthesis → Conte
 - Create: `agents/writing_agent.py`
 - Modify: `tests/test_agents.py`
 
-- [ ] **Step 1: Write failing test — append to `tests/test_agents.py`**
+- [ ] **Step 1: Write failing tests — append to `tests/test_agents.py`**
 
 ```python
 async def test_writing_agent_saves_draft(tmp_data_dir, sample_calendar_entry, sample_product_facts):
@@ -1919,12 +1919,59 @@ async def test_writing_agent_saves_draft(tmp_data_dir, sample_calendar_entry, sa
     assert "title:" in content
     assert "The Feynman Technique" in content
     assert article.markdown_content == fake_article.markdown_content
+
+
+def test_remove_em_dashes_space_both_sides():
+    from agents.writing_agent import _remove_em_dashes
+    assert _remove_em_dashes("learning — which") == "learning, which"
+
+
+def test_remove_em_dashes_no_spaces():
+    from agents.writing_agent import _remove_em_dashes
+    assert _remove_em_dashes("learning—which") == "learning, which"
+
+
+def test_remove_em_dashes_space_before_only():
+    from agents.writing_agent import _remove_em_dashes
+    assert _remove_em_dashes("learning —which") == "learning, which"
+
+
+def test_remove_em_dashes_multiple():
+    from agents.writing_agent import _remove_em_dashes
+    result = _remove_em_dashes("fast — effective — proven")
+    assert result == "fast, effective, proven"
+
+
+def test_remove_em_dashes_no_emdash():
+    from agents.writing_agent import _remove_em_dashes
+    assert _remove_em_dashes("no emdash here") == "no emdash here"
+
+
+async def test_writing_agent_strips_em_dashes_from_saved_draft(tmp_data_dir, sample_calendar_entry, sample_product_facts):
+    from agents.writing_agent import run_writing_agent
+    from output_schemas import ArticleOutput
+
+    fake_article = ArticleOutput(
+        title=sample_calendar_entry.title,
+        primary_keyword=sample_calendar_entry.primary_keyword,
+        meta_description=sample_calendar_entry.meta_description,
+        markdown_content="Learn fast — and remember more — every day.",
+    )
+
+    with patch("agents.writing_agent.run_writing_chain", new_callable=AsyncMock) as mock_chain:
+        mock_chain.return_value = fake_article
+        with patch("agents.writing_agent.DRAFTS_DIR", tmp_data_dir / "drafts"):
+            draft_path, _ = await run_writing_agent(sample_calendar_entry, sample_product_facts)
+
+    content = draft_path.read_text()
+    assert "—" not in content
+    assert "Learn fast, and remember more, every day." in content
 ```
 
 - [ ] **Step 2: Run to confirm failure**
 
 ```bash
-uv run pytest tests/test_agents.py::test_writing_agent_saves_draft -v
+uv run pytest tests/test_agents.py -k "writing_agent or em_dash" -v
 ```
 
 Expected: `ImportError`.
@@ -1932,6 +1979,7 @@ Expected: `ImportError`.
 - [ ] **Step 3: Create `agents/writing_agent.py`**
 
 ```python
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -1939,6 +1987,11 @@ from chains.writing_chain import run_writing_chain
 from models.article import ContentCalendarEntry
 from output_schemas import ArticleOutput
 from services.file_service import DRAFTS_DIR, write_text
+
+
+def _remove_em_dashes(text: str) -> str:
+    """Replace em dashes (with any surrounding spaces) with a comma and single space."""
+    return re.sub(r'\s*—\s*', ', ', text)
 
 
 def _build_frontmatter(article: ArticleOutput) -> str:
@@ -1959,12 +2012,14 @@ async def run_writing_agent(
     """Write one article. Returns (draft_path, ArticleOutput)."""
     article = await run_writing_chain(entry, product_facts)
 
+    clean_content = _remove_em_dashes(article.markdown_content)
+
     slug = entry.id
     date_str = datetime.now().strftime("%Y-%m-%d")
     filename = f"{date_str}-{slug}.md"
     draft_path = DRAFTS_DIR / filename
 
-    full_content = _build_frontmatter(article) + article.markdown_content
+    full_content = _build_frontmatter(article) + clean_content
     await write_text(draft_path, full_content)
 
     return draft_path, article
