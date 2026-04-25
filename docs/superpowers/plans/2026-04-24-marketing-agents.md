@@ -2042,50 +2042,361 @@ git commit -m "feat: writing agent — calls writing chain, saves markdown draft
 
 ---
 
-## Task 12: Orchestrator
+## Task 12: Orchestrator + Research Agent Split + Prompts Kick-off
+
+**Design change from original plan:** Research Agent is split into two functions with different cadences. Prompts kick-off messages move to `prompts/` modules. Three CLI modes instead of two.
 
 **Files:**
+- Modify: `output_schemas.py` — add `ResearchSetupOutput`, `MarketBriefOutput`
+- Modify: `services/file_service.py` — add `COMPETITOR_PROFILES_PATH`, `MARKET_BRIEF_PATH`; remove `RESEARCH_BRIEF_PATH`
+- Create: `prompts/md/research_setup_synthesis.md`, `prompts/md/research_market_synthesis.md`
+- Modify: `prompts/research.py` — split prompts + add kick-off constants
+- Modify: `prompts/seo.py` — add SEO kick-off constant
+- Modify: `agents/research_agent.py` — split into `run_setup_research()` + `run_market_research()`
+- Modify: `agents/seo_agent.py` — use kick-off constant from prompts
 - Create: `agents/orchestrator.py`
-- Modify: `tests/test_agents.py`
+- Modify: `tests/test_agents.py` — update research agent tests + add orchestrator tests
 
-- [ ] **Step 1: Write failing tests — append to `tests/test_agents.py`**
+---
+
+**Step 1: Add two new output schemas to `output_schemas.py` (append):**
 
 ```python
+class ResearchSetupOutput(_StrictModel):
+    product_facts: list[ProductFactOutput]
+    competitors: list[CompetitorOutput]
+
+
+class MarketBriefOutput(_StrictModel):
+    pain_points: list[str]
+    content_opportunities: list[ContentOpportunityOutput]
+```
+
+**Step 2: Update `services/file_service.py` — add new paths, remove old `RESEARCH_BRIEF_PATH`:**
+
+```python
+from pathlib import Path
+import aiofiles
+
+DATA_DIR = Path("data")
+DRAFTS_DIR = DATA_DIR / "drafts"
+PRODUCT_FACTS_PATH = DATA_DIR / "product_facts.md"
+COMPETITOR_PROFILES_PATH = DATA_DIR / "competitor_profiles.md"
+MARKET_BRIEF_PATH = DATA_DIR / "market_brief.md"
+
+
+async def read_text(path: Path) -> str:
+    async with aiofiles.open(path, "r", encoding="utf-8") as f:
+        return await f.read()
+
+
+async def write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    async with aiofiles.open(path, "w", encoding="utf-8") as f:
+        await f.write(content)
+```
+
+**Step 3: Create `prompts/md/research_setup_synthesis.md`:**
+
+```
+You are synthesising the results of a setup research session for Draft and Arc.
+You have gathered data about the product codebase and competitor pages.
+
+PRODUCT FACTS RULES:
+- Only include features found in actual code files — never infer or guess
+- Write facts as short, concrete statements: "Users set daily learning time (default: 20 minutes)"
+- Include the source file for every fact
+- Do NOT include features marked as TODO or out of scope in the code
+- NOT included: video, audio, images, external resource links (marked out of scope in code)
+
+COMPETITOR PROFILE RULES:
+- One profile per competitor actually found/crawled
+- Include: name, url, positioning, target_audience, content_gaps
+- content_gaps: specific topics or angles the competitor does NOT cover well
+---HUMAN---
+CODEBASE PATH: {codebase_path}
+
+RAW DATA GATHERED:
+{gathered_data}
+
+Produce the full structured output now. Include all product facts found in the codebase and all competitor profiles crawled.
+```
+
+**Step 4: Create `prompts/md/research_market_synthesis.md`:**
+
+```
+You are synthesising the results of a market research session for Draft and Arc.
+You have searched for current user pain points, market trends, and content opportunities.
+
+PAIN POINTS: what users complain about with existing learning tools — specific, sourced from real discussions.
+CONTENT OPPORTUNITIES: specific angles where Draft and Arc can rank and stand out — tied to real pain points and competitor gaps.
+---HUMAN---
+COMPETITOR CONTEXT:
+{competitor_profiles}
+
+RAW MARKET DATA GATHERED:
+{gathered_data}
+
+Produce the full structured output now. Pain points should be concrete user complaints. Content opportunities should be specific and actionable.
+```
+
+**Step 5: Rewrite `prompts/research.py`:**
+
+```python
+from prompts.loader import load_prompt
+
+RESEARCH_SETUP_SYSTEM_PROMPT = """You are the Setup Research Agent for Draft and Arc, an AI-powered personalized learning platform.
+Your job: extract verified product facts from the codebase AND build competitor profiles by crawling their pages.
+
+TOOLS AVAILABLE:
+- read_codebase_file: read a specific file from the Draft and Arc codebase
+- list_codebase_files: list Python files in the codebase to discover what to read
+- jina_reader: read the text content of any URL (for competitor pages)
+- tavily_search: search the web to discover new competitors
+
+WORKFLOW:
+1. List and read app/models/, app/ai/chains/, app/routers/ — extract real features only
+2. For each competitor in the seed list, use jina_reader on their homepage and features page
+3. Search for new competitors in the AI-native personalized learning space
+4. When done, summarise ALL findings.
+
+Competitor seed list: alice.tech, 360Learning, Docebo, Sana Labs, Absorb LMS, Duolingo, Coursera, Pearson, Arist, 5Mins.ai
+Never guess about product features. Only include what you read in the code."""
+
+RESEARCH_SETUP_KICKOFF = (
+    "Read the codebase at {codebase_path} and crawl all competitor pages. "
+    "Extract product facts from the code and build profiles for all competitors."
+)
+
+RESEARCH_MARKET_SYSTEM_PROMPT = """You are the Market Research Agent for Draft and Arc.
+Your job: find current user pain points with existing learning tools and identify content opportunities.
+
+TOOLS AVAILABLE:
+- tavily_search: search the web for forums, Reddit, reviews, and discussions
+
+WORKFLOW:
+1. Search for complaints and pain points about: online learning platforms, e-learning tools, Duolingo, Coursera, LMS tools
+2. Search for trending questions in the self-directed learning and study skills space
+3. Look for underserved content gaps — topics where existing content is thin or outdated
+4. When done, summarise ALL findings.
+
+Focus on what real users are saying right now — not general assumptions."""
+
+RESEARCH_MARKET_KICKOFF = (
+    "Search for current user pain points with learning tools and identify content opportunities "
+    "in the personalized learning market. Use the competitor context provided."
+)
+
+research_setup_synthesis_prompt = load_prompt("research_setup_synthesis.md")
+research_market_synthesis_prompt = load_prompt("research_market_synthesis.md")
+```
+
+**Step 6: Update `prompts/seo.py` — add kick-off constant:**
+
+```python
+from prompts.loader import load_prompt
+
+SEO_AGENT_SYSTEM_PROMPT = """You are the SEO Agent for Draft and Arc. You research keywords and plan articles.
+
+TOOLS AVAILABLE:
+- tavily_search: search the web and see what's ranking for a keyword
+- people_also_ask: get People Also Ask questions from Google for a query
+- google_trends: check if interest in a keyword is rising, stable, or falling
+
+WORKFLOW:
+1. Read the research context to understand content opportunities and competitor gaps
+2. For each opportunity, use tavily_search to see existing content and competition level
+3. Use people_also_ask to find real user questions (long-tail keyword gold)
+4. Use google_trends to verify interest is stable or rising
+5. When you have data for 4+ article ideas, respond with a summary of ALL findings.
+
+Target long-tail, low-competition, informational queries only."""
+
+SEO_KICKOFF = (
+    "Research keywords and SERP data for 4 article ideas based on the context provided. "
+    "Avoid these existing topics: {existing_ids}. "
+    "Use People Also Ask and Google Trends to validate each idea."
+)
+
+seo_synthesis_prompt = load_prompt("seo_synthesis.md")
+```
+
+**Step 7: Rewrite `agents/research_agent.py`:**
+
+```python
+from langgraph.prebuilt import create_react_agent
+from langchain_core.messages import HumanMessage
+
+from output_schemas import ResearchSetupOutput, MarketBriefOutput
+from prompts.research import (
+    RESEARCH_SETUP_SYSTEM_PROMPT, RESEARCH_SETUP_KICKOFF,
+    RESEARCH_MARKET_SYSTEM_PROMPT, RESEARCH_MARKET_KICKOFF,
+    research_setup_synthesis_prompt, research_market_synthesis_prompt,
+)
+from services.llm import get_llm
+from tools import jina_reader, tavily_search_tool, list_codebase_files, read_codebase_file
+
+
+def _format_product_facts(output: ResearchSetupOutput) -> str:
+    lines = ["## Draft and Arc — Product Facts\n"]
+    for fact in output.product_facts:
+        lines.append(f"- {fact.fact}  *(source: {fact.source_file})*")
+    return "\n".join(lines)
+
+
+def _format_competitor_profiles(output: ResearchSetupOutput) -> str:
+    sections = ["## Competitor Profiles\n"]
+    for c in output.competitors:
+        sections.append(f"**{c.name}** ({c.url})")
+        sections.append(f"- Positioning: {c.positioning}")
+        sections.append(f"- Target audience: {c.target_audience}")
+        sections.append(f"- Content gaps: {', '.join(c.content_gaps)}\n")
+    return "\n".join(sections)
+
+
+def _format_market_brief(output: MarketBriefOutput) -> str:
+    sections = ["## Market Brief\n", "### Pain Points\n"]
+    for pain in output.pain_points:
+        sections.append(f"- {pain}")
+    sections.append("\n### Content Opportunities\n")
+    for opp in output.content_opportunities:
+        sections.append(f"**{opp.angle}**")
+        sections.append(f"- Why: {opp.rationale}")
+        sections.append(f"- Audience: {opp.target_audience}\n")
+    return "\n".join(sections)
+
+
+async def run_setup_research(codebase_path: str) -> tuple[str, str]:
+    """Extract product facts + build competitor profiles. Returns (product_facts_md, competitor_profiles_md)."""
+    tools = [jina_reader, tavily_search_tool, list_codebase_files, read_codebase_file]
+    agent = create_react_agent(get_llm(), tools=tools, state_modifier=RESEARCH_SETUP_SYSTEM_PROMPT)
+
+    result = await agent.ainvoke({
+        "messages": [HumanMessage(content=RESEARCH_SETUP_KICKOFF.format(codebase_path=codebase_path))]
+    })
+    gathered_data = result["messages"][-1].content
+
+    chain = research_setup_synthesis_prompt | get_llm().with_structured_output(ResearchSetupOutput, method="function_calling")
+    output: ResearchSetupOutput = await chain.ainvoke({
+        "codebase_path": codebase_path,
+        "gathered_data": gathered_data,
+    })
+
+    return _format_product_facts(output), _format_competitor_profiles(output)
+
+
+async def run_market_research(competitor_profiles: str) -> str:
+    """Search for current pain points and content opportunities. Returns market_brief_md."""
+    tools = [tavily_search_tool]
+    agent = create_react_agent(get_llm(), tools=tools, state_modifier=RESEARCH_MARKET_SYSTEM_PROMPT)
+
+    result = await agent.ainvoke({
+        "messages": [HumanMessage(content=RESEARCH_MARKET_KICKOFF)]
+    })
+    gathered_data = result["messages"][-1].content
+
+    chain = research_market_synthesis_prompt | get_llm().with_structured_output(MarketBriefOutput, method="function_calling")
+    output: MarketBriefOutput = await chain.ainvoke({
+        "competitor_profiles": competitor_profiles,
+        "gathered_data": gathered_data,
+    })
+
+    return _format_market_brief(output)
+```
+
+**Step 8: Update `agents/seo_agent.py` — use kick-off constant:**
+
+In `run_seo_agent`, replace the hardcoded `HumanMessage` string with:
+
+```python
+from prompts.seo import SEO_AGENT_SYSTEM_PROMPT, SEO_KICKOFF, seo_synthesis_prompt
+
+# replace the HumanMessage line with:
+HumanMessage(content=SEO_KICKOFF.format(existing_ids=existing_ids or "none"))
+```
+
+**Step 9: Write failing orchestrator tests — append to `tests/test_agents.py`:**
+
+```python
+async def test_orchestrator_setup(tmp_data_dir, monkeypatch):
+    from agents.orchestrator import run_setup
+    from services import file_service
+
+    monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "COMPETITOR_PROFILES_PATH", tmp_data_dir / "competitor_profiles.md")
+
+    with patch("agents.orchestrator.run_setup_research", new_callable=AsyncMock) as mock_setup:
+        mock_setup.return_value = ("- Users set daily learning time", "**Duolingo** (duolingo.com)")
+        await run_setup()
+
+    assert (tmp_data_dir / "product_facts.md").exists()
+    assert "Users set daily learning time" in (tmp_data_dir / "product_facts.md").read_text()
+    assert (tmp_data_dir / "competitor_profiles.md").exists()
+
+
 async def test_orchestrator_weekly_batch(tmp_data_dir, monkeypatch):
     from agents.orchestrator import run_weekly_batch
     from services import calendar_service, file_service
 
     monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
-    monkeypatch.setattr(file_service, "RESEARCH_BRIEF_PATH", tmp_data_dir / "research_brief.md")
     monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "COMPETITOR_PROFILES_PATH", tmp_data_dir / "competitor_profiles.md")
+    monkeypatch.setattr(file_service, "MARKET_BRIEF_PATH", tmp_data_dir / "market_brief.md")
 
-    fake_facts = "- Users set daily learning time"
-    fake_brief = "Competitors: Duolingo"
+    await file_service.write_text(tmp_data_dir / "product_facts.md", "- fact")
+    await file_service.write_text(tmp_data_dir / "competitor_profiles.md", "**Duolingo**")
+
     from models.article import ArticleType, ContentCalendarEntry
     fake_entries = [
         ContentCalendarEntry(
-            id=f"article-{i}",
-            title=f"Article {i}",
-            primary_keyword=f"keyword {i}",
-            article_type=ArticleType.standard,
-            target_audience="learners",
-            angle="angle",
-            meta_description="desc",
+            id=f"article-{i}", title=f"Article {i}", primary_keyword=f"kw {i}",
+            article_type=ArticleType.standard, target_audience="learners",
+            angle="angle", meta_description="desc",
         )
         for i in range(4)
     ]
 
-    with patch("agents.orchestrator.run_research_agent", new_callable=AsyncMock) as mock_research:
-        mock_research.return_value = (fake_facts, fake_brief)
+    with patch("agents.orchestrator.run_market_research", new_callable=AsyncMock) as mock_market:
+        mock_market.return_value = "## Market Brief\n- pain point"
         with patch("agents.orchestrator.run_seo_agent", new_callable=AsyncMock) as mock_seo:
             mock_seo.return_value = fake_entries
             titles = await run_weekly_batch()
 
     assert len(titles) == 4
+    assert (tmp_data_dir / "market_brief.md").exists()
     calendar = await calendar_service.load_calendar()
     assert len(calendar) == 4
-    facts = (tmp_data_dir / "product_facts.md").read_text()
-    assert "Users set daily learning time" in facts
+
+
+async def test_orchestrator_weekly_batch_auto_setup(tmp_data_dir, monkeypatch):
+    from agents.orchestrator import run_weekly_batch
+    from services import calendar_service, file_service
+
+    monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
+    monkeypatch.setattr(file_service, "PRODUCT_FACTS_PATH", tmp_data_dir / "product_facts.md")
+    monkeypatch.setattr(file_service, "COMPETITOR_PROFILES_PATH", tmp_data_dir / "competitor_profiles.md")
+    monkeypatch.setattr(file_service, "MARKET_BRIEF_PATH", tmp_data_dir / "market_brief.md")
+
+    from models.article import ArticleType, ContentCalendarEntry
+    fake_entries = [
+        ContentCalendarEntry(
+            id=f"a-{i}", title=f"A {i}", primary_keyword=f"kw {i}",
+            article_type=ArticleType.standard, target_audience="learners",
+            angle="angle", meta_description="desc",
+        )
+        for i in range(4)
+    ]
+
+    with patch("agents.orchestrator.run_setup_research", new_callable=AsyncMock) as mock_setup:
+        mock_setup.return_value = ("- fact", "**Competitor**")
+        with patch("agents.orchestrator.run_market_research", new_callable=AsyncMock) as mock_market:
+            mock_market.return_value = "## Market Brief"
+            with patch("agents.orchestrator.run_seo_agent", new_callable=AsyncMock) as mock_seo:
+                mock_seo.return_value = fake_entries
+                titles = await run_weekly_batch()
+
+    mock_setup.assert_called_once()
+    assert len(titles) == 4
 
 
 async def test_orchestrator_article_mode_clean(tmp_data_dir, sample_calendar_entry, sample_product_facts, monkeypatch):
@@ -2112,8 +2423,7 @@ async def test_orchestrator_article_mode_clean(tmp_data_dir, sample_calendar_ent
         mock_write.return_value = (tmp_data_dir / "drafts" / "draft.md", fake_article)
         with patch("agents.orchestrator.run_fact_check_chain", new_callable=AsyncMock) as mock_fc:
             mock_fc.return_value = fake_fact_check
-            with patch("agents.writing_agent.DRAFTS_DIR", tmp_data_dir / "drafts"):
-                status, draft_path = await run_article()
+            status, draft_path = await run_article()
 
     from models.article import ArticleStatus
     assert status == ArticleStatus.ready_for_review
@@ -2131,21 +2441,18 @@ async def test_orchestrator_article_mode_no_planned(tmp_data_dir, monkeypatch):
     assert draft_path is None
 ```
 
-- [ ] **Step 2: Run to confirm failure**
-
+**Step 10: Run to confirm failure:**
 ```bash
 uv run pytest tests/test_agents.py -k "orchestrator" -v
 ```
 
-Expected: `ImportError`.
-
-- [ ] **Step 3: Create `agents/orchestrator.py`**
+**Step 11: Create `agents/orchestrator.py`:**
 
 ```python
 from pathlib import Path
 from typing import Optional
 
-from agents.research_agent import run_research_agent
+from agents.research_agent import run_setup_research, run_market_research
 from agents.seo_agent import run_seo_agent
 from agents.writing_agent import run_writing_agent
 from chains.fact_check_chain import run_fact_check_chain
@@ -2154,16 +2461,27 @@ from models.article import ArticleStatus
 from services import calendar_service, file_service
 
 
-async def run_weekly_batch() -> list[str]:
-    """Run the weekly batch: research → SEO → populate calendar. Returns planned article titles."""
-    product_facts, research_brief = await run_research_agent(settings.codebase_path)
+async def run_setup() -> None:
+    """Extract product facts + crawl competitors. Run once, or when product/competitors change."""
+    product_facts, competitor_profiles = await run_setup_research(settings.codebase_path)
     await file_service.write_text(file_service.PRODUCT_FACTS_PATH, product_facts)
-    await file_service.write_text(file_service.RESEARCH_BRIEF_PATH, research_brief)
+    await file_service.write_text(file_service.COMPETITOR_PROFILES_PATH, competitor_profiles)
+
+
+async def run_weekly_batch() -> list[str]:
+    """Refresh market data + plan 4 articles. Returns planned article titles."""
+    if not file_service.PRODUCT_FACTS_PATH.exists() or not file_service.COMPETITOR_PROFILES_PATH.exists():
+        await run_setup()
+
+    competitor_profiles = await file_service.read_text(file_service.COMPETITOR_PROFILES_PATH)
+    market_brief = await run_market_research(competitor_profiles)
+    await file_service.write_text(file_service.MARKET_BRIEF_PATH, market_brief)
 
     existing = await calendar_service.load_calendar()
     existing_ids = {e.id for e in existing}
 
-    new_entries = await run_seo_agent(research_brief, existing_ids)
+    research_context = competitor_profiles + "\n\n" + market_brief
+    new_entries = await run_seo_agent(research_context, existing_ids)
     await calendar_service.add_entries(new_entries)
 
     return [e.title for e in new_entries]
@@ -2176,11 +2494,8 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path]]:
         return None, None
 
     await calendar_service.update_status(entry.id, ArticleStatus.in_progress)
-
     product_facts = await file_service.read_text(file_service.PRODUCT_FACTS_PATH)
-
     draft_path, article = await run_writing_agent(entry, product_facts)
-
     fact_check = await run_fact_check_chain(product_facts, article.markdown_content)
 
     if fact_check.passed:
@@ -2197,19 +2512,19 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path]]:
     return final_status, draft_path
 ```
 
-- [ ] **Step 4: Run all agent tests — verify they pass**
+**Step 12: Update `tests/test_agents.py` — patch the existing research agent test to use the new function name:**
 
+Replace `run_research_agent` with `run_setup_research` in the existing test.
+
+**Step 13: Run all agent tests — verify they pass:**
 ```bash
 uv run pytest tests/test_agents.py -v
 ```
 
-Expected: 6 tests pass.
-
-- [ ] **Step 5: Commit**
-
+**Step 14: Commit:**
 ```bash
-git add agents/orchestrator.py tests/test_agents.py
-git commit -m "feat: orchestrator — weekly batch and per-article modes with fact-check lifecycle"
+git add agents/ services/file_service.py output_schemas.py prompts/ tests/test_agents.py
+git commit -m "feat: split research agent into setup + market, three orchestrator modes, prompts kick-off constants"
 ```
 
 ---
@@ -2219,13 +2534,11 @@ git commit -m "feat: orchestrator — weekly batch and per-article modes with fa
 **Files:**
 - Modify: `main.py`
 
-- [ ] **Step 1: Rewrite `main.py`**
+- [ ] **Step 1: Rewrite `main.py`:**
 
 ```python
 import argparse
 import asyncio
-import sys
-from pathlib import Path
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -2234,27 +2547,36 @@ def _build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  uv run python main.py --mode weekly     Run research + SEO, populate content calendar
+  uv run python main.py --mode setup      First-time setup: extract product facts + crawl competitors
+  uv run python main.py --mode weekly     Refresh market data + plan 4 articles
   uv run python main.py --mode article    Write the next planned article
         """,
     )
     parser.add_argument(
         "--mode",
-        choices=["weekly", "article"],
+        choices=["setup", "weekly", "article"],
         required=True,
-        help="weekly: research + SEO batch | article: write next planned draft",
+        help="setup: product facts + competitors | weekly: market refresh + SEO | article: write draft",
     )
     return parser
 
 
+async def _run_setup() -> None:
+    from agents.orchestrator import run_setup
+    print("Running setup: extracting product facts and crawling competitors...")
+    await run_setup()
+    print("Done. product_facts.md and competitor_profiles.md written to data/")
+    print("Run --mode weekly next to plan articles.")
+
+
 async def _run_weekly() -> None:
     from agents.orchestrator import run_weekly_batch
-    print("Running weekly batch: research → SEO → content calendar...")
+    print("Running weekly batch: market research → SEO → content calendar...")
     titles = await run_weekly_batch()
-    print(f"\n{len(titles)} articles planned for this week:")
+    print(f"\n{len(titles)} articles planned:")
     for i, title in enumerate(titles, 1):
         print(f"  {i}. {title}")
-    print("\nRun `--mode article` to write each draft.")
+    print("\nRun --mode article to write each draft.")
 
 
 async def _run_article() -> None:
@@ -2264,13 +2586,13 @@ async def _run_article() -> None:
     status, draft_path = await run_article()
     if status is None:
         print("No planned articles in the content calendar.")
-        print("Run `--mode weekly` first to populate the calendar.")
+        print("Run --mode weekly first to populate the calendar.")
         return
     if status == ArticleStatus.ready_for_review:
         print(f"\nDraft ready for review: {draft_path}")
         print("Review, then publish to your blog and import to Medium with canonical URL.")
     else:
-        print(f"\nDraft has flagged claims (needs human review): {draft_path}")
+        print(f"\nDraft has flagged claims — review before publishing: {draft_path}")
         print("Fact-check flags appended to the end of the draft file.")
 
 
@@ -2278,7 +2600,9 @@ def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
 
-    if args.mode == "weekly":
+    if args.mode == "setup":
+        asyncio.run(_run_setup())
+    elif args.mode == "weekly":
         asyncio.run(_run_weekly())
     elif args.mode == "article":
         asyncio.run(_run_article())
@@ -2288,45 +2612,21 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 2: Verify CLI help works**
-
+- [ ] **Step 2: Verify CLI help works:**
 ```bash
 uv run python main.py --help
 ```
+Expected: shows `{setup,weekly,article}` as choices.
 
-Expected output:
-```
-usage: main.py [-h] --mode {weekly,article}
-
-Draft and Arc marketing agent system
-
-options:
-  -h, --help            show this help message and exit
-  --mode {weekly,article}
-                        weekly: research + SEO batch | article: write next planned draft
-```
-
-- [ ] **Step 3: Verify CLI validation works**
-
-```bash
-uv run python main.py --mode invalid 2>&1 | head -3
-```
-
-Expected: `error: argument --mode: invalid choice: 'invalid'`
-
-- [ ] **Step 4: Run full test suite to confirm nothing is broken**
-
+- [ ] **Step 3: Run full test suite:**
 ```bash
 uv run pytest -v
 ```
 
-Expected: all tests pass.
-
-- [ ] **Step 5: Commit**
-
+- [ ] **Step 4: Commit:**
 ```bash
 git add main.py
-git commit -m "feat: CLI entry point — --mode weekly | article with asyncio.run"
+git commit -m "feat: CLI — add --mode setup alongside weekly and article"
 ```
 
 ---

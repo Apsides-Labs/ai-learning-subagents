@@ -128,12 +128,20 @@ All agents communicate through files on disk — no live inter-agent messaging.
 
 ```
 data/
-├── research_brief.md        # Market intelligence: competitors, pain points, content angles
-├── product_facts.md         # Verified product features extracted from codebase only
+├── product_facts.md         # Static: verified product features from codebase — update when features ship
+├── competitor_profiles.md   # Static: competitor analysis from crawling — update when you want fresh intel
+├── market_brief.md          # Fresh: pain points, trends, content opportunities — refreshed weekly
 ├── content_calendar.json    # Article queue with status tracking
 └── drafts/
     └── YYYY-MM-DD-slug.md   # One file per article, includes frontmatter + fact-check results
 ```
+
+### Why three research files
+
+Product features and competitor profiles change slowly (monthly at most). Market pain points and content opportunities change faster. Running a full competitor crawl every week wastes API calls on data that hasn't changed. The three-file split lets you:
+- Re-run market research weekly (fast, always fresh)
+- Re-run setup research manually when you ship features or want new competitor intel
+- Never re-crawl just to get fresh pain point data
 
 ### content_calendar.json entry schema
 
@@ -180,16 +188,23 @@ Topic teaser articles are a dual-purpose content type: they rank for topic-speci
 
 ### Orchestrator
 
-Coordinates the workflow. Runs in two modes:
+Coordinates the workflow. Runs in three modes:
 
-**Weekly Batch Mode:**
-1. Invoke Research Agent → updates `research_brief.md` and `product_facts.md`
-2. Invoke SEO Agent → adds 4 new entries to `content_calendar.json`
-3. Report the 4 planned article titles to the user
+**Setup Mode** (`--mode setup`) — run once, or any time you ship features / want fresh competitor data:
+1. Invoke `run_setup_research(codebase_path)` → reads codebase + crawls competitors
+2. Writes `product_facts.md` + `competitor_profiles.md`
+3. Reports what was extracted
 
-**Per-Article Mode:**
+**Weekly Batch Mode** (`--mode weekly`) — run every week:
+1. If `product_facts.md` or `competitor_profiles.md` missing → auto-run setup first
+2. Invoke `run_market_research()` → searches for current pain points, trends, opportunities
+3. Writes `market_brief.md`
+4. Invoke SEO Agent (reads `market_brief.md` + `competitor_profiles.md`) → adds 4 entries to `content_calendar.json`
+5. Reports the 4 planned article titles
+
+**Per-Article Mode** (`--mode article`) — run once per article:
 1. Pick the next `planned` entry from `content_calendar.json`
-2. Invoke Writing Agent
+2. Invoke Writing Agent (uses `product_facts.md`)
 3. Invoke Fact-Check Pass on the resulting draft
 4. Update article status and notify user the draft is ready
 
@@ -199,22 +214,31 @@ Never publishes. Job ends when draft is in the user's hands.
 
 ### Research Agent
 
-Runs weekly. Produces two files other agents depend on.
+Split into two functions with different cadences:
+
+**`run_setup_research(codebase_path)`** — run once, trigger manually when product changes or competitors change:
+- Tools: `read_codebase_file`, `list_codebase_files`, `jina_reader`, `tavily_search_tool`
+- Reads actual codebase files to extract product facts (never guesses)
+- Crawls competitor homepages and feature pages via Jina Reader
+- Produces `product_facts.md` and `competitor_profiles.md`
 
 **product_facts.md rules:**
-- Every fact must be traceable to a file in `/Users/ilirgruda/Repo/Python/ai-learning`
-- Facts are short, concrete statements — no marketing interpretation
-- Features marked TODO or out of scope in the code are excluded
-- Known real features to extract: course creation (prompt or PDF), knowledge levels (beginner/intermediate/advanced), daily learning time setting, course duration in days, lesson types (concept/workshop/case_study/problem_set/project/deep_dive), learning domains (conceptual/procedural/technical/creative/physical/language/analytical), Feynman technique, quiz assessments, progress tracking, time tracking per lesson, note-taking, Google OAuth, document RAG (PDF → vector search → lesson context)
-- NOT included: video, audio, images, external resource links (explicitly out of scope in codebase)
+- Every fact must be traceable to a file in the codebase
+- Short, concrete statements only — no marketing interpretation
+- Features marked TODO or out of scope in code are excluded
+- Known real features: course creation (prompt or PDF), knowledge levels, daily time setting, course duration, lesson types, learning domains, Feynman technique, quiz assessments, progress tracking, time tracking, note-taking, Google OAuth, document RAG
+- NOT included: video, audio, images, external resource links (out of scope in code)
 
-**research_brief.md sections:**
-1. Competitor analysis (Jina AI Reader on each competitor's homepage, features page, and 2–3 blog posts)
-2. Market pain points (Brave Search: forums, Reddit, reviews)
-3. Content opportunities (gaps competitors aren't covering, underserved audiences, weak existing answers)
+**competitor_profiles.md:** one entry per competitor — positioning, target audience, content gaps.
 
-**Competitor seed list:** alice.tech, 360Learning, Docebo, Sana Labs, Absorb LMS, Duolingo, Coursera, Pearson, Arist, 5Mins.ai  
-Agent also discovers new competitors via web search.
+**`run_market_research()`** — run weekly, always fresh:
+- Tools: `tavily_search_tool`
+- Searches for current user pain points (forums, Reddit, reviews)
+- Finds content opportunities and underserved angles
+- Reads existing `competitor_profiles.md` as context
+- Produces `market_brief.md` (pain points + content opportunities)
+
+**Competitor seed list:** alice.tech, 360Learning, Docebo, Sana Labs, Absorb LMS, Duolingo, Coursera, Pearson, Arist, 5Mins.ai
 
 ---
 
