@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage
 from output_schemas import ResearchSetupOutput, MarketBriefOutput
 from prompts.loader import load_prompt, load_system_prompt
 from services.llm import get_llm
+from tools import jina_reader, tavily_search_tool, list_codebase_files, read_codebase_file
 
 RESEARCH_SETUP_SYSTEM_PROMPT  = load_system_prompt("agents/research_setup_system.md")
 RESEARCH_SETUP_KICKOFF        = "Read the codebase at {codebase_path} and crawl all competitor pages. Extract product facts from the code and build profiles for all competitors."
@@ -11,7 +12,6 @@ RESEARCH_MARKET_SYSTEM_PROMPT = load_system_prompt("agents/research_market_syste
 RESEARCH_MARKET_KICKOFF       = "Search for current user pain points with learning tools and identify content opportunities in the personalized learning market. Use the competitor context provided."
 research_setup_synthesis_prompt  = load_prompt("chains/research_setup_synthesis.md")
 research_market_synthesis_prompt = load_prompt("chains/research_market_synthesis.md")
-from tools import jina_reader, tavily_search_tool, list_codebase_files, read_codebase_file
 
 
 def _format_product_facts(output: ResearchSetupOutput) -> str:
@@ -57,7 +57,8 @@ def _format_market_brief(output: MarketBriefOutput) -> str:
 
 
 async def run_setup_research(codebase_path: str) -> tuple[str, str]:
-    """Extract product facts + build competitor profiles. Returns (product_facts_md, competitor_profiles_md)."""
+    """Entry point for --mode setup. Extract product facts + build competitor profiles.
+    Returns (product_facts_md, competitor_profiles_md). Run once, or when product/competitors change."""
     tools = [jina_reader, tavily_search_tool, list_codebase_files, read_codebase_file]
     agent = create_react_agent(get_llm(), tools=tools, state_modifier=RESEARCH_SETUP_SYSTEM_PROMPT)
 
@@ -76,7 +77,8 @@ async def run_setup_research(codebase_path: str) -> tuple[str, str]:
 
 
 async def run_market_research(competitor_profiles: str) -> str:
-    """Search for current pain points and content opportunities. Returns market_brief_md."""
+    """Entry point for --mode weekly (step 1). Search for current pain points and content opportunities.
+    Returns market_brief_md. Run weekly for fresh market data."""
     tools = [tavily_search_tool]
     agent = create_react_agent(get_llm(), tools=tools, state_modifier=RESEARCH_MARKET_SYSTEM_PROMPT)
 

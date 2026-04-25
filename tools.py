@@ -1,7 +1,7 @@
 from pathlib import Path
 import httpx
 from langchain_core.tools import tool
-from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_tavily import TavilySearch
 from pytrends.request import TrendReq
 from config import settings
 
@@ -69,4 +69,4 @@ def read_codebase_file(relative_path: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-tavily_search_tool = TavilySearchResults(max_results=5)
+tavily_search_tool = TavilySearch(max_results=5)
