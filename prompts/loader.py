@@ -17,3 +17,8 @@ def load_prompt(filename: str) -> ChatPromptTemplate:
         ("system", system.strip()),
         ("human", human.strip()),
     ])
+
+
+def load_system_prompt(filename: str) -> str:
+    """Load a plain-text system prompt as a string (no ---HUMAN--- split)."""
+    return (PROMPTS_DIR / filename).read_text(encoding="utf-8").strip()
