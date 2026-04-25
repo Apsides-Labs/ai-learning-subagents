@@ -5,9 +5,9 @@ from models.article import ArticleType, ContentCalendarEntry
 from output_schemas import SEOOutput
 from prompts.loader import load_prompt, load_system_prompt
 
-SEO_AGENT_SYSTEM_PROMPT = load_system_prompt("seo_system.md")
-SEO_KICKOFF             = load_system_prompt("seo_kickoff.md")
-seo_synthesis_prompt    = load_prompt("seo_synthesis.md")
+SEO_AGENT_SYSTEM_PROMPT = load_system_prompt("agents/seo_system.md")
+SEO_KICKOFF             = "Research keywords and SERP data for 4 article ideas based on the context provided. Avoid these existing topics: {existing_ids}. Use People Also Ask and Google Trends to validate each idea."
+seo_synthesis_prompt    = load_prompt("chains/seo_synthesis.md")
 from services.llm import get_llm
 from tools import tavily_search_tool, people_also_ask, google_trends
 
