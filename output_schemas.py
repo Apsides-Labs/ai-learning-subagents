@@ -14,10 +14,20 @@ class CompetitorOutput(_StrictModel):
     content_gaps: list[str]
 
 
+class PainPointOutput(_StrictModel):
+    statement: str
+    sources: list[str]
+    intensity: str          # low | medium | high
+    frequency: str          # isolated | recurring | dominant
+    content_addressable: bool
+
+
 class ContentOpportunityOutput(_StrictModel):
     angle: str
-    rationale: str
-    target_audience: str
+    addresses_pain_point: str   # reference to the pain point statement this addresses
+    competitor_gap: str         # competitor name whose gap this fills, or "none"
+    why_now: str
+    article_type_hint: str      # standard | topic_teaser
 
 
 class ProductFactOutput(_StrictModel):
@@ -69,5 +79,7 @@ class ResearchSetupOutput(_StrictModel):
 
 
 class MarketBriefOutput(_StrictModel):
-    pain_points: list[str]
+    pain_points: list[PainPointOutput]
     content_opportunities: list[ContentOpportunityOutput]
+    tensions: list[str] = []
+    data_coverage_note: str = ""

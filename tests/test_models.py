@@ -88,6 +88,7 @@ def test_article_plan_round_trips_to_dict():
 from output_schemas import (
     _StrictModel,
     CompetitorOutput,
+    PainPointOutput,
     ContentOpportunityOutput,
     ProductFactOutput,
     ResearchSetupOutput,
@@ -151,17 +152,34 @@ def test_research_setup_output_with_failures():
 
 def test_market_brief_output_valid():
     output = MarketBriefOutput(
-        pain_points=["no personalised pacing"],
-        content_opportunities=[
-            ContentOpportunityOutput(
-                angle="Feynman technique for programmers",
-                rationale="competitors don't cover this",
-                target_audience="developers",
+        pain_points=[
+            PainPointOutput(
+                statement="People start strong with Anki, hit week 3, and bail because the review queue becomes a wall.",
+                sources=["Reddit r/Anki", "Reddit r/languagelearning"],
+                intensity="high",
+                frequency="dominant",
+                content_addressable=True,
             )
         ],
+        content_opportunities=[
+            ContentOpportunityOutput(
+                angle="Why most people quit Anki at week 3 — and the schedule change that fixes it",
+                addresses_pain_point="People start strong with Anki, hit week 3, and bail because the review queue becomes a wall.",
+                competitor_gap="Duolingo",
+                why_now="Top 3 results all explain Anki at surface level and never address the week-3 dropoff.",
+                article_type_hint="standard",
+            )
+        ],
+        tensions=["users want more structure vs. users want self-direction"],
+        data_coverage_note="",
     )
     assert len(output.pain_points) == 1
+    assert output.pain_points[0].intensity == "high"
+    assert output.pain_points[0].content_addressable is True
     assert len(output.content_opportunities) == 1
+    assert output.content_opportunities[0].article_type_hint == "standard"
+    assert len(output.tensions) == 1
+    assert output.data_coverage_note == ""
 
 
 def test_fact_check_output_passed():

@@ -207,18 +207,28 @@ async def test_writing_agent_strips_em_dashes_from_saved_draft(tmp_data_dir, sam
 
 async def test_research_agent_run_market_research():
     from agents.research_agent import run_market_research
-    from output_schemas import MarketBriefOutput, ContentOpportunityOutput
+    from output_schemas import MarketBriefOutput, PainPointOutput, ContentOpportunityOutput
 
     gathered_data = "Pain: no personalised pacing. Opportunity: Feynman for programmers."
     fake_gather_result = {"messages": [AIMessage(content=gathered_data)]}
 
     fake_synthesis = MarketBriefOutput(
-        pain_points=["no personalised pacing"],
+        pain_points=[
+            PainPointOutput(
+                statement="no personalised pacing",
+                sources=["Reddit r/languagelearning"],
+                intensity="high",
+                frequency="recurring",
+                content_addressable=True,
+            )
+        ],
         content_opportunities=[
             ContentOpportunityOutput(
                 angle="Feynman technique for programmers",
-                rationale="gap in competitor content",
-                target_audience="developers",
+                addresses_pain_point="no personalised pacing",
+                competitor_gap="Duolingo",
+                why_now="gap in competitor content",
+                article_type_hint="standard",
             )
         ],
     )

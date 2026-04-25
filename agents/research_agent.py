@@ -34,12 +34,25 @@ def _format_competitor_profiles(output: ResearchSetupOutput) -> str:
 def _format_market_brief(output: MarketBriefOutput) -> str:
     sections = ["## Market Brief\n", "### Pain Points\n"]
     for pain in output.pain_points:
-        sections.append(f"- {pain}")
+        sections.append(f"- **{pain.statement}**")
+        sections.append(f"  - Sources: {', '.join(pain.sources)}")
+        sections.append(f"  - Intensity: {pain.intensity} | Frequency: {pain.frequency} | Content-addressable: {pain.content_addressable}\n")
+
+    if output.tensions:
+        sections.append("\n### Tensions\n")
+        for tension in output.tensions:
+            sections.append(f"- {tension}")
+
     sections.append("\n### Content Opportunities\n")
     for opp in output.content_opportunities:
-        sections.append(f"**{opp.angle}**")
-        sections.append(f"- Why: {opp.rationale}")
-        sections.append(f"- Audience: {opp.target_audience}\n")
+        sections.append(f"**{opp.angle}** ({opp.article_type_hint})")
+        sections.append(f"- Addresses: {opp.addresses_pain_point}")
+        sections.append(f"- Competitor gap: {opp.competitor_gap}")
+        sections.append(f"- Why now: {opp.why_now}\n")
+
+    if output.data_coverage_note:
+        sections.append(f"\n### Data Coverage Note\n{output.data_coverage_note}")
+
     return "\n".join(sections)
 
 
