@@ -83,3 +83,79 @@ def test_article_plan_round_trips_to_dict():
     d = plan.model_dump()
     assert d["id"] == "learn-spanish-30-days"
     ArticlePlan(**d)  # round-trips without error
+
+
+from output_schemas import (
+    _StrictModel,
+    CompetitorOutput,
+    ContentOpportunityOutput,
+    ProductFactOutput,
+    ResearchOutput,
+    ArticlePlanOutput,
+    SEOOutput,
+    ArticleOutput,
+    FactCheckItemOutput,
+    FactCheckOutput,
+)
+
+
+def test_strict_model_rejects_extra_fields():
+    from pydantic import ValidationError
+    with pytest.raises(ValidationError):
+        CompetitorOutput(
+            name="X",
+            url="https://x.com",
+            positioning="p",
+            target_audience="a",
+            content_gaps=[],
+            unexpected_field="boom",
+        )
+
+
+def test_research_output_valid():
+    output = ResearchOutput(
+        competitors=[
+            CompetitorOutput(
+                name="Duolingo",
+                url="https://duolingo.com",
+                positioning="gamified",
+                target_audience="casual",
+                content_gaps=["no custom topics"],
+            )
+        ],
+        pain_points=["no personalised pacing"],
+        content_opportunities=[
+            ContentOpportunityOutput(
+                angle="Feynman technique for programmers",
+                rationale="competitors don't cover this",
+                target_audience="developers",
+            )
+        ],
+        product_facts=[
+            ProductFactOutput(
+                fact="Users set daily learning time",
+                source_file="app/models/course.py",
+            )
+        ],
+    )
+    assert len(output.competitors) == 1
+
+
+def test_fact_check_output_passed():
+    fc = FactCheckOutput(passed=True, items=[])
+    assert fc.passed
+
+
+def test_fact_check_output_flagged():
+    fc = FactCheckOutput(
+        passed=False,
+        items=[
+            FactCheckItemOutput(
+                claim="Draft and Arc offers video lessons",
+                verdict="UNSUPPORTED",
+                source_sentence="Draft and Arc offers video lessons for visual learners.",
+            )
+        ],
+    )
+    assert not fc.passed
+    assert fc.items[0].verdict == "UNSUPPORTED"
