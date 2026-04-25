@@ -64,6 +64,8 @@ class FactCheckOutput(_StrictModel):
 class ResearchSetupOutput(_StrictModel):
     product_facts: list[ProductFactOutput]
     competitors: list[CompetitorOutput]
+    crawl_failures: list[str] = []
+    coverage_note: str = ""
 
 
 class MarketBriefOutput(_StrictModel):

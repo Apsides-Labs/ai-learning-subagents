@@ -133,6 +133,20 @@ def test_research_setup_output_valid():
     )
     assert len(output.competitors) == 1
     assert len(output.product_facts) == 1
+    assert output.crawl_failures == []
+    assert output.coverage_note == ""
+
+
+def test_research_setup_output_with_failures():
+    output = ResearchSetupOutput(
+        product_facts=[],
+        competitors=[],
+        crawl_failures=["https://arist.co — returned 403"],
+        coverage_note="Only app/models/ was available; app/ai/ not included in gathered data.",
+    )
+    assert len(output.crawl_failures) == 1
+    assert "403" in output.crawl_failures[0]
+    assert output.coverage_note != ""
 
 
 def test_market_brief_output_valid():
