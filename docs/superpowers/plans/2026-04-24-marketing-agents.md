@@ -23,15 +23,22 @@
 | `services/llm.py` | `get_llm()` — global singleton, mirrors main repo |
 | `services/file_service.py` | Async read/write for `data/` files; exports path constants |
 | `services/calendar_service.py` | `content_calendar.json` CRUD: load, save, add, next_planned, update_status |
-| `prompts/loader.py` | `load_prompt(filename)` — splits `.md` on `---HUMAN---` into `ChatPromptTemplate` |
-| `prompts/md/research_synthesis.md` | Prompt for synthesising raw research data into structured output |
-| `prompts/md/seo_synthesis.md` | Prompt for synthesising keyword research into article plans |
-| `prompts/md/writing.md` | Prompt for writing one article draft |
-| `prompts/md/fact_check.md` | Prompt for fact-checking a draft against `product_facts.md` |
-| `prompts/research.py` | Exports `research_synthesis_prompt` and `RESEARCH_AGENT_SYSTEM_PROMPT` |
-| `prompts/seo.py` | Exports `seo_synthesis_prompt` and `SEO_AGENT_SYSTEM_PROMPT` |
-| `prompts/writing.py` | Exports `writing_prompt` |
-| `prompts/fact_check.py` | Exports `fact_check_prompt` |
+| `prompts/loader.py` | Two loaders: `load_prompt()` → `ChatPromptTemplate` (LCEL chains); `load_system_prompt()` → `str` (ReAct agents) |
+| `prompts/md/research_setup_system.md` | System prompt for the setup research ReAct agent |
+| `prompts/md/research_setup_kickoff.md` | Kick-off message for setup research (has `{codebase_path}`) |
+| `prompts/md/research_market_system.md` | System prompt for the market research ReAct agent |
+| `prompts/md/research_market_kickoff.md` | Kick-off message for market research |
+| `prompts/md/research_setup_synthesis.md` | Synthesis prompt (LCEL) — raw data → `ResearchSetupOutput` |
+| `prompts/md/research_market_synthesis.md` | Synthesis prompt (LCEL) — raw data → `MarketBriefOutput` |
+| `prompts/md/seo_system.md` | System prompt for the SEO ReAct agent |
+| `prompts/md/seo_kickoff.md` | Kick-off message for SEO agent (has `{existing_ids}`) |
+| `prompts/md/seo_synthesis.md` | Synthesis prompt (LCEL) — keyword data → `SEOOutput` |
+| `prompts/md/writing.md` | Writing agent prompt (LCEL, has `---HUMAN---`) |
+| `prompts/md/fact_check.md` | Fact-check prompt (LCEL, has `---HUMAN---`) |
+| `prompts/research.py` | Pure registry — maps names to files, zero prompt text |
+| `prompts/seo.py` | Pure registry — maps names to files, zero prompt text |
+| `prompts/writing.py` | Exports `writing_prompt` (ChatPromptTemplate) |
+| `prompts/fact_check.py` | Exports `fact_check_prompt` (ChatPromptTemplate) |
 | `chains/writing_chain.py` | LCEL: `writing_prompt \| get_llm().with_structured_output(ArticleOutput)` |
 | `chains/fact_check_chain.py` | LCEL: `fact_check_prompt \| get_llm().with_structured_output(FactCheckOutput)` |
 | `agents/research_agent.py` | `create_react_agent` loop + synthesis LCEL step → writes `product_facts.md` + `research_brief.md` |
