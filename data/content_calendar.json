@@ -1,0 +1,106 @@
+[
+  {
+    "id": "anki-review-queue-burnout",
+    "status": "planned",
+    "title": "Why most people quit Anki at week 3 \u2014 and how to redesign your review load before burnout hits",
+    "primary_keyword": "Anki review queue too long",
+    "secondary_keywords": [
+      "how to reduce review time in Anki",
+      "change review limit Anki",
+      "Anki backlog burnout",
+      "spaced repetition overload"
+    ],
+    "search_intent": "Informational \u2014 the reader wants to understand why Anki review piles become overwhelming and how to prevent burnout.",
+    "article_type": "standard",
+    "target_audience": "Students and self-learners using Anki who feel overwhelmed by a growing review queue after missing a few days.",
+    "angle": "Focus on the emotional and workflow reasons people quit, then show how to redesign review load before the backlog becomes discouraging.",
+    "meta_description": "If your Anki review queue keeps exploding, learn why burnout happens and how to redesign your workload so spaced repetition stays sustainable.",
+    "suggested_headings": [
+      "Why Anki backlogs feel so punishing",
+      "The mistake that makes review queues explode",
+      "How to redesign your deck before burnout",
+      "A sustainable weekly Anki review system",
+      "When to pause, trim, or rebuild your setup"
+    ],
+    "cta_prompt": "Keep using Draft and Arc to turn your study notes into a lighter, more realistic review system.",
+    "draft_path": null
+  },
+  {
+    "id": "tutorial-hell-progress",
+    "status": "needs_review_flagged",
+    "title": "Tutorial hell is the real problem \u2014 here\u2019s how to turn passive YouTube learning into actual progress",
+    "primary_keyword": "how to get rid of tutorial hell",
+    "secondary_keywords": [
+      "what exactly is tutorial hell",
+      "passive YouTube learning",
+      "project-based learning from tutorials",
+      "stop watching tutorials"
+    ],
+    "search_intent": "Informational \u2014 the reader wants a concrete way to stop consuming tutorials passively and start making real progress.",
+    "article_type": "standard",
+    "target_audience": "Beginners and self-taught learners, especially in coding or technical skills, who feel stuck watching videos without building anything.",
+    "angle": "Treat tutorial hell as a systems problem, not a motivation problem, and give readers a transition process from watching to doing.",
+    "meta_description": "Tutorial hell happens when watching feels productive but learning stalls. Here\u2019s how to turn tutorials into real skill-building progress.",
+    "suggested_headings": [
+      "What tutorial hell actually is",
+      "Why watching tutorials feels productive",
+      "The transition from viewing to doing",
+      "How to use projects to force learning",
+      "A simple weekly anti-tutorial-hell routine"
+    ],
+    "cta_prompt": "Use Draft and Arc to turn one tutorial into a small project plan, not another endless watch list.",
+    "draft_path": "data/drafts/2026-04-27-tutorial-hell-progress.md"
+  },
+  {
+    "id": "self-study-roadmap",
+    "status": "planned",
+    "title": "How to build a self-study roadmap when no teacher is there to tell you what to do next",
+    "primary_keyword": "how do i create a self-study plan",
+    "secondary_keywords": [
+      "self-study routine that sticks",
+      "self-learning roadmap",
+      "study plan without teacher",
+      "how to self-learn a subject"
+    ],
+    "search_intent": "Informational \u2014 the reader wants a practical framework for organizing independent study from scratch.",
+    "article_type": "topic_teaser",
+    "target_audience": "Independent learners, career switchers, and students without formal guidance who need structure more than inspiration.",
+    "angle": "Give readers a decision tree for turning a blank topic into a sequence of goals, resources, practice, and checkpoints.",
+    "meta_description": "Build a self-study roadmap from scratch with a simple framework for goals, resources, practice, and review when no teacher is guiding you.",
+    "suggested_headings": [
+      "Start with the outcome, not the resources",
+      "How to break a subject into milestones",
+      "Choosing resources without overload",
+      "Scheduling practice and review",
+      "How to know if your plan is working"
+    ],
+    "cta_prompt": "Build me a 12-week self-study plan for [subject] with milestones, practice tasks, and weekly checks.",
+    "draft_path": null
+  },
+  {
+    "id": "coursera-practice-gap",
+    "status": "planned",
+    "title": "Coursera feels too theoretical \u2014 how to turn certificate lessons into real practice",
+    "primary_keyword": "coursera feels too theoretical",
+    "secondary_keywords": [
+      "coursera certificate practical projects",
+      "turn certificate lessons into practice",
+      "apply coursera lessons in real work",
+      "coursera learning workflow"
+    ],
+    "search_intent": "Informational \u2014 the reader wants to make Coursera coursework more practical and usable, not just finish videos and quizzes.",
+    "article_type": "topic_teaser",
+    "target_audience": "Career learners and certificate students who want Coursera courses to produce usable skills, portfolio pieces, or work-ready understanding.",
+    "angle": "Show how to extract hands-on practice from theory-heavy lessons so the learner leaves with something they can actually do.",
+    "meta_description": "If Coursera feels too theoretical, use this framework to turn lessons into practice, projects, and real skill-building.",
+    "suggested_headings": [
+      "Why theoretical courses stall progress",
+      "How to convert each lesson into practice",
+      "Adding projects to a certificate course",
+      "Using notes, prompts, and checkpoints",
+      "What real progress looks like by week four"
+    ],
+    "cta_prompt": "Build me a practice-first study plan for a Coursera course on [topic] so I finish with projects, not just notes.",
+    "draft_path": null
+  }
+]

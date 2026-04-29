@@ -1,0 +1,82 @@
+## Draft and Arc — Product Facts
+
+- The app mounts authenticated routers for courses, lessons, notes, time entries, internal endpoints, and auth in the main FastAPI application.  *(source: app/main.py:1-18)*
+- The FastAPI app is titled "AI Learning Platform" with the description "Backend for AI-powered personalized learning".  *(source: app/main.py:20-37)*
+- The app allows CORS from any origin (`allow_origins=["*"]`).  *(source: app/main.py:20-37)*
+- A `GET /health` endpoint returns `{"status": "healthy"}`.  *(source: app/main.py:39-40)*
+- The default database name is `ai_learning`.  *(source: app/config.py:7-14)*
+- `openai_api_key` is required at runtime and has no default value.  *(source: app/config.py:7-14)*
+- The default OpenAI model is `gpt-5.4-mini`.  *(source: app/config.py:7-14)*
+- `anthropic_api_key` defaults to an empty string.  *(source: app/config.py:7-14)*
+- The default Anthropic model is `claude-haiku-4-5-20251001`.  *(source: app/config.py:7-14)*
+- The default API key is `test-api-key-12345`.  *(source: app/config.py:15-22)*
+- The default Cloudflare R2 bucket name is `ai-learning-documents`.  *(source: app/config.py:15-22)*
+- The default microservice URL is `http://localhost:8001`.  *(source: app/config.py:24-34)*
+- LangChain tracing v2 is disabled by default.  *(source: app/config.py:24-34)*
+- The default LangChain project name is `Learn ai`.  *(source: app/config.py:24-34)*
+- Refresh tokens expire after 30 days by default.  *(source: app/config.py:36-42)*
+- The Google OAuth client ID defaults to an empty string.  *(source: app/config.py:36-42)*
+- The Google OAuth client secret defaults to an empty string.  *(source: app/config.py:36-42)*
+- Course knowledge levels are `beginner`, `intermediate`, and `advanced`.  *(source: app/models/course.py:8-17)*
+- Course assessment frequency values are `per_lesson` and `none`.  *(source: app/models/course.py:8-17)*
+- Course status values are `draft`, `pending_document`, `active`, and `completed`.  *(source: app/models/course.py:8-17)*
+- Course difficulty values are `easy`, `medium`, and `hard`.  *(source: app/models/course.py:8-17)*
+- Course settings default to 20 daily learning minutes.  *(source: app/models/course.py:19-25)*
+- Course settings default to a 14-day duration.  *(source: app/models/course.py:19-25)*
+- Course settings default quiz frequency to `none`.  *(source: app/models/course.py:19-25)*
+- Course settings default Feynman frequency to `none`.  *(source: app/models/course.py:19-25)*
+- A course stores a `prompt` field, optional `document_id`, generated `syllabus`, `estimated_hours`, status, and timestamps.  *(source: app/models/course.py:51-68)*
+- Courses are indexed by `user_id` and by the compound key `(user_id, status)`.  *(source: app/models/course.py:70-74)*
+- Documents track processing status values `pending`, `extracting`, `chunking`, `embedding`, `completed`, and `failed`.  *(source: app/models/document.py:7-14)*
+- A processed document stores `course_id`, `filename`, `r2_key`, `status`, `error_message`, extracted title and summary, section titles, key concepts, `chunk_count`, and timestamps.  *(source: app/models/document.py:16-34)*
+- A document chunk stores `course_id`, `document_id`, `chunk_index`, `text`, `embedding`, and `section_title`.  *(source: app/models/document.py:36-45)*
+- The lesson content model includes block types for text, structure, code, interactive content, and reserved external resource types `video_link`, `audio_link`, `image_link`, and `resource_link`.  *(source: app/models/lesson.py:20-38)*
+- A lesson stores `course_id`, `syllabus_lesson_id`, chapter and lesson indexes, title, learning domain, content, estimated minutes, quiz, Feynman prompt, and `created_at`.  *(source: app/models/lesson.py:64-77)*
+- A note stores `user_id`, `course_id`, `course_title`, `lesson_id`, `lesson_title`, `chapter_title`, `content`, `created_at`, and `updated_at`.  *(source: app/models/note.py:6-13)*
+- Notes are indexed by `(user_id, lesson_id)` and `(user_id, course_id)`.  *(source: app/models/note.py:15-18)*
+- Completed lessons store chapter index, lesson index, completion time, and time spent minutes.  *(source: app/models/progress.py:7-16)*
+- Quiz results store score, pass/fail, question-level results, and attempted time.  *(source: app/models/progress.py:18-27)*
+- Feynman responses store prompt, user response, AI feedback, score, pass/fail, and submission time.  *(source: app/models/progress.py:29-39)*
+- Progress stores completed lessons, quiz results, Feynman responses, current chapter and lesson, total time spent minutes, last lesson ID, started at, and last activity.  *(source: app/models/progress.py:41-53)*
+- The courses router is authenticated with `current_active_user`.  *(source: app/routers/courses.py:14-16)*
+- Course creation accepts a prompt, knowledge level, daily learning minutes, course duration days, quiz frequency, Feynman frequency, and a filename. It rejects missing prompt or filename and only supports PDF uploads.  *(source: app/routers/courses.py:18-48)*
+- The courses router exposes course listing with an optional list of status filters.  *(source: app/routers/courses.py:50-55)*
+- The courses router exposes course progress retrieval, course activation, course completion, syllabus editing, deletion, and chapter warming endpoints.  *(source: app/routers/courses.py:57-117)*
+- The notes module exposes both course-scoped routes under `/api/courses` and global note routes under `/api/notes`.  *(source: app/routers/notes.py:9-10)*
+- The notes API supports note upsert/get/delete, course note listing, global note listing, and counting notes by course.  *(source: app/routers/notes.py:13-59)*
+- The time entries module exposes both course-scoped lesson routes and a user-level `/api/time-entries` router.  *(source: app/routers/time_entries.py:10-18)*
+- Time entry records store course and lesson snapshot titles plus duration, and user time entries are returned sorted by `started_at`.  *(source: app/routers/time_entries.py:22-75)*
+- The auth router provides custom login and refresh-token endpoints, plus FastAPI Users auth/register/reset/verify/users routers and Google OAuth integration.  *(source: app/routers/auth.py:14-102)*
+- The internal router exposes a dev-only document-processing trigger endpoint and a secret-protected completion endpoint.  *(source: app/routers/internal.py:10-44)*
+- `create_course` creates a pending-document course when file metadata is provided, inserts a `ProcessedDocument`, stores `document_id`, and returns an upload URL plus the new document ID.  *(source: app/services/course_service.py:16-47)*
+- `create_course` generates a syllabus and estimated hours for prompt-only courses before inserting the course.  *(source: app/services/course_service.py:48-69)*
+- Course responses and course listings compute completion, time spent, and remaining minutes from `Progress` and the course syllabus.  *(source: app/services/course_service.py:80-117)*
+- A course can be activated only from `draft` to `active`.  *(source: app/services/course_service.py:119-136)*
+- A course can be completed only from `active` to `completed`.  *(source: app/services/course_service.py:138-153)*
+- Deleting a course deletes its lessons, progress, notes, and the course record itself.  *(source: app/services/course_service.py:155-165)*
+- Draft courses can have their syllabus edited, and syllabus editing can incorporate document context when available.  *(source: app/services/course_service.py:167-195)*
+- Document context is only returned after a processed document reaches `completed` status.  *(source: app/services/document_service.py:11-24)*
+- Completing document processing generates a syllabus and estimated hours, then resets the course status to `draft`.  *(source: app/services/document_service.py:27-58)*
+- Document processing is triggered by POSTing the document's `r2_key` to `{microservice_url}/process-by-key`.  *(source: app/services/document_service.py:61-79)*
+- Lessons are generated lazily when missing, using similar document chunks as context when available.  *(source: app/services/lesson_service.py:18-75)*
+- Lesson lookup by ID resolves through the syllabus `find_lesson_by_id` method.  *(source: app/services/lesson_service.py:77-92)*
+- Completing a lesson can auto-activate a draft course on first completion and marks the course completed when all lessons are done.  *(source: app/services/lesson_service.py:94-133)*
+- Quiz retrieval is implemented separately from quiz submission.  *(source: app/services/lesson_service.py:135-156)*
+- Quiz submission computes a score, stores a `QuizResult`, and appends it to progress history.  *(source: app/services/lesson_service.py:158-210)*
+- Chapter warming can background-generate missing lessons with `asyncio.create_task`.  *(source: app/services/lesson_service.py:212-230)*
+- Feynman submission evaluates the response with the model and stores a `FeynmanResponse`.  *(source: app/services/lesson_service.py:232-260)*
+- OpenAI embeddings are used for retrieval, with a `text-embedding-3-small` embedding model.  *(source: app/services/vector_service.py:1-15)*
+- Document chunk retrieval uses MongoDB `$vectorSearch` filtered by `course_id` and the `vector_index` index.  *(source: app/services/vector_service.py:17-35)*
+- Syllabus generation and editing use structured LLM output.  *(source: app/ai/chains/syllabus_chain.py:10-61)*
+- Document context passed into syllabus generation is truncated to 10,000 characters.  *(source: app/ai/chains/syllabus_chain.py:63-79)*
+- Lesson generation adapts prose floor expectations by learning domain.  *(source: app/ai/chains/lesson_chain.py:8-39)*
+- Lesson generation retries on validation and value errors.  *(source: app/ai/chains/lesson_chain.py:41-57)*
+- Quiz generation is model-backed and uses lesson content key concepts as input.  *(source: app/ai/chains/quiz_chain.py:1-14)*
+- Feynman prompt generation is model-backed, and Feynman evaluation uses structured output.  *(source: app/ai/chains/feynman_chain.py:1-25)*
+- LLM output schemas are strict by default and forbid extra fields in `_StrictModel`.  *(source: app/ai/output_schemas.py:8-16)*
+- `ContentBlockOutput` is intentionally looser than the other LLM output schemas and ignores extra fields.  *(source: app/ai/output_schemas.py:26-32)*
+- Feynman prompts are loaded from external markdown templates rather than inline strings.  *(source: app/ai/prompts/feynman.py:1-4)*
+- Note upserts validate the course and syllabus lesson, store snapshot titles, and update existing note timestamps.  *(source: app/services/note_service.py:8-35)*
+- Getting or deleting a note looks it up by `user_id` and `lesson_id`.  *(source: app/services/note_service.py:37-59)*
+- Password validation requires at least 8 characters, one uppercase letter, and one special character.  *(source: app/services/user_manager.py:12-26)*
+- Forgot-password and verification hooks log tokens and still contain TODO email delivery paths.  *(source: app/services/user_manager.py:37-44)*

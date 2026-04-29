@@ -38,8 +38,5 @@ Thumbs.db
 htmlcov/
 
 .env
-data/*.md
-data/*.json
-data/drafts/
 !data/.gitkeep
 !data/drafts/.gitkeep
