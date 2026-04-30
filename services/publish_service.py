@@ -67,13 +67,22 @@ async def create_blog_pr(
     )
 
     encoded = base64.b64encode(mdx_content.encode()).decode()
-    await _run_gh(
+    put_args = [
         "api", f"repos/{repo}/contents/{blog_path}",
         "-X", "PUT",
         "-f", f"message=Add blog post: {slug}",
         "-f", f"content={encoded}",
         "-f", f"branch={branch}",
-    )
+    ]
+    try:
+        existing_sha = await _run_gh(
+            "api", f"repos/{repo}/contents/{blog_path}?ref={branch}",
+            "--jq", ".sha",
+        )
+        put_args.extend(["-f", f"sha={existing_sha}"])
+    except RuntimeError:
+        pass  # File doesn't exist yet, no sha needed
+    await _run_gh(*put_args)
 
     return await _run_gh(
         "pr", "create",
