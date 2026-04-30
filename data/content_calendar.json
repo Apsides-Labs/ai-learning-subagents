@@ -1,7 +1,7 @@
 [
   {
     "id": "anki-review-queue-burnout",
-    "status": "planned",
+    "status": "needs_review_flagged",
     "title": "Why most people quit Anki at week 3 \u2014 and how to redesign your review load before burnout hits",
     "primary_keyword": "Anki review queue too long",
     "secondary_keywords": [
@@ -23,7 +23,9 @@
       "When to pause, trim, or rebuild your setup"
     ],
     "cta_prompt": "Keep using Draft and Arc to turn your study notes into a lighter, more realistic review system.",
-    "draft_path": null
+    "blog_category": "Study Methods",
+    "draft_path": "data/drafts/2026-05-01-anki-review-queue-burnout.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/7"
   },
   {
     "id": "tutorial-hell-progress",
@@ -49,7 +51,9 @@
       "A simple weekly anti-tutorial-hell routine"
     ],
     "cta_prompt": "Use Draft and Arc to turn one tutorial into a small project plan, not another endless watch list.",
-    "draft_path": "data/drafts/2026-04-27-tutorial-hell-progress.md"
+    "blog_category": "Study Methods",
+    "draft_path": "data/drafts/2026-05-01-tutorial-hell-progress.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/8"
   },
   {
     "id": "self-study-roadmap",
@@ -75,7 +79,9 @@
       "How to know if your plan is working"
     ],
     "cta_prompt": "Build me a 12-week self-study plan for [subject] with milestones, practice tasks, and weekly checks.",
-    "draft_path": null
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
   },
   {
     "id": "coursera-practice-gap",
@@ -101,6 +107,8 @@
       "What real progress looks like by week four"
     ],
     "cta_prompt": "Build me a practice-first study plan for a Coursera course on [topic] so I finish with projects, not just notes.",
-    "draft_path": null
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
   }
 ]
