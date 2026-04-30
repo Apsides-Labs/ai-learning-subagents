@@ -39,6 +39,7 @@ async def update_status(
     entry_id: str,
     status: ArticleStatus,
     draft_path: Optional[str] = None,
+    pr_url: Optional[str] = None,
 ) -> None:
     entries = await load_calendar()
     for entry in entries:
@@ -46,4 +47,6 @@ async def update_status(
             entry.status = status
             if draft_path is not None:
                 entry.draft_path = draft_path
+            if pr_url is not None:
+                entry.pr_url = pr_url
     await save_calendar(entries)

@@ -31,3 +31,4 @@ class ContentCalendarEntry(BaseModel):
     cta_prompt: str = ""
     blog_category: str = "Study Methods"
     draft_path: Optional[str] = None
+    pr_url: Optional[str] = None

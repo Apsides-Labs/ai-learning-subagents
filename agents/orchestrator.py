@@ -58,8 +58,6 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path], Option
         existing_content = await file_service.read_text(draft_path)
         await file_service.write_text(draft_path, existing_content + "\n".join(flag_lines))
 
-    await calendar_service.update_status(entry.id, final_status, draft_path=str(draft_path))
-
     pr_url = None
     if settings.gh_repo:
         pr_url = await create_blog_pr(
@@ -69,5 +67,9 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path], Option
             excerpt=article.meta_description,
             body=article.markdown_content,
         )
+
+    await calendar_service.update_status(
+        entry.id, final_status, draft_path=str(draft_path), pr_url=pr_url,
+    )
 
     return final_status, draft_path, pr_url
