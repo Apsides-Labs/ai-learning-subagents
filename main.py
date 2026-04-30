@@ -44,7 +44,7 @@ async def _run_article() -> None:
     from agents.orchestrator import run_article
     from models.article import ArticleStatus
     print("Writing next planned article...")
-    status, draft_path = await run_article()
+    status, draft_path, pr_url = await run_article()
     if status is None:
         print("No planned articles in the content calendar.")
         print("Run --mode weekly first to populate the calendar.")
@@ -55,6 +55,8 @@ async def _run_article() -> None:
     else:
         print(f"\nDraft has flagged claims — review before publishing: {draft_path}")
         print("Fact-check flags appended to the end of the draft file.")
+    if pr_url:
+        print(f"\nBlog PR created: {pr_url}")
 
 
 def main() -> None:

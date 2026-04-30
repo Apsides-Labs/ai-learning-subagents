@@ -25,6 +25,7 @@ def _to_calendar_entry(plan) -> ContentCalendarEntry:
         meta_description=plan.meta_description,
         suggested_headings=plan.suggested_headings,
         cta_prompt=plan.cta_prompt,
+        blog_category=plan.blog_category,
     )
 
 

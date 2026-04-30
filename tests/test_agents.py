@@ -69,6 +69,7 @@ async def test_seo_agent_returns_calendar_entries():
             meta_description="Learn Spanish in 30 days with a personalised plan.",
             suggested_headings=["H2: Why 30 days works"],
             cta_prompt="Create a 30-day beginner Spanish course for me",
+            blog_category="Study Methods",
         ),
         ArticlePlanOutput(
             id="feynman-technique-study",
@@ -82,6 +83,7 @@ async def test_seo_agent_returns_calendar_entries():
             meta_description="Master any subject with the Feynman Technique.",
             suggested_headings=["H2: What is Feynman Technique"],
             cta_prompt="",
+            blog_category="Learning Science",
         ),
         ArticlePlanOutput(
             id="learn-python-2-weeks",
@@ -95,6 +97,7 @@ async def test_seo_agent_returns_calendar_entries():
             meta_description="Learn Python in 2 weeks with a daily plan.",
             suggested_headings=["H2: The 2-week plan"],
             cta_prompt="Create a 2-week beginner Python course for me",
+            blog_category="Study Methods",
         ),
         ArticlePlanOutput(
             id="personalized-learning-plan",
@@ -108,6 +111,7 @@ async def test_seo_agent_returns_calendar_entries():
             meta_description="Build a personalised learning plan that actually works.",
             suggested_headings=["H2: Start with time"],
             cta_prompt="",
+            blog_category="Productivity",
         ),
     ])
 
@@ -358,7 +362,9 @@ async def test_orchestrator_article_mode_clean(tmp_data_dir, sample_calendar_ent
         mock_write.return_value = (tmp_data_dir / "drafts" / "draft.md", fake_article)
         with patch("agents.orchestrator.run_fact_check_chain", new_callable=AsyncMock) as mock_fc:
             mock_fc.return_value = fake_fact_check
-            status, draft_path = await run_article()
+            with patch("agents.orchestrator.create_blog_pr", new_callable=AsyncMock) as mock_pr:
+                mock_pr.return_value = None
+                status, draft_path, pr_url = await run_article()
 
     from models.article import ArticleStatus
     assert status == ArticleStatus.ready_for_review
@@ -371,6 +377,7 @@ async def test_orchestrator_article_mode_no_planned(tmp_data_dir, monkeypatch):
     from services import calendar_service
 
     monkeypatch.setattr(calendar_service, "CALENDAR_PATH", tmp_data_dir / "content_calendar.json")
-    status, draft_path = await run_article()
+    status, draft_path, pr_url = await run_article()
     assert status is None
     assert draft_path is None
+    assert pr_url is None

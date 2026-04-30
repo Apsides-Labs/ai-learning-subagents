@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     tavily_api_key: str
     serpapi_api_key: str
     codebase_path: str = "/Users/ilirgruda/Repo/Python/ai-learning"
+    gh_repo: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",

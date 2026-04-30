@@ -8,6 +8,7 @@ from chains.fact_check_chain import run_fact_check_chain
 from config import settings
 from models.article import ArticleStatus
 from services import calendar_service, file_service
+from services.publish_service import create_blog_pr
 
 
 async def run_setup() -> None:
@@ -36,11 +37,11 @@ async def run_weekly_batch() -> list[str]:
     return [e.title for e in new_entries]
 
 
-async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path]]:
-    """Write the next planned article. Returns (final_status, draft_path) or (None, None)."""
+async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path], Optional[str]]:
+    """Write the next planned article. Returns (final_status, draft_path, pr_url) or (None, None, None)."""
     entry = await calendar_service.next_planned()
     if entry is None:
-        return None, None
+        return None, None, None
 
     await calendar_service.update_status(entry.id, ArticleStatus.in_progress)
     product_facts = await file_service.read_text(file_service.PRODUCT_FACTS_PATH)
@@ -58,4 +59,15 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path]]:
         await file_service.write_text(draft_path, existing_content + "\n".join(flag_lines))
 
     await calendar_service.update_status(entry.id, final_status, draft_path=str(draft_path))
-    return final_status, draft_path
+
+    pr_url = None
+    if settings.gh_repo:
+        pr_url = await create_blog_pr(
+            draft_path,
+            entry.blog_category,
+            title=article.title,
+            excerpt=article.meta_description,
+            body=article.markdown_content,
+        )
+
+    return final_status, draft_path, pr_url
