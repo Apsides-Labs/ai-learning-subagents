@@ -30,7 +30,7 @@ async def generate_blog_image(
             model="gpt-image-2",
             prompt=prompt,
             size="1536x1024",
-            response_format="b64_json",
+            output_format="png",
             n=1,
         )
 
