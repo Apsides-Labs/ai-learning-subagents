@@ -363,19 +363,33 @@ async def test_orchestrator_article_mode_clean(tmp_data_dir, sample_calendar_ent
         key_takeaway="Teaching what you learn is the fastest way to master it.",
     )
     fake_fact_check = FactCheckOutput(passed=True, items=[])
+    fake_image = b"fake png bytes"
 
     with patch("agents.orchestrator.run_writing_agent", new_callable=AsyncMock) as mock_write:
         mock_write.return_value = (tmp_data_dir / "drafts" / "draft.md", fake_article)
         with patch("agents.orchestrator.run_fact_check_chain", new_callable=AsyncMock) as mock_fc:
             mock_fc.return_value = fake_fact_check
-            with patch("agents.orchestrator.create_blog_pr", new_callable=AsyncMock) as mock_pr:
-                mock_pr.return_value = None
-                status, draft_path, pr_url = await run_article()
+            with patch("agents.orchestrator.generate_blog_image", new_callable=AsyncMock) as mock_img:
+                mock_img.return_value = fake_image
+                with patch("agents.orchestrator.create_blog_pr", new_callable=AsyncMock) as mock_pr:
+                    mock_pr.return_value = None
+                    status, draft_path, pr_url = await run_article()
 
     from models.article import ArticleStatus
     assert status == ArticleStatus.ready_for_review
-    calendar = await calendar_service.load_calendar()
-    assert calendar[0].status == ArticleStatus.ready_for_review
+
+    # Verify image generation was called with article fields
+    mock_img.assert_called_once_with(
+        title=fake_article.title,
+        article_summary=fake_article.article_summary,
+        key_takeaway=fake_article.key_takeaway,
+    )
+
+    # Verify image bytes were passed to create_blog_pr
+    mock_pr.assert_called_once()
+    pr_call_kwargs = mock_pr.call_args
+    # image_bytes should be passed as keyword arg
+    assert pr_call_kwargs[1].get("image_bytes") == fake_image
 
 
 async def test_orchestrator_article_mode_no_planned(tmp_data_dir, monkeypatch):

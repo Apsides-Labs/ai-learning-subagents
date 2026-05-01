@@ -8,6 +8,7 @@ from chains.fact_check_chain import run_fact_check_chain
 from config import settings
 from models.article import ArticleStatus
 from services import calendar_service, file_service
+from services.image_service import generate_blog_image
 from services.publish_service import create_blog_pr
 
 
@@ -60,12 +61,19 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path], Option
 
     pr_url = None
     if settings.gh_repo:
+        image_bytes = await generate_blog_image(
+            title=article.title,
+            article_summary=article.article_summary,
+            key_takeaway=article.key_takeaway,
+        )
+
         pr_url = await create_blog_pr(
             draft_path,
             entry.blog_category,
             title=article.title,
             excerpt=article.meta_description,
             body=article.markdown_content,
+            image_bytes=image_bytes,
         )
 
     await calendar_service.update_status(
