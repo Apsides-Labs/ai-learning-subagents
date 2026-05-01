@@ -59,6 +59,8 @@ class ArticleOutput(_StrictModel):
     primary_keyword: str
     meta_description: str
     markdown_content: str
+    article_summary: str
+    key_takeaway: str
 
 
 class FactCheckItemOutput(_StrictModel):

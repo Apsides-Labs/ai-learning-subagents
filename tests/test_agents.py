@@ -148,6 +148,8 @@ async def test_writing_agent_saves_draft(tmp_data_dir, sample_calendar_entry, sa
         primary_keyword=sample_calendar_entry.primary_keyword,
         meta_description=sample_calendar_entry.meta_description,
         markdown_content="# The Feynman Technique\n\nYou can learn anything...",
+        article_summary="A guide to using the Feynman Technique to learn programming concepts faster.",
+        key_takeaway="Explaining a concept in simple terms reveals what you actually understand.",
     )
 
     with patch("agents.writing_agent.run_writing_chain", new_callable=AsyncMock) as mock_chain:
@@ -197,6 +199,8 @@ async def test_writing_agent_strips_em_dashes_from_saved_draft(tmp_data_dir, sam
         primary_keyword=sample_calendar_entry.primary_keyword,
         meta_description=sample_calendar_entry.meta_description,
         markdown_content="Learn fast — and remember more — every day.",
+        article_summary="Tips for learning faster and retaining more.",
+        key_takeaway="Spacing your practice sessions beats cramming every time.",
     )
 
     with patch("agents.writing_agent.run_writing_chain", new_callable=AsyncMock) as mock_chain:
@@ -355,6 +359,8 @@ async def test_orchestrator_article_mode_clean(tmp_data_dir, sample_calendar_ent
         primary_keyword=sample_calendar_entry.primary_keyword,
         meta_description=sample_calendar_entry.meta_description,
         markdown_content="# Feynman Technique\n\nLearn anything.",
+        article_summary="A guide to the Feynman Technique for programmers.",
+        key_takeaway="Teaching what you learn is the fastest way to master it.",
     )
     fake_fact_check = FactCheckOutput(passed=True, items=[])
 
