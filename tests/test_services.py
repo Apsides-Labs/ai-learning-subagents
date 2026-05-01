@@ -135,13 +135,13 @@ async def test_create_blog_pr_includes_image_in_frontmatter():
 
     assert result == "https://github.com/test/repo/pull/1"
 
-    # Check that image was pushed
+    # Check that image was pushed (SHA check GET + PUT = 2 calls)
     image_push_calls = [c for c in gh_calls if "contents/public/blog/test-slug.png" in str(c)]
-    assert len(image_push_calls) == 1
+    assert len(image_push_calls) == 2
 
-    # Check that MDX contains heroImage
+    # Check that MDX was pushed (SHA check GET + PUT = 2 calls)
     mdx_push_calls = [c for c in gh_calls if "contents/src/content/blog/test-slug.mdx" in str(c)]
-    assert len(mdx_push_calls) == 1
+    assert len(mdx_push_calls) == 2
 
 
 async def test_create_blog_pr_no_image_skips_push():

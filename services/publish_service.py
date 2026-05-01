@@ -79,23 +79,41 @@ async def create_blog_pr(
     if image_bytes is not None:
         image_path = f"public/blog/{slug}.png"
         encoded_image = base64.b64encode(image_bytes).decode()
-        await _run_gh(
+        img_put_args = [
             "api", f"repos/{repo}/contents/{image_path}",
             "-X", "PUT",
             "-f", f"message=Add hero image for {slug}",
             "-f", f"content={encoded_image}",
             "-f", f"branch={branch}",
-        )
+        ]
+        try:
+            existing_img_sha = await _run_gh(
+                "api", f"repos/{repo}/contents/{image_path}?ref={branch}",
+                "--jq", ".sha",
+            )
+            img_put_args.extend(["-f", f"sha={existing_img_sha}"])
+        except RuntimeError:
+            pass
+        await _run_gh(*img_put_args)
 
     # Push MDX file
     encoded = base64.b64encode(mdx_content.encode()).decode()
-    await _run_gh(
+    put_args = [
         "api", f"repos/{repo}/contents/{blog_path}",
         "-X", "PUT",
         "-f", f"message=Add blog post: {slug}",
         "-f", f"content={encoded}",
         "-f", f"branch={branch}",
-    )
+    ]
+    try:
+        existing_sha = await _run_gh(
+            "api", f"repos/{repo}/contents/{blog_path}?ref={branch}",
+            "--jq", ".sha",
+        )
+        put_args.extend(["-f", f"sha={existing_sha}"])
+    except RuntimeError:
+        pass
+    await _run_gh(*put_args)
 
     return await _run_gh(
         "pr", "create",
