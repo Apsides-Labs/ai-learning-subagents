@@ -17,6 +17,8 @@ async def test_writing_chain_returns_article_output(entry, sample_product_facts)
         primary_keyword=entry.primary_keyword,
         meta_description=entry.meta_description,
         markdown_content="# The Feynman Technique\n\nYou can learn anything...",
+        article_summary="A guide to using the Feynman Technique to learn programming concepts faster.",
+        key_takeaway="Explaining a concept in simple terms reveals what you actually understand.",
     )
 
     with patch("chains.writing_chain.get_llm") as mock_get_llm:

@@ -30,6 +30,7 @@ async def create_blog_pr(
     title: str,
     excerpt: str,
     body: str,
+    image_bytes: bytes | None = None,
 ) -> str:
     """Build .mdx from structured fields, push to the blog repo, and open a PR. Returns the PR URL."""
     repo = settings.gh_repo.strip().rstrip("/").removeprefix("https://github.com/")
@@ -43,11 +44,19 @@ async def create_blog_pr(
     bg_color = _BG_COLORS[hash(slug) % len(_BG_COLORS)]
     date_str = datetime.now().strftime("%b %d, %Y")
 
-    mdx_content = (
-        f'---\ntitle: "{title}"\ncategory: "{category}"\n'
-        f'excerpt: "{excerpt}"\ndate: "{date_str}"\n'
-        f'readTime: "{read_time}"\nimageBg: "{bg_color}"\n---\n\n{body}\n'
-    )
+    # Build frontmatter — include heroImage only when we have an image
+    frontmatter_lines = [
+        f'title: "{title}"',
+        f'category: "{category}"',
+        f'excerpt: "{excerpt}"',
+        f'date: "{date_str}"',
+        f'readTime: "{read_time}"',
+        f'imageBg: "{bg_color}"',
+    ]
+    if image_bytes is not None:
+        frontmatter_lines.append(f'heroImage: "/blog/{slug}.png"')
+
+    mdx_content = "---\n" + "\n".join(frontmatter_lines) + "\n---\n\n" + body + "\n"
 
     default_branch_sha = await _run_gh(
         "api", f"repos/{repo}/git/ref/heads/main",
@@ -66,6 +75,28 @@ async def create_blog_pr(
         "-f", f"sha={default_branch_sha}",
     )
 
+    # Push image if provided
+    if image_bytes is not None:
+        image_path = f"public/blog/{slug}.png"
+        encoded_image = base64.b64encode(image_bytes).decode()
+        img_put_args = [
+            "api", f"repos/{repo}/contents/{image_path}",
+            "-X", "PUT",
+            "-f", f"message=Add hero image for {slug}",
+            "-f", f"content={encoded_image}",
+            "-f", f"branch={branch}",
+        ]
+        try:
+            existing_img_sha = await _run_gh(
+                "api", f"repos/{repo}/contents/{image_path}?ref={branch}",
+                "--jq", ".sha",
+            )
+            img_put_args.extend(["-f", f"sha={existing_img_sha}"])
+        except RuntimeError:
+            pass
+        await _run_gh(*img_put_args)
+
+    # Push MDX file
     encoded = base64.b64encode(mdx_content.encode()).decode()
     put_args = [
         "api", f"repos/{repo}/contents/{blog_path}",
@@ -81,7 +112,7 @@ async def create_blog_pr(
         )
         put_args.extend(["-f", f"sha={existing_sha}"])
     except RuntimeError:
-        pass  # File doesn't exist yet, no sha needed
+        pass
     await _run_gh(*put_args)
 
     return await _run_gh(
