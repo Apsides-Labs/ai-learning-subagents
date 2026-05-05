@@ -47,6 +47,7 @@ class ArticlePlanOutput(_StrictModel):
     meta_description: str
     suggested_headings: list[str]
     cta_prompt: str
+    blog_category: str
 
 
 class SEOOutput(_StrictModel):

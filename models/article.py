@@ -29,4 +29,6 @@ class ContentCalendarEntry(BaseModel):
     meta_description: str
     suggested_headings: list[str] = []
     cta_prompt: str = ""
+    blog_category: str = "Study Methods"
     draft_path: Optional[str] = None
+    pr_url: Optional[str] = None

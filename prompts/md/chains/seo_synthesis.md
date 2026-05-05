@@ -32,6 +32,17 @@ The 4 plans should cover different ground. Before finalizing, check:
 - Are any two plans likely to attract the same reader for the same reason? If yes, replace one.
 - Does the mix include at least one plan whose angle is genuinely contrarian or specific (not "5 tips for X")?
 
+# BLOG CATEGORY
+
+Each plan must include a `blog_category` — one of these exact values:
+- **Study Methods** — techniques, workflows, or habits for learning (e.g. Feynman technique, active recall, tutorial hell)
+- **Learning Science** — research-backed concepts like spaced repetition, forgetting curves, memory consolidation
+- **AI & Learning** — AI-generated curricula, LLM tutoring, AI study tools
+- **Career** — job search, interviews, career transitions, portfolio building
+- **Productivity** — time management, routines, focus, habit systems
+
+Pick the single best fit based on the article's primary angle. When in doubt, prefer Study Methods.
+
 # SLUG RULES
 
 - Lowercase, hyphen-separated, ASCII only.

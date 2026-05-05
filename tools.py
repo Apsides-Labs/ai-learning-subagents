@@ -1,7 +1,9 @@
 from pathlib import Path
 import httpx
+import requests.exceptions
 from langchain_core.tools import tool
 from langchain_tavily import TavilySearch
+from pytrends import exceptions as pytrends_exceptions
 from pytrends.request import TrendReq
 from config import settings
 
@@ -9,7 +11,7 @@ from config import settings
 @tool
 async def jina_reader(url: str) -> str:
     """Read the text content of any URL using Jina AI Reader. Use for competitor pages."""
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.get(f"https://r.jina.ai/{url}")
         response.raise_for_status()
         return response.text
@@ -18,9 +20,12 @@ async def jina_reader(url: str) -> str:
 @tool
 def google_trends(keyword: str) -> str:
     """Check Google Trends interest for a keyword. Returns: rising, stable, falling, or no_data."""
-    pytrends = TrendReq(hl="en-US", tz=360)
-    pytrends.build_payload([keyword], timeframe="today 12-m")
-    df = pytrends.interest_over_time()
+    try:
+        pytrends = TrendReq(hl="en-US", tz=360)
+        pytrends.build_payload([keyword], timeframe="today 12-m")
+        df = pytrends.interest_over_time()
+    except (requests.exceptions.RequestException, pytrends_exceptions.ResponseCodeError) as e:
+        return f"no_data (trend lookup failed: {type(e).__name__})"
     if df.empty or keyword not in df.columns:
         return "no_data"
     values = df[keyword].tolist()
