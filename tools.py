@@ -24,7 +24,7 @@ def google_trends(keyword: str) -> str:
         pytrends = TrendReq(hl="en-US", tz=360)
         pytrends.build_payload([keyword], timeframe="today 12-m")
         df = pytrends.interest_over_time()
-    except (requests.exceptions.RequestException, pytrends_exceptions.ResponseCodeError) as e:
+    except (requests.exceptions.RequestException, pytrends_exceptions.ResponseError) as e:
         return f"no_data (trend lookup failed: {type(e).__name__})"
     if df.empty or keyword not in df.columns:
         return "no_data"

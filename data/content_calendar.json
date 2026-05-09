@@ -1,7 +1,7 @@
 [
   {
     "id": "anki-review-queue-burnout",
-    "status": "planned",
+    "status": "published",
     "title": "Why most people quit Anki at week 3 \u2014 and how to redesign your review load before burnout hits",
     "primary_keyword": "Anki review queue too long",
     "secondary_keywords": [
@@ -23,11 +23,13 @@
       "When to pause, trim, or rebuild your setup"
     ],
     "cta_prompt": "Keep using Draft and Arc to turn your study notes into a lighter, more realistic review system.",
-    "draft_path": null
+    "blog_category": "Study Methods",
+    "draft_path": "data/drafts/2026-05-09-anki-review-queue-burnout.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/18"
   },
   {
     "id": "tutorial-hell-progress",
-    "status": "needs_review_flagged",
+    "status": "published",
     "title": "Tutorial hell is the real problem \u2014 here\u2019s how to turn passive YouTube learning into actual progress",
     "primary_keyword": "how to get rid of tutorial hell",
     "secondary_keywords": [
@@ -49,11 +51,13 @@
       "A simple weekly anti-tutorial-hell routine"
     ],
     "cta_prompt": "Use Draft and Arc to turn one tutorial into a small project plan, not another endless watch list.",
-    "draft_path": "data/drafts/2026-04-27-tutorial-hell-progress.md"
+    "blog_category": "Study Methods",
+    "draft_path": "data/drafts/2026-04-27-tutorial-hell-progress.md",
+    "pr_url": null
   },
   {
     "id": "self-study-roadmap",
-    "status": "planned",
+    "status": "published",
     "title": "How to build a self-study roadmap when no teacher is there to tell you what to do next",
     "primary_keyword": "how do i create a self-study plan",
     "secondary_keywords": [
@@ -75,11 +79,13 @@
       "How to know if your plan is working"
     ],
     "cta_prompt": "Build me a 12-week self-study plan for [subject] with milestones, practice tasks, and weekly checks.",
-    "draft_path": null
+    "blog_category": "Study Methods",
+    "draft_path": "data/drafts/2026-05-09-self-study-roadmap.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/19"
   },
   {
     "id": "coursera-practice-gap",
-    "status": "planned",
+    "status": "published",
     "title": "Coursera feels too theoretical \u2014 how to turn certificate lessons into real practice",
     "primary_keyword": "coursera feels too theoretical",
     "secondary_keywords": [
@@ -101,6 +107,220 @@
       "What real progress looks like by week four"
     ],
     "cta_prompt": "Build me a practice-first study plan for a Coursera course on [topic] so I finish with projects, not just notes.",
-    "draft_path": null
+    "blog_category": "Study Methods",
+    "draft_path": "data/drafts/2026-05-09-coursera-practice-gap.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/20"
+  },
+  {
+    "id": "duolingo-quit-usefulness",
+    "status": "planned",
+    "title": "Why People Quit Duolingo After a Huge Streak \u2014 and How to Tell When an App Has Stopped Helping You Learn",
+    "primary_keyword": "why are so many people quitting duolingo",
+    "secondary_keywords": [
+      "duolingo quitting stories",
+      "duolingo streak burnout",
+      "why learners quit language apps"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Habit-driven Duolingo users and language learners who have built streaks but feel their progress has stalled",
+    "angle": "A decision framework for spotting when gamified practice is no longer translating into real language ability, and what to do next before resentment sets in.",
+    "meta_description": "Duolingo streaks can hide stalled progress. Learn the signs an app has stopped helping and how to decide whether to keep going or switch strategies.",
+    "suggested_headings": [
+      "Why streaks can outlive real progress",
+      "Signs your app habit has stopped transferring to real skill",
+      "What to do when motivation turns into maintenance",
+      "How to choose your next learning setup"
+    ],
+    "cta_prompt": "Explore Draft and Arc for a better-structured language learning plan when your app stops moving you forward.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "language-app-speaking-gap",
+    "status": "planned",
+    "title": "Why Language Apps Fail at Speaking and Listening \u2014 and What to Use Instead When You Want Real-World Output",
+    "primary_keyword": "why language apps are bad for speaking",
+    "secondary_keywords": [
+      "language app speaking practice",
+      "why apps fail at listening comprehension",
+      "real-world language output"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Intermediate language learners who can complete app lessons but still freeze in real conversations",
+    "angle": "A practical explanation of why passive app success doesn\u2019t produce speaking fluency, with a clearer path toward output-focused practice.",
+    "meta_description": "Language apps often teach recognition, not conversation. Find out why speaking lags behind and what kinds of practice close the gap faster.",
+    "suggested_headings": [
+      "Why app lessons produce recognition more than recall",
+      "The missing layer: speaking and listening under pressure",
+      "What to do instead: input, output, and feedback",
+      "How to build a practice loop that transfers to real life"
+    ],
+    "cta_prompt": "Use Draft and Arc to build a language plan that prioritizes speaking practice, not just lesson completion.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "anki-flashcards-reading-workflow",
+    "status": "planned",
+    "title": "The Fastest Way to Turn Reading Into Flashcards Without Turning Card Creation Into a Second Job",
+    "primary_keyword": "what is the quickest way to make flashcards",
+    "secondary_keywords": [
+      "turn reading into flashcards",
+      "flashcard workflow from notes",
+      "make flashcards faster"
+    ],
+    "search_intent": "Informational",
+    "article_type": "topic_teaser",
+    "target_audience": "Students and self-learners who read a lot but struggle to convert that reading into usable flashcards consistently",
+    "angle": "A workflow-first guide for extracting only the highest-value facts from reading so card creation stays sustainable instead of becoming a bottleneck.",
+    "meta_description": "Learn a faster reading-to-flashcards workflow that avoids busywork and keeps review decks useful instead of overwhelming.",
+    "suggested_headings": [
+      "Why fast flashcard creation usually fails",
+      "The minimum viable reading-to-card workflow",
+      "What to capture and what to skip",
+      "How to keep cards reviewable later"
+    ],
+    "cta_prompt": "Build me a 2-week plan to turn my reading notes into high-quality flashcards without spending hours on card creation.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "obsidian-minimum-setup",
+    "status": "planned",
+    "title": "Why Obsidian Feels Like Work Before It Feels Useful \u2014 and the Minimum Setup That Avoids the Rabbit Holes",
+    "primary_keyword": "does obsidian actually work",
+    "secondary_keywords": [
+      "obsidian beginner setup",
+      "obsidian rabbit holes",
+      "simple obsidian workflow"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "New or frustrated Obsidian users who want a reliable note system without becoming power-user obsessed",
+    "angle": "A contrarian take that argues Obsidian works best when you stop optimizing and choose a tiny default system first.",
+    "meta_description": "Obsidian can help or hinder depending on setup. Learn the minimum workflow that gets value fast without endless customization.",
+    "suggested_headings": [
+      "Why Obsidian feels hard before it feels helpful",
+      "The minimum setup that actually gets used",
+      "What not to customize early",
+      "When to add complexity, and when not to"
+    ],
+    "cta_prompt": "Use Draft and Arc to design a simple Obsidian note-taking system with the fewest possible moving parts.",
+    "blog_category": "Productivity",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "ai-note-taking-human-cleanup",
+    "status": "planned",
+    "title": "The real reason AI note-taking still needs human cleanup",
+    "primary_keyword": "AI note taking human cleanup",
+    "secondary_keywords": [
+      "what are the risks of AI notetakers",
+      "AI note takers accuracy",
+      "AI meeting notes review"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Students, knowledge workers, and self-directed learners trying AI note-taking tools but still spending time editing the output",
+    "angle": "Explain why AI note-taking tools reduce effort but do not eliminate review, with practical examples of where human cleanup is still required and how to build a fast verification workflow.",
+    "meta_description": "AI note-taking tools still need human cleanup. Learn why the output is useful, where it breaks down, and how to review notes without losing the time savings.",
+    "suggested_headings": [
+      "Why AI notes still need human cleanup",
+      "Where AI note-takers usually go wrong",
+      "A fast review workflow that keeps the time savings",
+      "When to trust AI notes and when not to",
+      "How Draft and Arc can help you turn messy notes into something usable"
+    ],
+    "cta_prompt": "",
+    "blog_category": "AI & Learning",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "anki-work-full-time-burnout",
+    "status": "planned",
+    "title": "How to use Anki without burning out when you work full time",
+    "primary_keyword": "Anki burnout full time work reviews",
+    "secondary_keywords": [
+      "Anki fatigue after work",
+      "sustainable Anki habits",
+      "how to reduce Anki review load"
+    ],
+    "search_intent": "Informational",
+    "article_type": "topic_teaser",
+    "target_audience": "Working professionals and students who want to keep using Anki but keep falling behind on reviews",
+    "angle": "Show how to shrink the review queue, cap daily effort, and make Anki sustainable around a real job schedule instead of treating it like a guilt-based streak habit.",
+    "meta_description": "Keep Anki sustainable with a full-time job. Learn how to cap reviews, reduce queue pressure, and avoid the burnout cycle that makes people quit.",
+    "suggested_headings": [
+      "Why Anki breaks down after the first strong month",
+      "How to shrink the queue before it becomes guilt",
+      "Time-boxed review rules for busy weekdays",
+      "What to do when you miss several days",
+      "How Draft and Arc can build a realistic Anki plan"
+    ],
+    "cta_prompt": "Build me a 2-week Anki plan that fits around a full-time job and keeps daily reviews under 20 minutes.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "duolingo-grammar-serious-learners",
+    "status": "planned",
+    "title": "Why Duolingo feels pointless to serious learners \u2014 and what grammar support it is missing",
+    "primary_keyword": "Duolingo grammar support for serious learners",
+    "secondary_keywords": [
+      "why doesn't Duolingo do grammar",
+      "Duolingo grammar lessons",
+      "serious language learners Duolingo"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Intermediate language learners who have outgrown streak-based practice and want real grammar instruction",
+    "angle": "Critique the shallow-feeling parts of Duolingo for serious learners, then explain what kind of grammar support would make the app more useful without turning it into a textbook.",
+    "meta_description": "Duolingo can feel too shallow for serious learners. See what grammar support it already offers, what it still lacks, and how to supplement it effectively.",
+    "suggested_headings": [
+      "Why Duolingo starts to feel insufficient",
+      "What serious learners actually want from grammar support",
+      "What Duolingo already does and why it still feels thin",
+      "How to patch the gap without quitting entirely",
+      "How Draft and Arc can help you make a better study mix"
+    ],
+    "cta_prompt": "",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "language-class-progress-gap",
+    "status": "planned",
+    "title": "Why your language class feels productive but you still worry you are not really progressing",
+    "primary_keyword": "language class productive but not progressing",
+    "secondary_keywords": [
+      "language class not progressing",
+      "feel productive but not improving language",
+      "class and self-study balance language learning"
+    ],
+    "search_intent": "Informational",
+    "article_type": "topic_teaser",
+    "target_audience": "Language learners taking classes plus self-study who want confidence that their effort is leading to real progress",
+    "angle": "Address the gap between passing a class and actually building usable language ability, then show how to add the right kind of self-study so the class starts producing measurable gains.",
+    "meta_description": "If your language class feels productive but you still feel stuck, learn how to tell real progress from busywork and build a study plan that closes the gap.",
+    "suggested_headings": [
+      "Why language classes can feel productive but stall progress",
+      "Signs you are learning versus just completing tasks",
+      "How to add self-study that matches the class",
+      "What to measure instead of just attendance or completion",
+      "How Draft and Arc can help you turn class material into a real plan"
+    ],
+    "cta_prompt": "Build me a 4-week plan to turn my language class into real progress with daily self-study that fits my schedule.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
   }
 ]

@@ -2,99 +2,105 @@
 
 ### Pain Points
 
-- **People open Anki, see a huge review queue after missing a couple of days, and close the app because the backlog feels impossible.**
-  - Sources: Reddit r/Anki — https://www.reddit.com/r/Anki/comments/1o3f07o/anki_reviews_take_too_long_can_barely_do_100_in_2/
+- **People start strong with Anki, then skip reviews for days, feel guilty about it, and eventually stop because the daily queue becomes too draining on top of work and classes.**
+  - Sources: Reddit r/learndutch — https://www.reddit.com/r/learndutch/comments/1rlfqac/frustrated_with_myself_and_unmotivated_to_continue, Reddit r/languagelearning — https://www.reddit.com/r/languagelearning/comments/1lfdflr/i_was_doing_really_good_for_about_3_months_then_i/, Reddit r/Anki — https://www.reddit.com/r/Anki/comments/1rc42bf/anki%E3%82%92%E4%BD%BF%E3%82%8F%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%E6%9C%80%E5%A4%A7%E3%81%AE%E7%90%86%E7%94%B1%E3%81%AF/?tl=en
   - Intensity: high | Frequency: recurring | Content-addressable: True
 
-- **Anki’s daily maintenance can feel like a punishment, with users describing the backlog as a weight that makes them quit spaced repetition altogether.**
-  - Sources: Hacker News — https://news.ycombinator.com/item?id=45198420
+- **Learners using classes plus self-study feel overwhelmed by the combined workload and worry the class-only path will help them pass exams without actually making real progress.**
+  - Sources: Reddit r/learndutch — https://www.reddit.com/r/learndutch/comments/1rlfqac/frustrated_with_myself_and_unmotivated_to_continue
+  - Intensity: medium | Frequency: isolated | Content-addressable: True
+
+- **Anki can feel unsustainable when work leaves people too drained to add new cards and review old ones every day.**
+  - Sources: Reddit r/learndutch — https://www.reddit.com/r/learndutch/comments/1rlfqac/frustrated_with_myself_and_unmotivated_to_continue
   - Intensity: high | Frequency: recurring | Content-addressable: True
 
-- **Obsidian-to-Anki workflows feel like extra work because users still have to manage flashcard fields separately, making the setup seem no better than using the tools independently.**
-  - Sources: Reddit r/ObsidianMD — https://www.reddit.com/r/ObsidianMD/comments/1bsit09/obsidian_and_spaced_repetition_workflow_i_dont/
+- **Some learners quit Anki because it does not feel aligned with how they are being tested or with the outcomes they actually want.**
+  - Sources: Reddit r/medicalschoolanki — https://www.reddit.com/r/medicalschoolanki/comments/jsdiji/nothin_personnel_kiddo/, Reddit r/Anki — https://www.reddit.com/r/Anki/comments/1rc42bf/anki%E3%82%92%E4%BD%BF%E3%82%8F%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%9F%E6%9C%80%E5%A4%A7%E3%81%AE%E7%90%86%E7%94%B1%E3%81%AF/?tl=en
   - Intensity: medium | Frequency: recurring | Content-addressable: True
 
-- **Obsidian spaced repetition users report progress resetting or due cards not updating properly, which breaks trust in the review system.**
-  - Sources: Reddit r/ObsidianMD — https://www.reddit.com/r/ObsidianMD/comments/1g6fv6w/problems_with_the_spaced_repetition_plugin/
-  - Intensity: high | Frequency: isolated | Content-addressable: False
-
-- **Long-term Duolingo users feel the app punishes them for learning by pushing monetization and feature restrictions that make the experience worse over time.**
-  - Sources: Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1lnw7d0/why_i_quit_this_app_after_3_years_and_1100_day/, Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1kw0p55/just_canceled_super_and_finally_seeing_how_bare/
+- **Obsidian users get frustrated by unreliable sync and the feeling that the safest sync option is too expensive to be practical.**
+  - Sources: Reddit r/ObsidianMD — https://www.reddit.com/r/ObsidianMD/comments/1koioiw/what_frustrates_you_the_most_when_you_use_obsidian/
   - Intensity: high | Frequency: recurring | Content-addressable: False
 
-- **Duolingo lessons feel shallow and pointless when they only rehearse a few new words without enough meaningful practice or progression.**
-  - Sources: Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1sfej53/so_frustrated_with_the_new_update_considering/
+- **Obsidian users struggle with attachment management, especially when notes accumulate files and the workflow stops feeling tidy or easy to maintain.**
+  - Sources: Reddit r/ObsidianMD — https://www.reddit.com/r/ObsidianMD/comments/u2lvho/what_are_some_of_your_current_frustrations_with/
+  - Intensity: medium | Frequency: recurring | Content-addressable: False
+
+- **Beginners trying to use Obsidian feel lost in guru-style advice and overly complex systems, and just want a practical first step.**
+  - Sources: Reddit r/ObsidianMD — https://www.reddit.com/r/ObsidianMD/comments/1q7tf0y/im_tired_of_notetaking_gurus_how_do_i_actually/, Reddit r/ObsidianMD — https://www.reddit.com/r/ObsidianMD/comments/1o5ftbp/what_would_you_recommend_to_an_absolute_beginner/
   - Intensity: high | Frequency: recurring | Content-addressable: True
 
-- **Some Duolingo users quit because they lose control over exercise types, such as not being able to disable speaking practice they do not want.**
-  - Sources: Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1h8vzor/why_im_quitting_duolingo_with_a_2000_day_streak/
-  - Intensity: medium | Frequency: isolated | Content-addressable: False
+- **Duolingo learners get frustrated that lessons feel shallow, like they just recycle a few vocabulary words without enough grammar explanation or instructional value.**
+  - Sources: Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1t4rpfi/getting_really_frustrated_now…/, Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1sfej53/so_frustrated_with_the_new_update_considering/, Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1lnw7d0/why_i_quit_this_app_after_3_years_and_1100_day/
+  - Intensity: high | Frequency: dominant | Content-addressable: True
 
-- **ChatGPT can be useful for studying, but hallucinations make users doubt whether they can trust it as a learning source.**
-  - Sources: Reddit r/ChatGPT — https://www.reddit.com/r/ChatGPT/comments/1m7oje7/i_love_chatgpt_but_the_hallucinations_have_gotten/, Reddit r/ChatGPT — https://www.reddit.com/r/ChatGPT/comments/1hboqky/people_who_use_chatgpt_for_educating_yourself_are/
+- **Long-term Duolingo users eventually decide the app is not a serious way to learn and quit after years of streak-based use.**
+  - Sources: Reddit r/duolingo — https://www.reddit.com/r/duolingo/comments/1lnw7d0/why_i_quit_this_app_after_3_years_and_1100_day/
   - Intensity: high | Frequency: recurring | Content-addressable: True
 
-- **Coursera certificate content can feel too theoretical because lecturers explain what to learn without showing how to apply it in real practice.**
-  - Sources: Reddit r/Coursera — https://www.reddit.com/r/coursera/comments/1gnsdjg/i_have_been_using_coursera_for_2_years_here_are/
+- **People using AI note-taking tools do not trust the output enough to skip human cleanup, so the tools save less time than promised.**
+  - Sources: Reddit r/ProductivityApps — https://www.reddit.com/r/ProductivityApps/comments/1mp5gn8/tested_5_ai_note_taking_apps_for_inperson/, Reddit r/AI_Agents — https://www.reddit.com/r/AI_Agents/comments/1rav5ks/what_is_actually_the_best_ai_note_taking_app_for/, Reddit r/ProductivityApps — https://www.reddit.com/r/ProductivityApps/comments/1j35biu/do_you_trust_ai_for_notetaking_productivity/
   - Intensity: medium | Frequency: recurring | Content-addressable: True
 
-- **Self-learners repeatedly ask how to study academic subjects without formal guidance, showing a real lack of clear process and structure for independent learning.**
-  - Sources: Reddit r/Polymath — https://www.reddit.com/r/Polymath/comments/1im8gwq/how_do_you_selflearn_academic_subjects_without/, Reddit r/GetStudying — https://www.reddit.com/r/GetStudying/comments/127z7ca/what_steps_should_i_take_when_selflearning_a_topic/, Reddit r/AskAcademia — https://www.reddit.com/r/AskAcademia/comments/tpdbok/is_there_a_way_to_learn_how_to_learn_on_your_own/
-  - Intensity: medium | Frequency: dominant | Content-addressable: True
-
-- **People trying to teach themselves with YouTube often get stuck in tutorial hell, spending hours watching videos but not actually learning much.**
-  - Sources: Reddit r/learnprogramming — https://www.reddit.com/r/learnprogramming/comments/1or1yds/i_am_stuck_in_tutorial_hell_does_anyone_actually/
+- **Self-directed learners are confused by conflicting advice from YouTube, AI, and other sources, and do not know how to study in a way that actually sticks.**
+  - Sources: Reddit r/studytips — https://www.reddit.com/r/studytips/comments/1on8ika/how_can_i_study_im_completely_confused_and_dont/, Reddit r/lifelonglearning — https://www.reddit.com/r/lifelonglearning/comments/1kmzkfo/how_do_you_actually_learn_from_youtube_videos/
   - Intensity: high | Frequency: recurring | Content-addressable: True
 
-- **Learners struggle to find YouTube tutorials they can trust, because quality is inconsistent and they do not want to waste time on bad ones.**
-  - Sources: Reddit r/learnprogramming — https://www.reddit.com/r/learnprogramming/comments/1n3taia/how_do_you_usually_find_good_tutorials_on_youtube/
-  - Intensity: medium | Frequency: recurring | Content-addressable: True
+- **People get stuck in tutorial hell, watching YouTube lessons that feel useful in the moment but do not translate into real skill or independent practice.**
+  - Sources: Reddit r/learnprogramming — https://www.reddit.com/r/learnprogramming/comments/1or1yds/i_am_stuck_in_tutorial_hell_does_anyone_actually/, Reddit r/lifelonglearning — https://www.reddit.com/r/lifelonglearning/comments/1kmzkfo/how_do_you_actually_learn_from_youtube_videos/
+  - Intensity: high | Frequency: recurring | Content-addressable: True
 
 
 ### Tensions
 
-- Learners want structure from tools like Anki and Coursera, but they also want less daily overhead and fewer maintenance chores.
-- Some users want more automation and AI guidance, while others want simple, transparent workflows they can control.
-- Language learners disagree on whether gamified, shallow lessons are motivating or whether they need deeper, more serious practice.
-- Self-learners want both freedom from formal instruction and a clearer roadmap than scattered tutorials provide.
+- Learners want structure, but too much structure turns into overwhelm and abandonment.
+- Users want AI help, but they do not trust AI enough to let it replace human review.
+- Self-learners want visible progress, but they also want instruction that feels genuinely deep, not just streak maintenance.
+- Some users want receptive practice and easy recall, while others want productive output and real conversation ability.
+- People want simple starting advice, yet the content ecosystem rewards complex guru systems and advanced setups.
 
 ### Content Opportunities
 
-**Why most people quit Anki at week 3 — and how to redesign your review load before burnout hits** (standard)
-- Addresses: People open Anki, see a huge review queue after missing a couple of days, and close the app because the backlog feels impossible.; Anki’s daily maintenance can feel like a punishment, with users describing the backlog as a weight that makes them quit spaced repetition altogether.
-- Competitor gap: No direct competitor content gap was supplied for Anki, so this is a pain-point-led opportunity rather than a gap-exploitation play.
-- Why now: The strongest discussion around Anki is about backlog overload and quitting, while existing search results typically explain spaced repetition mechanics without giving a realistic anti-burnout plan.
+**Why most people quit Anki after the first strong month — and how to shrink the review queue before it turns into guilt** (standard)
+- Addresses: People start strong with Anki, then skip reviews for days, feel guilty about it, and eventually stop because the daily queue becomes too draining on top of work and classes.
+- Competitor gap: No direct competitor gap exploited; this is a fresh angle against generic Anki/self-study content.
+- Why now: Search results and forum discussions focus on Anki fundamentals, but the real user problem is the week-3-to-week-6 dropoff and the emotional pile-up around missed reviews.
 
-**Obsidian to Anki: when the workflow helps, when it just adds busywork, and how to keep notes and cards in sync** (standard)
-- Addresses: Obsidian-to-Anki workflows feel like extra work because users still have to manage flashcard fields separately, making the setup seem no better than using the tools independently.
-- Competitor gap: No direct competitor content gap was supplied for Obsidian; this is based on observed user confusion in Reddit threads.
-- Why now: The thread shows people asking the core value question directly, which suggests current content is not answering the practical “why bother?” objection clearly.
+**How to use Anki without burning out when you work full time** (topic_teaser)
+- Addresses: Anki can feel unsustainable when work leaves people too drained to add new cards and review old ones every day.
+- Competitor gap: No direct competitor gap exploited; this is a fresh angle against generic flashcard advice.
+- Why now: The current discussion is rooted in workload and energy constraints, not tool setup, so practical time-boxing and load-shedding content is a clearer match than another settings guide.
 
-**How to build a self-study roadmap when no teacher is there to tell you what to do next** (topic_teaser)
-- Addresses: Self-learners repeatedly ask how to study academic subjects without formal guidance, showing a real lack of clear process and structure for independent learning.
-- Competitor gap: No competitor gap reference applies directly; this is a broad informational gap rather than a specific competitor weakness.
-- Why now: Search demand is explicit and recurring, but the existing discussion is still at the level of scattered advice instead of a usable process.
+**Why your language class feels productive but you still worry you are not really progressing** (standard)
+- Addresses: Learners using classes plus self-study feel overwhelmed by the combined workload and worry the class-only path will help them pass exams without actually making real progress.
+- Competitor gap: No direct competitor gap exploited; could be mapped to Alice’s university-student audience, but the crawled content did not show a class-plus-self-study workflow.
+- Why now: There is a clear tension between course completion and real skill growth in the source thread, and current generic study advice does not address that split.
 
-**Tutorial hell is the real problem — here’s how to turn passive YouTube learning into actual progress** (standard)
-- Addresses: People trying to teach themselves with YouTube often get stuck in tutorial hell, spending hours watching videos but not actually learning much.
-- Competitor gap: No competitor gap reference applies directly; this is a high-intent learner problem across generic tutorial content.
-- Why now: The SERP and forum conversation are full of frustration about passive consumption, leaving room for a concrete workflow article with checklists or examples.
+**Why Duolingo feels pointless to serious learners — and what kind of grammar support the app is missing** (standard)
+- Addresses: Duolingo learners get frustrated that lessons feel shallow, like they just recycle a few vocabulary words without enough grammar explanation or instructional value.
+- Competitor gap: Duolingo
+- Why now: The SERP is likely to be crowded with brand-defense or beginner-friendly explainers, but the user voice here is specifically about shallow instruction and missing grammar context.
 
-**How to tell if a YouTube tutorial is worth your time before you waste an hour on it** (topic_teaser)
-- Addresses: Learners struggle to find YouTube tutorials they can trust, because quality is inconsistent and they do not want to waste time on bad ones.
-- Competitor gap: No competitor gap reference applies directly; this is a gap in evaluator content rather than a product gap.
-- Why now: The question itself is a recurring search-shaped pain, and most results are broad recommendation lists rather than a method for pre-screening tutorials.
+**Why long-term Duolingo users quit after years of streaks** (standard)
+- Addresses: Long-term Duolingo users eventually decide the app is not a serious way to learn and quit after years of streak-based use.
+- Competitor gap: Duolingo
+- Why now: A quit-story angle is likely under-served by generic Duolingo SEO pages and directly matches the emotionally charged churn language in the source thread.
 
-**Why ChatGPT feels amazing for self-study until the hallucinations break your trust** (standard)
-- Addresses: ChatGPT can be useful for studying, but hallucinations make users doubt whether they can trust it as a learning source.
-- Competitor gap: No competitor gap reference applies directly; this is a trust-and-workflow topic rather than a named competitor weakness.
-- Why now: User discussions split between enthusiasm and skepticism, creating room for a balanced article on verification habits and safe use cases.
+**The real reason AI note-taking still needs human cleanup** (standard)
+- Addresses: People using AI note-taking tools do not trust the output enough to skip human cleanup, so the tools save less time than promised.
+- Competitor gap: Sana Labs
+- Why now: Competitor homepages emphasize AI output and productivity, but the search demand here is about verification cost and whether AI actually reduces review time.
 
-**Coursera feels too theoretical — how to turn certificate lessons into real practice** (standard)
-- Addresses: Coursera certificate content can feel too theoretical because lecturers explain what to learn without showing how to apply it in real practice.
-- Competitor gap: Coursera
-- Why now: The complaint is specific and recurring, and the current homepage positioning does not appear to address the missing practice layer.
+**How to stop tutorial hell: turn YouTube learning into a practice loop that produces real skill** (topic_teaser)
+- Addresses: People get stuck in tutorial hell, watching YouTube lessons that feel useful in the moment but do not translate into real skill or independent practice.
+- Competitor gap: No direct competitor gap exploited; this is a fresh angle with strong fit to learner confusion.
+- Why now: Both the coding and lifelong-learning questions show a repeated gap: people can find videos, but not a process for active practice after the video ends.
+
+**Obsidian for beginners: what to do in your first week without following guru systems** (topic_teaser)
+- Addresses: Beginners trying to use Obsidian feel lost in guru-style advice and overly complex systems, and just want a practical first step.
+- Competitor gap: No direct competitor gap exploited; the crawled Obsidian content gap is not in the competitor list, so this would be a non-comp-gap opportunity.
+- Why now: There is obvious demand for a simple start-here guide, and the current content ecosystem appears dominated by advanced workflows and jargon.
 
 
 ### Data Coverage Note
-The dataset is heavily Reddit- and HN-skewed, with strongest coverage around Anki, Obsidian, Duolingo, ChatGPT, Coursera, and self-study/tutorial-hell complaints. There is little evidence here for enterprise LMS pain points, and several pain points are content-addressable rather than product-fixable.
+The evidence is heavily concentrated in Reddit discussions around language learning, Anki, Duolingo, Obsidian, and AI note-taking. There is little direct evidence from competitor-owned content or non-Reddit sources, so the strongest signals are user frustration threads and help-seeking posts rather than broad market-wide measurement.

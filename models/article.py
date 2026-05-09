@@ -8,6 +8,7 @@ class ArticleStatus(StrEnum):
     in_progress = "in_progress"
     ready_for_review = "ready_for_review"
     needs_review_flagged = "needs_review_flagged"
+    shelved = "shelved"
     published = "published"
 
 
