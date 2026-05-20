@@ -68,10 +68,11 @@ The system grows from a 3-mode pipeline to a 4-mode flywheel:
                        ▼
         ┌──────────────────────────────────────┐
         │              article                 │
-        │  writing_agent + fact_check          │
-        │  → draft.md → human review → publish │
+        │  writing_agent + fact_check + auto-PR│
+        │  → draft.md → PR to draftnarc repo   │
+        │  → human reviews & merges → live     │
         └──────────────────┬───────────────────┘
-                           │  (you publish to draftandarc.com/blog)
+                           │  (after merge: run --mark-published <id> --url)
                            ▼
    ┌────────────────────────────────────────────────────────────┐
    │                  measure  (NEW)                            │
@@ -114,7 +115,7 @@ The system grows from a 3-mode pipeline to a 4-mode flywheel:
 - `tools.py` → converted into the `tools/` package. The conversion is: delete the top-level `tools.py`, create `tools/__init__.py` that re-exports the legacy names (`jina_reader`, `tavily_search_tool`, `list_codebase_files`, `read_codebase_file`) so existing imports in `research_agent.py` keep working unchanged. The orphaned `people_also_ask` (SerpAPI) and `google_trends` (pytrends) functions are **not** re-exported — they are deleted along with their dependencies.
 - `agents/seo_agent.py` — new tool list (DataForSEO tools from `tools/dataforseo.py`), reads `measurement_brief.md` from context, catches `DataForSEOBudgetExceeded` and falls through to synthesis with partial data + coverage note.
 - `agents/orchestrator.py` — prepends `## MEASUREMENT BRIEF\n\n` delimiter + reads `measurement_brief.md` into SEO agent context when present; adds `run_measure()` entry point; adds `mark_published(article_id, live_url)` helper.
-- `models/article.py` — `ContentCalendarEntry` gains `published_at: Optional[str] = None` (ISO date) and `live_url: Optional[str] = None` (canonical URL). Needed for "0 impressions after 14 days" math and per-article URL matching against GSC/GA4 rows.
+- `models/article.py` — `ContentCalendarEntry` gains `published_at: Optional[str] = None` (ISO date) and `live_url: Optional[str] = None` (canonical URL). Needed for "0 impressions after 14 days" math and per-article URL matching against GSC/GA4 rows. Coexists with the existing `pr_url`, `draft_path`, and `blog_category` fields added by the upstream auto-PR feature. `ArticleStatus.shelved` (also upstream) is treated as "not measurable" by `measurement_agent`.
 - `prompts/md/agents/seo_system.md` — updated `TOOLS` section and new `PAST-PERFORMANCE CONTEXT` section.
 - `chains/seo_synthesis.md` — mentions DataForSEO metric names (volume, difficulty).
 - `services/file_service.py` — add `MEASUREMENT_BRIEF_MD_PATH` and `MEASUREMENT_BRIEF_HTML_PATH`. Add `atomic_write_text(path, content)` helper (tmp file + `os.replace`) and migrate the existing `save_calendar` to use it.
@@ -308,6 +309,9 @@ TAVILY_API_KEY=tvly-...
 # Codebase to read product facts from
 CODEBASE_PATH=/Users/ilirgruda/Repo/Python/ai-learning
 
+# Blog repo for auto-PR publishing (kept from upstream auto-blog-PR feature)
+GH_REPO=https://github.com/Apsides-Labs/draftnarc
+
 # DataForSEO (new — replaces SerpAPI + pytrends)
 DATAFORSEO_LOGIN=your-account-email
 DATAFORSEO_PASSWORD=your-api-password
@@ -321,7 +325,7 @@ GSC_SITE_URL=sc-domain:draftandarc.com
 GA4_PROPERTY_ID=123456789
 ```
 
-The `SERPAPI_API_KEY` line is removed.
+The `SERPAPI_API_KEY` line is removed. The `GH_REPO` line is preserved from the upstream auto-PR publishing feature.
 
 ### Failure modes
 
