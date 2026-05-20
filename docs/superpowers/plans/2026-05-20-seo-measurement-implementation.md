@@ -55,9 +55,55 @@
 
 ---
 
+## Task 0: Verify DataForSEO endpoint pricing (manual, no code)
+
+**Why this task exists:** The spec's Section 4 cost table is an estimate. Bulk Keyword Difficulty pricing in particular has been uncertain (~$0.01 vs ~$0.10 per 1000 kw). Before writing the client code, confirm prices against the live dashboard so the `MAX_COST_PER_RUN` default in Task 7 ($1.00) is reasonable.
+
+- [ ] **Step 1: Log into the DataForSEO dashboard**
+
+Open `app.dataforseo.com` and sign in with the account credentials you'll use in `.env`.
+
+- [ ] **Step 2: Verify per-call cost for the 5 endpoints we use**
+
+Confirm prices on each pricing page (Account → Pricing or API → individual endpoint docs):
+
+| Endpoint | Expected from spec | Actual (verify) |
+|---|---|---|
+| SERP / Google / Organic / Live Advanced | ~$0.002/query | _____ |
+| Keywords Data / Google Ads / Search Volume | ~$0.05/1000 kw | _____ |
+| Labs / Google / Bulk Keyword Difficulty | ~$0.01/1000 kw | _____ |
+| Labs / Google / Keyword Suggestions | ~$0.01/task | _____ |
+| Labs / Google / Ranked Keywords for Domain | ~$0.02/task | _____ |
+
+- [ ] **Step 3: If any number diverges materially, update the spec**
+
+Open `docs/superpowers/specs/2026-05-19-seo-measurement-integration-design.md`. Find the endpoint table in Section 4. Replace the diverged price(s) with the verified rate. Commit:
+
+```bash
+git add docs/superpowers/specs/2026-05-19-seo-measurement-integration-design.md
+git commit -m "docs: update DataForSEO pricing after dashboard verification"
+```
+
+- [ ] **Step 4: Reconsider `MAX_COST_PER_RUN`**
+
+If the new prices imply that a normal weekly batch costs >$0.30 (the high end of the spec's projection), bump `MAX_COST_PER_RUN` default in Task 7's code from `1.00` to ~3× normal usage. The cap is meant to catch bugs, not normal usage.
+
+- [ ] **Step 5: Pre-flight check — pandas isn't used outside the deleted tests**
+
+Run: `grep -rn "import pandas\|from pandas" --include='*.py' .`
+Expected: only references in `tests/test_tools.py::test_google_trends_*` (which are deleted in Task 2). If any other file imports pandas, surface this to the user before proceeding — Task 2 will break things.
+
+- [ ] **Step 6: Acknowledge — no commit required**
+
+This task changes nothing in the repo unless Step 3 fired. Continue to Task 1.
+
+---
+
 ## Task 1: Convert `tools.py` into a `tools/` package
 
 **Why first:** Python cannot have `tools.py` and `tools/` coexist. Every later task that imports from `tools` depends on this. Existing imports (`from tools import jina_reader, tavily_search_tool, ...` in `agents/research_agent.py`; `from tools import tavily_search_tool, people_also_ask, google_trends` in `agents/seo_agent.py`) must keep working after this conversion.
+
+**Important:** `agents/seo_agent.py` imports `people_also_ask` and `google_trends` and won't be updated to drop them until Task 14. To prevent the repo from being import-broken for the entire Task 2–13 stretch, this task keeps **deprecation shims** for those two names in `tools/__init__.py` — they exist as callable stubs that raise `NotImplementedError` if invoked. The shims are deleted in Task 14 as part of the SEO agent's tool list swap.
 
 **Files:**
 - Delete: `tools.py`
@@ -75,7 +121,13 @@ Confirm it contains: `jina_reader`, `google_trends`, `people_also_ask`, `list_co
 Create `tests/test_tools_package.py`:
 
 ```python
-"""Confirms the tools/ package re-exports legacy names after the tools.py → tools/ conversion."""
+"""Confirms the tools/ package re-exports legacy names after the tools.py → tools/ conversion.
+
+The people_also_ask and google_trends shims exist but raise NotImplementedError
+when called. They are removed in Task 14 once the SEO agent stops importing them.
+"""
+
+import pytest
 
 
 def test_research_agent_imports_still_work():
@@ -86,30 +138,43 @@ def test_research_agent_imports_still_work():
     assert callable(read_codebase_file)
 
 
-def test_orphaned_seo_tools_are_removed():
-    """people_also_ask and google_trends are dead after dep removal — they MUST NOT exist."""
-    import tools
-    assert not hasattr(tools, "people_also_ask")
-    assert not hasattr(tools, "google_trends")
+def test_seo_agent_imports_resolve_to_shims():
+    """seo_agent.py still imports these until Task 14; the shims keep the import alive."""
+    from tools import people_also_ask, google_trends
+    assert callable(people_also_ask)
+    assert callable(google_trends)
+
+
+def test_shims_raise_when_invoked():
+    """Calling a shim is a programmer error — the SEO agent's tool list is swapped in Task 14."""
+    from tools import people_also_ask, google_trends
+    with pytest.raises(NotImplementedError):
+        people_also_ask.invoke({"query": "x"})
+    with pytest.raises(NotImplementedError):
+        google_trends.invoke({"keyword": "x"})
 ```
 
 - [ ] **Step 3: Run the test to confirm current state**
 
 Run: `uv run pytest tests/test_tools_package.py -v`
-Expected: PASSES on the first test (legacy `tools.py` still re-exports them) but FAILS on the second test (because `people_also_ask` and `google_trends` still exist).
+Expected: FAIL on `test_shims_raise_when_invoked` (current `tools.py` provides real implementations) and FAIL on `test_seo_agent_imports_resolve_to_shims` if pytest can't even import the test module because pytrends/SerpAPI aren't installed in your dev env — that's fine, the implementation step removes them.
 
 - [ ] **Step 4: Create the `tools/` directory and move keepable code**
 
 Run: `mkdir tools`
 
-Create `tools/__init__.py` with only the kept functions:
+Create `tools/__init__.py` with the kept functions PLUS deprecation shims:
 
 ```python
 """Tools package. Re-exports the research-agent tools.
 
 DataForSEO tools live in `tools.dataforseo` and are imported by the SEO agent
-directly from that module. They are not re-exported here to keep the surface
-minimal.
+directly from that module after Task 14.
+
+The people_also_ask and google_trends shims below exist solely to keep
+`agents/seo_agent.py` importable between Tasks 2 and 13 (the SEO agent
+swaps its tool list in Task 14). They raise NotImplementedError when
+invoked — if anything actually calls them, that's a bug.
 """
 
 from pathlib import Path
@@ -152,6 +217,30 @@ def read_codebase_file(relative_path: str) -> str:
 
 
 tavily_search_tool = TavilySearch(max_results=5)
+
+
+# --- Deprecation shims (deleted in Task 14) ---
+# Reason these exist at all: agents/seo_agent.py still does
+# `from tools import people_also_ask, google_trends`. If we delete those
+# names here in Task 1, the import fails until Task 14. The shims keep
+# the import alive but raise loudly if called.
+
+@tool
+def people_also_ask(query: str) -> str:
+    """DEPRECATED. Removed in Task 14 — SEO agent uses dfs_serp_live_advanced."""
+    raise NotImplementedError(
+        "people_also_ask was removed. The SEO agent should be calling "
+        "dfs_serp_live_advanced from tools.dataforseo (Task 14)."
+    )
+
+
+@tool
+def google_trends(keyword: str) -> str:
+    """DEPRECATED. Removed in Task 14 — SEO agent uses dfs_keyword_suggestions + dfs_bulk_keyword_data."""
+    raise NotImplementedError(
+        "google_trends was removed. The SEO agent should be calling "
+        "dfs_keyword_suggestions / dfs_bulk_keyword_data from tools.dataforseo (Task 14)."
+    )
 ```
 
 - [ ] **Step 5: Delete the old `tools.py`**
@@ -173,15 +262,15 @@ Expected: existing tests that touched `people_also_ask` / `google_trends` (in `t
 ```bash
 git add tools/ tests/test_tools_package.py
 git rm tools.py
-git commit -m "refactor: convert tools.py into tools/ package, drop SerpAPI/pytrends tools
+git commit -m "refactor: convert tools.py into tools/ package + shim deprecated tools
 
 Python won't let tools.py and tools/ coexist; later tasks add
 tools/dataforseo.py. The package's __init__.py re-exports the
-research-agent tools so existing imports in agents/research_agent.py
-keep working unchanged.
+research-agent tools so agents/research_agent.py keeps working.
 
-people_also_ask and google_trends are removed — they depend on
-SerpAPI and pytrends, both being dropped in this spec."
+people_also_ask and google_trends are stubs that raise
+NotImplementedError. They exist only to keep agents/seo_agent.py
+importable until Task 14 swaps its tool list. Deleted in Task 14."
 ```
 
 ---
@@ -388,9 +477,9 @@ leaves a half-written file."
 - Modify: `services/calendar_service.py`
 - Modify: `tests/test_services.py` (verify existing behavior unchanged)
 
-- [ ] **Step 1: Update `save_calendar` to use atomic write**
+- [ ] **Step 1: Update `save_calendar` to use atomic write (preserve current signatures)**
 
-Open `services/calendar_service.py`. Replace the `save_calendar` function:
+Open `services/calendar_service.py`. The only change is to route `save_calendar` through `atomic_write_text`. Every other function, including `update_status`'s `pr_url` parameter (added by the upstream auto-blog-PR feature), is preserved verbatim:
 
 ```python
 import json
@@ -434,6 +523,7 @@ async def update_status(
     entry_id: str,
     status: ArticleStatus,
     draft_path: Optional[str] = None,
+    pr_url: Optional[str] = None,
 ) -> None:
     entries = await load_calendar()
     for entry in entries:
@@ -441,6 +531,8 @@ async def update_status(
             entry.status = status
             if draft_path is not None:
                 entry.draft_path = draft_path
+            if pr_url is not None:
+                entry.pr_url = pr_url
     await save_calendar(entries)
 ```
 
@@ -540,35 +632,40 @@ DATAFORSEO_PASSWORD=your-api-password
 
 The `SERPAPI_API_KEY` line is gone. The Google service-account lines are commented out — they'll be uncommented in Task 17.
 
-- [ ] **Step 3: Update Hatch packages in `pyproject.toml`**
+- [ ] **Step 3: Create the `renderers/` placeholder**
 
-Open `pyproject.toml`. Update the wheel packages list:
+The `renderers/` package is fully populated in Tasks 23–24, but the Hatch wheel-packages list (next sub-step) will reference it now. Hatch requires the directory and its `__init__.py` to exist at registration time. Create the placeholder unconditionally:
+
+```bash
+mkdir -p renderers
+```
+
+Create `renderers/__init__.py` with one line of content (empty files trip some linters):
+
+```python
+"""Renderers for the measurement brief. Populated in Tasks 23-24."""
+```
+
+- [ ] **Step 4: Update Hatch packages in `pyproject.toml`**
+
+Open `pyproject.toml`. Replace the wheel packages list:
 
 ```toml
 [tool.hatch.build.targets.wheel]
 packages = ["agents", "chains", "models", "prompts", "renderers", "services", "tests", "tools"]
 ```
 
-(The `renderers` package is added in Task 24; including it now is safe — empty package or missing directory does not fail Hatch's discovery; if it does, we'll create an empty `renderers/__init__.py` placeholder here.)
-
-If the package discovery complains about `renderers`, also create a placeholder:
-
-```bash
-mkdir -p renderers
-touch renderers/__init__.py
-```
-
-- [ ] **Step 4: Sync dependencies**
+- [ ] **Step 5: Sync dependencies**
 
 Run: `uv sync`
 Expected: no errors.
 
-- [ ] **Step 5: Confirm settings import works**
+- [ ] **Step 6: Confirm settings import works**
 
 Run: `uv run python -c "from config import settings; print(bool(settings.dataforseo_login or True), settings.dataforseo_max_cost_per_run)"`
 Expected: `True 1.0`
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add config.py .env.example pyproject.toml renderers/__init__.py
@@ -1702,15 +1799,30 @@ Open `agents/orchestrator.py`. Add at the bottom:
 async def run_validate() -> int:
     """Cheap end-to-end validation of external integrations.
 
-    GSC + GA4 checks are added in Task 20. For now, only DataForSEO is checked.
+    GSC + GA4 checks are added in Task 19. For now, only DataForSEO is checked.
     Returns 0 on full success, 1 if any check failed.
+
+    Each check is independent and degrades gracefully — a missing credential
+    must produce a clean [FAIL] line, not a Python traceback. That's the
+    entire point of validate mode.
     """
-    from services.dataforseo_client import get_client
+    from services.dataforseo_client import get_client, DataForSEOClient
 
     results: list[tuple[str, bool, str]] = []
 
-    client = get_client()
-    ok, message = await client.validate()
+    dfs_client: DataForSEOClient | None = None
+    try:
+        dfs_client = get_client()
+        ok, message = await dfs_client.validate()
+    except Exception as exc:  # noqa: BLE001
+        # Covers RuntimeError on missing credentials and any other init failure.
+        ok, message = False, f"Could not construct client: {exc}"
+    finally:
+        if dfs_client is not None:
+            try:
+                await dfs_client.aclose()
+            except Exception:  # noqa: BLE001
+                pass  # Cleanup failure shouldn't mask the real error.
     results.append(("DataForSEO", ok, message))
 
     all_ok = True
@@ -1763,27 +1875,55 @@ In the `main()` dispatch, add:
         asyncio.run(_run_validate())
 ```
 
-- [ ] **Step 6: Run the test suite**
+- [ ] **Step 6: Add the missing-credentials test**
+
+Append to `tests/test_dataforseo_client.py`:
+
+```python
+async def test_run_validate_handles_missing_credentials_cleanly(capsys):
+    """The exact case validate exists to diagnose: empty .env must produce
+    [FAIL] DataForSEO: ... not a traceback."""
+    from agents.orchestrator import run_validate
+    from services import dataforseo_client as mod
+
+    mod._client = None
+    with patch.object(mod, "settings") as mock_settings:
+        mock_settings.dataforseo_login = ""
+        mock_settings.dataforseo_password = ""
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        exit_code = await run_validate()
+
+    assert exit_code == 1
+    captured = capsys.readouterr()
+    assert "[FAIL] DataForSEO" in captured.out
+    assert "must be set" in captured.out.lower() or "could not construct" in captured.out.lower()
+```
+
+- [ ] **Step 7: Run the test suite**
 
 Run: `uv run pytest tests/test_dataforseo_client.py -v`
-Expected: all PASS.
+Expected: all PASS, including the new missing-credentials test.
 
-- [ ] **Step 7: Smoke-test the validate command**
+- [ ] **Step 8: Smoke-test the validate command**
 
 If you have real DFS credentials set up:
 ```bash
 uv run python main.py --mode validate
 ```
-Expected: prints `[PASS] DataForSEO: ... Balance: $...`. Without credentials, it should print `[FAIL] DataForSEO: ...`.
+Expected: prints `[PASS] DataForSEO: ... Balance: $...`. Without credentials, it should print `[FAIL] DataForSEO: Could not construct client: ...` (and exit code 1) — never a traceback.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 9: Commit**
 
 ```bash
 git add services/dataforseo_client.py agents/orchestrator.py main.py tests/test_dataforseo_client.py
 git commit -m "feat: add --mode validate for DataForSEO
 
-Calls free /v3/appendix/user_data endpoint. Exit code 0 on success,
-1 on any failure. GSC + GA4 are appended in Task 20."
+Calls free /v3/appendix/user_data endpoint. Wraps get_client() in
+try/except so missing credentials produce a clean [FAIL] line, not
+a traceback. Closes the httpx AsyncClient in a finally block.
+Exit code 0 on success, 1 on any failure. GSC + GA4 added in Task 19."
 ```
 
 ---
@@ -1954,6 +2094,7 @@ def _to_calendar_entry(plan) -> ContentCalendarEntry:
         meta_description=plan.meta_description,
         suggested_headings=plan.suggested_headings,
         cta_prompt=plan.cta_prompt,
+        blog_category=plan.blog_category,   # preserved from upstream auto-PR feature
     )
 
 
@@ -1998,7 +2139,26 @@ async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[Con
     return [_to_calendar_entry(plan) for plan in output.articles]
 ```
 
-- [ ] **Step 4: Update the TOOLS section of `prompts/md/agents/seo_system.md`**
+- [ ] **Step 4: Remove the deprecation shims from `tools/__init__.py`**
+
+The SEO agent no longer imports `people_also_ask` or `google_trends` (the file you just wrote uses the DataForSEO tools instead). The shims in `tools/__init__.py` (Task 1) are now dead.
+
+Open `tools/__init__.py`. Delete the entire "Deprecation shims" block at the bottom of the file (the two `@tool`-decorated functions for `people_also_ask` and `google_trends`, plus the comment header that explains them).
+
+Also update `tests/test_tools_package.py`: delete `test_seo_agent_imports_resolve_to_shims` and `test_shims_raise_when_invoked`. Add their replacement:
+
+```python
+def test_orphaned_seo_tools_are_gone():
+    """people_also_ask and google_trends are removed in Task 14 — they MUST NOT exist."""
+    import tools
+    assert not hasattr(tools, "people_also_ask")
+    assert not hasattr(tools, "google_trends")
+```
+
+Run: `uv run pytest tests/test_tools_package.py -v`
+Expected: all PASS.
+
+- [ ] **Step 5: Update the TOOLS section of `prompts/md/agents/seo_system.md`**
 
 Open `prompts/md/agents/seo_system.md`. Replace the existing `# TOOLS` section (around lines 13–17 of the current file) with:
 
@@ -2016,26 +2176,29 @@ Open `prompts/md/agents/seo_system.md`. Replace the existing `# TOOLS` section (
   filter obviously bad bets (zero volume, difficulty above 50).
 ```
 
-- [ ] **Step 5: Run the test**
+- [ ] **Step 6: Run the test**
 
 Run: `uv run pytest tests/test_seo_agent_budget.py -v`
 Expected: PASS.
 
-- [ ] **Step 6: Run the full suite**
+- [ ] **Step 7: Run the full suite**
 
 Run: `uv run pytest -x -q`
 Expected: PASS (any old test that referenced the removed tools should already have been cleaned in Tasks 1–2).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-git add agents/seo_agent.py prompts/md/agents/seo_system.md tests/test_seo_agent_budget.py
-git commit -m "feat: switch SEO agent to DataForSEO tools + budget fall-through
+git add agents/seo_agent.py prompts/md/agents/seo_system.md tools/__init__.py tests/test_seo_agent_budget.py tests/test_tools_package.py
+git commit -m "feat: switch SEO agent to DataForSEO tools + remove deprecation shims
 
 Tool list is now [dfs_serp_live_advanced, dfs_keyword_suggestions,
 dfs_bulk_keyword_data]. The agent caller catches
 DataForSEOBudgetExceeded around ainvoke and runs synthesis on
 partial data instead of crashing.
+
+Removes the Task 1 deprecation shims for people_also_ask and
+google_trends now that nothing imports them.
 
 This is the spec's 'decision point' — run a real weekly batch and
 compare output to the last manual one before proceeding."
@@ -2458,7 +2621,10 @@ def _build_mock_response(fixture_name: str):
     return resp
 
 
-async def test_query_blog_engagement_merges_two_reports():
+async def test_query_blog_engagement_returns_rows_and_cta_separately():
+    """GA4 client returns a (rows, cta_clicks_by_path) tuple. The separation
+    means downstream code doesn't have to do a fragile divide-by-row-count
+    trick to dedupe per-path CTA counts across multiple source/medium splits."""
     from services import ga4_client
 
     eng = _build_mock_response("ga4_engagement_response.json")
@@ -2472,31 +2638,27 @@ async def test_query_blog_engagement_merges_two_reports():
         mock_settings.ga4_property_id = "123456789"
         mock_settings.google_application_credentials = "/tmp/fake.json"
 
-        rows = await ga4_client.query_blog_engagement(
+        rows, cta_by_path = await ga4_client.query_blog_engagement(
             start_date=date(2026, 4, 21),
             end_date=date(2026, 5, 19),
         )
 
-    # Engagement rows for tutorial-hell-progress (2 source/medium splits)
-    # plus the conversion row merged on pagePath.
-    by_path = {(r["page_path"], r["source_medium"]): r for r in rows}
+    # Engagement rows for tutorial-hell-progress (2 source/medium splits).
+    by_key = {(r["page_path"], r["source_medium"]): r for r in rows}
 
-    organic = by_path[("/blog/tutorial-hell-progress", "google / organic")]
+    organic = by_key[("/blog/tutorial-hell-progress", "google / organic")]
     assert organic["active_users"] == 24
     assert organic["engaged_sessions"] == 18
     assert organic["avg_session_duration"] == 102.5
-    # Conversion events are attributed at the pagePath level
-    # (not the source/medium split, since the conversion report doesn't include it).
-    assert organic["cta_click_count"] == 2
 
-    twitter = by_path[("/blog/tutorial-hell-progress", "twitter / referral")]
+    twitter = by_key[("/blog/tutorial-hell-progress", "twitter / referral")]
     assert twitter["active_users"] == 3
-    # Same page → same cta_click_count attribution.
-    assert twitter["cta_click_count"] == 2
 
-    anki = by_path[("/blog/anki-review-queue-burnout", "(direct) / (none)")]
+    anki = by_key[("/blog/anki-review-queue-burnout", "(direct) / (none)")]
     assert anki["active_users"] == 1
-    assert anki["cta_click_count"] == 0  # No conversion row for this page.
+
+    # CTA attribution is per-path, not per-split. Returned as a dict.
+    assert cta_by_path == {"/blog/tutorial-hell-progress": 2}
 ```
 
 - [ ] **Step 3: Run to verify failure**
@@ -2563,12 +2725,22 @@ def _blog_path_filter() -> FilterExpression:
     )
 
 
-async def query_blog_engagement(start_date: date, end_date: date) -> list[dict[str, Any]]:
-    """Per-(pagePath, sourceMedium) engagement + CTA conversion for /blog/ URLs.
+async def query_blog_engagement(
+    start_date: date, end_date: date
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Per-(pagePath, sourceMedium) engagement + per-pagePath CTA conversion.
 
-    Returns rows with keys:
-      page_path, source_medium, active_users, engaged_sessions,
-      avg_session_duration, cta_click_count
+    Returns a tuple:
+      (engagement_rows, cta_clicks_by_path)
+
+      engagement_rows: list of dicts with keys
+        page_path, source_medium, active_users, engaged_sessions, avg_session_duration
+
+      cta_clicks_by_path: dict mapping page_path → total signup_cta_click count
+
+    Returning these separately (rather than denormalizing CTA into every
+    engagement row) means downstream code doesn't have to dedupe a CTA
+    count that's been duplicated across multiple source/medium splits.
     """
     client = _build_async_client()
     property_path = f"properties/{settings.ga4_property_id}"
@@ -2619,20 +2791,17 @@ async def query_blog_engagement(start_date: date, end_date: date) -> list[dict[s
         count = int(row.metric_values[0].value or 0)
         cta_by_path[page_path] = cta_by_path.get(page_path, 0) + count
 
-    # Build the merged engagement rows.
-    out: list[dict[str, Any]] = []
+    # Build engagement rows (no CTA field — that's returned separately).
+    rows: list[dict[str, Any]] = []
     for row in eng_resp.rows or []:
-        page_path = row.dimension_values[0].value
-        source_medium = row.dimension_values[1].value
-        out.append({
-            "page_path": page_path,
-            "source_medium": source_medium,
+        rows.append({
+            "page_path": row.dimension_values[0].value,
+            "source_medium": row.dimension_values[1].value,
             "active_users": int(row.metric_values[0].value or 0),
             "engaged_sessions": int(row.metric_values[1].value or 0),
             "avg_session_duration": float(row.metric_values[2].value or 0.0),
-            "cta_click_count": cta_by_path.get(page_path, 0),
         })
-    return out
+    return rows, cta_by_path
 
 
 async def validate() -> tuple[bool, str]:
@@ -2867,8 +3036,13 @@ def score_position(avg_position: float) -> Label:
     return Label.poor
 
 
-def _expected_ctr_for_position(pos: float) -> float:
-    """Interpolate expected CTR between table anchors."""
+def expected_ctr_for_position(pos: float) -> float:
+    """Interpolate expected CTR between table anchors.
+
+    Public so the measurement_agent can use the same baseline for the
+    'reason' string it attaches to CTR scores — avoids a parallel
+    source of truth.
+    """
     table = _EXPECTED_CTR_BY_POSITION
     if pos <= table[0][0]:
         return table[0][1]
@@ -2882,7 +3056,7 @@ def _expected_ctr_for_position(pos: float) -> float:
 
 
 def score_ctr(ctr: float, avg_position: float) -> Label:
-    expected = _expected_ctr_for_position(avg_position)
+    expected = expected_ctr_for_position(avg_position)
     if ctr >= expected * 0.95:
         return Label.good
     if ctr >= expected * 0.5:
@@ -3093,6 +3267,15 @@ class MeasurementReport:
     data_source_status: DataSourceStatus = field(
         default_factory=lambda: DataSourceStatus(False, False, False, [])
     )
+
+
+@dataclass
+class FinalMeasurementReport:
+    """Deterministic report + LLM-produced prose, merged. Both renderers consume this type."""
+    report: MeasurementReport
+    actions: list                 # list[MeasurementActionOutput], typed Any to avoid Pydantic circular import
+    verdicts: dict[str, str]      # article_id → verdict prose
+    coverage_note: str            # LLM coverage prose, with any deterministic status notes prepended
 
 
 def normalize_url(url: Optional[str]) -> str:
@@ -4027,9 +4210,10 @@ async def test_run_measure_assembles_full_report():
             "page_path": "/blog/tutorial-hell-progress",
             "source_medium": "google / organic",
             "active_users": 24, "engaged_sessions": 18,
-            "avg_session_duration": 102.5, "cta_click_count": 2,
+            "avg_session_duration": 102.5,
         }
     ]
+    ga4_cta_by_path = {"/blog/tutorial-hell-progress": 2}
 
     dfs_ranked = [
         {"keyword": "tutorial hell python", "position": 28.0, "volume": 90,
@@ -4055,7 +4239,7 @@ async def test_run_measure_assembles_full_report():
          patch("agents.measurement_agent.file_service.read_text", AsyncMock(return_value="## Product Facts\n- x")):
 
         mock_gsc.query_blog_performance = AsyncMock(return_value=gsc_rows)
-        mock_ga4.query_blog_engagement = AsyncMock(return_value=ga4_rows)
+        mock_ga4.query_blog_engagement = AsyncMock(return_value=(ga4_rows, ga4_cta_by_path))
 
         mock_dfs = MagicMock()
         mock_dfs.ranked_keywords_for_site = AsyncMock(return_value=dfs_ranked)
@@ -4076,7 +4260,60 @@ async def test_run_measure_assembles_full_report():
     assert "position" in article.metrics
     # LLM-side merged in.
     assert "page 1" in final_report.verdicts["tutorial-hell-progress"].lower()
-    assert final_report.coverage_note.startswith("All three sources")
+    # Deterministic status notes prepended to LLM coverage_note.
+    assert "All three sources" in final_report.coverage_note
+
+
+async def test_run_measure_surfaces_skipped_articles_missing_live_url():
+    """A published entry missing live_url MUST appear in coverage_note,
+    not silently disappear from the brief (spec backfill note)."""
+    from agents import measurement_agent
+    from models.article import ContentCalendarEntry, ArticleStatus, ArticleType
+    from output_schemas import MeasurementBriefOutput
+
+    entries = [
+        ContentCalendarEntry(
+            id="legacy-article",
+            status=ArticleStatus.published,
+            title="...",
+            primary_keyword="...",
+            secondary_keywords=[],
+            article_type=ArticleType.standard,
+            target_audience="...",
+            angle="...",
+            meta_description="...",
+            # NO published_at, NO live_url — legacy pre-spec entry.
+        )
+    ]
+
+    mock_output = MeasurementBriefOutput(actions=[], article_verdicts=[], coverage_note="")
+
+    with patch("agents.measurement_agent.load_calendar", AsyncMock(return_value=entries)), \
+         patch("agents.measurement_agent.gsc_client") as mock_gsc, \
+         patch("agents.measurement_agent.ga4_client") as mock_ga4, \
+         patch("agents.measurement_agent.get_dfs_client") as mock_get_dfs, \
+         patch("agents.measurement_agent.get_llm") as mock_get_llm, \
+         patch("agents.measurement_agent.file_service.read_text", AsyncMock(return_value="facts")):
+
+        mock_gsc.query_blog_performance = AsyncMock(return_value=[])
+        mock_ga4.query_blog_engagement = AsyncMock(return_value=([], {}))
+
+        mock_dfs = MagicMock()
+        mock_dfs.ranked_keywords_for_site = AsyncMock(return_value=[])
+        mock_get_dfs.return_value = mock_dfs
+
+        mock_llm = MagicMock()
+        mock_chain = MagicMock()
+        mock_chain.ainvoke = AsyncMock(return_value=mock_output)
+        mock_llm.with_structured_output.return_value = mock_chain
+        mock_get_llm.return_value = mock_llm
+
+        final = await measurement_agent.run_measurement_agent(days=28)
+
+    assert "legacy-article" in final.coverage_note
+    assert "missing live_url" in final.coverage_note or "live_url/published_at" in final.coverage_note
+    # Article must NOT silently appear in per_article — it should be skipped.
+    assert final.report.per_article == []
 ```
 
 - [ ] **Step 2: Run to verify failure**
@@ -4095,7 +4332,6 @@ Numbers are deterministic; only the prose interpretation goes through an LLM.
 """
 
 import asyncio
-from dataclasses import dataclass
 from datetime import date, timedelta
 from urllib.parse import urlparse
 
@@ -4104,6 +4340,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from models.article import ArticleStatus, ContentCalendarEntry
 from models.measurement import (
     DataSourceStatus,
+    FinalMeasurementReport,
     GapOpportunity,
     MeasurementReport,
     MetricScore,
@@ -4120,6 +4357,7 @@ from services.dataforseo_client import get_client as get_dfs_client
 from services.llm import get_llm
 from services.scoring import (
     Label,
+    expected_ctr_for_position,
     score_cta_rate,
     score_ctr,
     score_engagement_time,
@@ -4129,14 +4367,6 @@ from services.scoring import (
 
 
 GSC_LAG_DAYS = 3   # See spec Section 5: GSC 'final' data lags ~2-3 days.
-
-
-@dataclass
-class FinalMeasurementReport:
-    report: MeasurementReport
-    actions: list                 # list[MeasurementActionOutput]
-    verdicts: dict                # article_id -> verdict string
-    coverage_note: str
 
 
 measurement_synthesis_prompt = load_prompt("chains/measurement_synthesis.md")
@@ -4172,10 +4402,12 @@ async def _safe_gsc(start, end):
 
 
 async def _safe_ga4(start, end):
+    """Returns ((rows, cta_by_path), error_message_or_none)."""
     try:
-        return await ga4_client.query_blog_engagement(start, end), None
+        rows, cta_by_path = await ga4_client.query_blog_engagement(start, end)
+        return (rows, cta_by_path), None
     except Exception as exc:  # noqa: BLE001
-        return [], f"GA4 fetch failed: {exc}"
+        return ([], {}), f"GA4 fetch failed: {exc}"
 
 
 async def _safe_dfs_ranked():
@@ -4191,9 +4423,22 @@ def _aggregate_per_article(
     entries: list[ContentCalendarEntry],
     gsc_rows: list[dict],
     ga4_rows: list[dict],
+    ga4_cta_by_path: dict[str, int],
     end_iso: date,
-) -> list[ScoredArticlePerformance]:
-    """Join GSC + GA4 rows to calendar entries on exact normalized live_url."""
+) -> tuple[list[ScoredArticlePerformance], list[str]]:
+    """Join GSC + GA4 rows to calendar entries on exact normalized live_url.
+
+    Returns (per_article, coverage_skipped_ids). Caller is expected to surface
+    any skipped ids in DataSourceStatus.notes so they don't silently disappear
+    from the brief.
+
+    URL matching is intentionally asymmetric:
+      - GSC returns FULL URLs in the 'page' field (host + path) → join on
+        normalize_url(r["page"]) == normalize_url(entry.live_url).
+      - GA4 returns only the path in 'page_path' → join on rstrip("/") of
+        the path. Do NOT try to "unify" these — they're different upstream
+        contracts.
+    """
     out: list[ScoredArticlePerformance] = []
     coverage_skipped: list[str] = []
 
@@ -4207,7 +4452,7 @@ def _aggregate_per_article(
         target_url = normalize_url(entry.live_url)
         # GSC join on full URL.
         gsc_for_article = [r for r in gsc_rows if normalize_url(r["page"]) == target_url]
-        # GA4 join on pagePath only.
+        # GA4 join on pagePath only (different upstream contract — see docstring).
         target_path = urlparse(target_url).path
         ga4_for_article = [r for r in ga4_rows if r["page_path"].rstrip("/") == target_path]
 
@@ -4226,8 +4471,9 @@ def _aggregate_per_article(
             sum(r["avg_session_duration"] * r["active_users"] for r in ga4_for_article) / users
             if users else 0.0
         )
-        cta_clicks = sum(r["cta_click_count"] for r in ga4_for_article) // max(1, len(ga4_for_article))
-        # Each ga4 row carries the same cta_click_count for its pagePath; the // dedupes.
+        # CTA is attributed per-path, looked up in the separate dict from ga4_client.
+        # Looking up under the same target_path the engagement join used.
+        cta_clicks = ga4_cta_by_path.get(target_path, 0)
 
         metrics = {
             "position": MetricScore(
@@ -4242,7 +4488,7 @@ def _aggregate_per_article(
                 display=f"{ctr * 100:.1f}%",
                 label=score_ctr(ctr, avg_position) if impressions else Label.insufficient_data,
                 reason=(
-                    f"vs ~{0.06 if avg_position > 5 else 0.11:.0%} expected at this position"
+                    f"vs ~{expected_ctr_for_position(avg_position):.1%} expected at this position"
                     if impressions else "no impressions yet"
                 ),
             ),
@@ -4288,7 +4534,7 @@ def _aggregate_per_article(
             top_queries=top_queries,
         ))
 
-    return out
+    return out, coverage_skipped
 
 
 def _gap_opportunities(
@@ -4329,17 +4575,28 @@ async def run_measurement_agent(days: int = 28) -> FinalMeasurementReport:
 
     entries = await load_calendar()
 
-    # Parallel fetch.
-    (gsc_rows, gsc_err), (ga4_rows, ga4_err), (dfs_rows, dfs_err) = await asyncio.gather(
+    # Parallel fetch. GA4 result is a (rows, cta_by_path) tuple.
+    (gsc_rows, gsc_err), (ga4_result, ga4_err), (dfs_rows, dfs_err) = await asyncio.gather(
         _safe_gsc(start, end),
         _safe_ga4(start, end),
         _safe_dfs_ranked(),
     )
+    ga4_rows, ga4_cta_by_path = ga4_result
 
     notes: list[str] = []
     if gsc_err: notes.append(gsc_err)
     if ga4_err: notes.append(ga4_err)
     if dfs_err: notes.append(dfs_err)
+
+    per_article, skipped_ids = _aggregate_per_article(
+        entries, gsc_rows, ga4_rows, ga4_cta_by_path, end
+    )
+    if skipped_ids:
+        notes.append(
+            f"{len(skipped_ids)} published article(s) missing live_url/published_at "
+            f"and skipped: {', '.join(skipped_ids)}. "
+            f"Run --mark-published <id> --url <live_url> to include."
+        )
 
     status = DataSourceStatus(
         gsc_ok=gsc_err is None,
@@ -4348,7 +4605,6 @@ async def run_measurement_agent(days: int = 28) -> FinalMeasurementReport:
         notes=notes,
     )
 
-    per_article = _aggregate_per_article(entries, gsc_rows, ga4_rows, end)
     gap_opps = _gap_opportunities(entries, dfs_rows)
 
     headline = {
@@ -4391,11 +4647,23 @@ async def run_measurement_agent(days: int = 28) -> FinalMeasurementReport:
     valid_ids = {a.article_id for a in per_article}
     verdicts = {v.article_id: v.verdict for v in output.article_verdicts if v.article_id in valid_ids}
 
+    # Spec Section 6: deterministic data_source_status.notes must be prepended
+    # to the final coverage_note so a failed source / skipped article can't be
+    # softened or omitted by the LLM.
+    coverage_parts: list[str] = []
+    if status.notes:
+        coverage_parts.append("Data-source / coverage notes (deterministic):")
+        for note in status.notes:
+            coverage_parts.append(f"  - {note}")
+    if output.coverage_note:
+        coverage_parts.append(output.coverage_note)
+    final_coverage_note = "\n".join(coverage_parts)
+
     return FinalMeasurementReport(
         report=report,
         actions=list(output.actions),
         verdicts=verdicts,
-        coverage_note=output.coverage_note,
+        coverage_note=final_coverage_note,
     )
 ```
 
@@ -4435,15 +4703,24 @@ async def run_measure(days: int = 28) -> tuple[Path, Path]:
     from renderers.measurement_md import render_md
     from renderers.measurement_html import render_html
     from services import file_service
+    from services.dataforseo_client import get_client as get_dfs_client
 
-    final = await run_measurement_agent(days=days)
+    try:
+        final = await run_measurement_agent(days=days)
 
-    md = render_md(final)
-    effective_note = "data finalized through " + final.report.window_end
-    html = render_html(final, effective_end_note=effective_note)
+        md = render_md(final)
+        effective_note = "data finalized through " + final.report.window_end
+        html = render_html(final, effective_end_note=effective_note)
 
-    await file_service.atomic_write_text(file_service.MEASUREMENT_BRIEF_MD_PATH, md)
-    await file_service.atomic_write_text(file_service.MEASUREMENT_BRIEF_HTML_PATH, html)
+        await file_service.atomic_write_text(file_service.MEASUREMENT_BRIEF_MD_PATH, md)
+        await file_service.atomic_write_text(file_service.MEASUREMENT_BRIEF_HTML_PATH, html)
+    finally:
+        # Close the httpx AsyncClient on the singleton DFS client to avoid
+        # 'unclosed transport' RuntimeWarning on process exit.
+        try:
+            await get_dfs_client().aclose()
+        except Exception:  # noqa: BLE001
+            pass
 
     return file_service.MEASUREMENT_BRIEF_MD_PATH, file_service.MEASUREMENT_BRIEF_HTML_PATH
 ```
