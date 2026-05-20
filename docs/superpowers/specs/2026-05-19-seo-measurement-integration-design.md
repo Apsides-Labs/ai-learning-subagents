@@ -1,6 +1,6 @@
 # SEO Measurement Integration — Design
 
-- **Date**: 2026-05-19 (revised 2026-05-20 incorporating two-reviewer feedback)
+- **Date**: 2026-05-19 (revised 2026-05-20 twice — first round + post-rebase + this round)
 - **Status**: Draft (awaiting user review)
 - **Scope**: DataForSEO integration + GSC/GA4 measurement + SEO playbook. Defers article-quality upgrades and the 10-article content batch to follow-up sessions.
 - **Related docs**: `docs/superpowers/specs/2026-04-24-marketing-agents-design.md` (the original marketing-agents design this builds on).
@@ -123,7 +123,7 @@ The system grows from a 3-mode pipeline to a 4-mode flywheel:
 - `output_schemas.py` — see Section 6 for the full schema set. Key change from the previous draft: `MeasurementBriefOutput` carries only the LLM's outputs (`actions`, `coverage_note`); per-article data lives in a deterministic `MeasurementReport` dataclass, **not** in any LLM output schema.
 - `main.py` — adds `--mode measure [--days N]`, `--mode validate`, `--mark-published <id> --url <live_url>`.
 - `config.py` + `.env.example` — see Section 5 for the exact final `.env.example` content.
-- `pyproject.toml` — add `google-auth`, `google-api-python-client`, `google-analytics-data`, `jinja2`. Remove `google-search-results` (SerpAPI) and `pytrends`. **Implementation must verify** that `pandas` (transitively pulled by pytrends and used only by the deleted `google_trends` test) is not used anywhere else before removing.
+- `pyproject.toml` — add `google-auth`, `google-api-python-client`, `google-analytics-data`, `jinja2`. Remove `google-search-results` (SerpAPI) and `pytrends`. **Implementation must verify** that `pandas` (transitively pulled by pytrends and used only by the deleted `google_trends` test) is not used anywhere else before removing. Also update `[tool.hatch.build.targets.wheel]` `packages` to include the new `tools` and `renderers` packages — the current list is `["agents", "chains", "models", "prompts", "services", "tests"]`; after this spec it becomes `["agents", "chains", "models", "prompts", "renderers", "services", "tests", "tools"]`. Without this, wheel builds silently skip the new modules.
 - `tests/test_tools.py` — remove the `test_google_trends_*` tests; they reference deleted functions.
 - `Makefile` — add `measure`, `validate` targets.
 
@@ -198,13 +198,14 @@ Both raise `DataForSEOBudgetExceeded`. Overridable via `DATAFORSEO_MAX_COST_PER_
 
 If `DataForSEOBudgetExceeded` fires partway through a weekly batch (say, on candidate 5 of 12):
 
-1. The `seo_agent` catches the exception at the tool-loop boundary.
-2. It surfaces a partial-data note in `gathered_data` ("budget cap reached after N keyword evaluations — synthesis ran on partial data").
-3. The synthesis chain still runs and produces a calendar — possibly with fewer than 4 entries or weaker rationale.
-4. The synthesis output's `data_coverage_note` (existing field on `MarketBriefOutput`-style coverage; introduced for SEO output in this spec via an `seo_coverage_note` on `SEOOutput`) records the cap event.
-5. Orchestrator prints a clear warning to stdout, does not crash.
+1. The `@tool` wrapper re-raises `DataForSEOBudgetExceeded`. The LangChain agent loop does not catch it natively (a tool exception surfaces as a tool error inside the conversation, not as a Python exception). The exception propagates out of `await agent.ainvoke(...)`.
+2. **Implementation site**: wrap `await agent.ainvoke(...)` inside `agents/seo_agent.run_seo_agent` with a `try / except DataForSEOBudgetExceeded`. No change needed to the agent loop itself, only the caller.
+3. On catch, the caller builds a partial `gathered_data` string ("budget cap reached after N keyword evaluations — synthesis ran on partial data") from whatever tool messages already exist in the agent's message history.
+4. The synthesis chain still runs and produces a calendar — possibly with fewer than 4 entries or weaker rationale.
+5. The synthesis output's `seo_coverage_note` field (new on `SEOOutput` — see "Other schema changes" in Section 6) records the cap event.
+6. Orchestrator prints a clear warning to stdout, does not crash.
 
-This matches the existing "fail soft" pattern. Hard crash on cap is the wrong default — it would silently destroy a weekly batch over a bug or a price-table drift.
+This matches the existing "fail soft" pattern used by `MarketBriefOutput.data_coverage_note`. Hard crash on cap is the wrong default — it would silently destroy a weekly batch over a bug or a price-table drift.
 
 ### Endpoint-to-tool exposure (important)
 
@@ -238,10 +239,13 @@ A step-by-step checklist with screenshot placeholders lives in `docs/playbooks/s
 
 ### What we ask GSC for
 
-One method on `services/gsc_client.py`:
+One async-facing method on `services/gsc_client.py`. **`google-api-python-client` is sync-only**, so the public async method wraps a synchronous helper via `asyncio.to_thread`. This keeps the call non-blocking from the event-loop's perspective without inventing a custom async HTTP layer.
 
 ```python
 async def query_blog_performance(start_date: date, end_date: date) -> list[GSCRow]:
+    return await asyncio.to_thread(self._query_blog_performance_sync, start_date, end_date)
+
+def _query_blog_performance_sync(self, start_date, end_date):
     # dimensions: [page, query]
     # metrics:    clicks, impressions, ctr, position
     # rowLimit:   25000  (GSC max per call)
@@ -258,7 +262,7 @@ One API call per measurement run. Returns "for every published article, which qu
 
 GA4's `runReport` cannot filter one metric to one event while leaving other metrics unfiltered. A `dimensionFilter` on `eventName` would scope `activeUsers` / `engagedSessions` / `averageSessionDuration` to only sessions that fired `signup_cta_click`, making engagement metrics meaningless. The correct shape is **two `runReport` calls, merged client-side on `pagePath`**.
 
-`services/ga4_client.py` exposes one public method, two internal report calls:
+`services/ga4_client.py` exposes one public method, two internal report calls. **`google-analytics-data` ships an async client** (`BetaAnalyticsDataAsyncClient` — gRPC-based), so unlike the GSC client, no `asyncio.to_thread` wrapping is needed. Use the async client directly.
 
 ```python
 async def query_blog_engagement(start_date: date, end_date: date) -> list[GA4Row]:
@@ -363,7 +367,12 @@ uv run python main.py --mode measure --days 90       # custom window
 
 3. Deterministic aggregation → MeasurementReport dataclass:
      • Per-article rollups (impressions, clicks, position, engagement,
-       CTA clicks)
+       CTA clicks). GSC `page` and GA4 `pagePath` rows are joined to
+       calendar entries by **exact match on `live_url`** (with a small
+       normalization: trim trailing slash, strip query string and
+       fragment, lowercase host). Rows that match no calendar entry
+       still count in the domain-level headline but are not attributed
+       to any per-article card.
      • Per-article scored metrics via services/scoring.py
        (rule-based labels: GOOD / BORDERLINE / POOR / INSUFFICIENT_DATA)
      • Domain-level headline numbers
@@ -372,6 +381,10 @@ uv run python main.py --mode measure --days 90       # custom window
 
 4. LLM synthesis (measurement_synthesis chain):
      • Input: the MeasurementReport rendered to a compact text summary
+       via `models.measurement.report_to_synthesis_input(report) -> str`
+       — a pure helper alongside the dataclass. Unit-testable (input
+       report → expected prompt fragment) and iterable without touching
+       the agent itself.
      • Output: MeasurementBriefOutput — actions + per-article verdict text
        + coverage_note (one paragraph). LLM never emits numbers; it only
        writes prose interpretation.
@@ -571,6 +584,22 @@ class FinalMeasurementReport:
 
 A renderer reading `FinalMeasurementReport` knows: numbers are trustworthy; prose is LLM-generated and labeled as such in the HTML output.
 
+### Other schema changes
+
+`SEOOutput` (existing schema, used by the synthesis chain in `run_seo_agent`) gains one new field to record the budget fall-through (referenced in Section 4 "Budget-exceeded behavior"):
+
+```python
+# output_schemas.py — existing schema, modified
+
+class SEOOutput(_StrictModel):
+    articles: list[ArticlePlanOutput]
+    seo_coverage_note: str = ""   # NEW. Populated when DataForSEOBudgetExceeded
+                                  # fired mid-batch and synthesis ran on partial data.
+                                  # Empty string when the batch completed normally.
+```
+
+The synthesis prompt (`prompts/md/chains/seo_synthesis.md`) gets a one-line addition telling the LLM to set this field if the input note flags a budget event.
+
 ### Edge cases (handled in the brief, not as errors)
 
 - Article in calendar but `status != published` → silently skipped (not measurable yet).
@@ -590,9 +619,11 @@ Sets three fields on the entry: `status: published`, `published_at: <today's ISO
 Why all three fields:
 - `status: published` — gates the measurement agent's per-article processing.
 - `published_at` — drives "days since publish" for `score_impressions` (which returns `INSUFFICIENT_DATA` for <14 days) and for the "0 impressions after 14 days" alert in `Recommended actions`.
-- `live_url` — needed to join GSC and GA4 rows to calendar entries. Slug-based URL inference is unreliable: the blog template might rewrite slugs, prepend dates, add a locale prefix, etc.
+- `live_url` — needed to join GSC and GA4 rows to calendar entries by exact normalized match (see Section 6 step 3). Slug-based URL inference is unreliable: the blog template might rewrite slugs, prepend dates, add a locale prefix, etc.
 
 The `published` value already exists in `ArticleStatus`; no enum change needed. `ContentCalendarEntry` gains the two new optional fields (Section 3 file list captures this).
+
+**Backfill for entries published before this spec lands.** Any `ContentCalendarEntry` already in `status: published` state when this rolls out will have `published_at` and `live_url` set to `None`. The measurement agent silently skips such entries (no error, but they don't appear in the brief) with a coverage note listing their `id`s as "needs backfill". To make them measurable, run `--mark-published <id> --url <live_url>` once against each one — a one-time backfill. The calendar's current state (`planned` and `needs_review_flagged` entries only, no `published` yet) makes this a near-zero-cost migration today, but the spec calls it out so the operator isn't surprised if previously-published content silently disappears from future briefs.
 
 ---
 
@@ -826,6 +857,6 @@ This spec adds a measurement spine to the existing marketing-agent system. It re
 
 The change is intentionally minimal: ~15 files added, ~10 changed, no rewrites. Each piece is independently shippable. A hand-written playbook turns the integration into something the operator can actually learn from, not just operate.
 
-Total ongoing cost: approximately $0.10 per week against a $50 DataForSEO budget. Total implementation surface: small enough to ship in a single focused session per rollout step.
+Total ongoing cost: approximately $0.10–$0.30 per week against a $50 DataForSEO budget (range exists because Bulk Keyword Difficulty pricing needs re-verification at implementation Step 0 — see Section 4). Total implementation surface: small enough to ship in a single focused session per rollout step.
 
 The leverage is high because measurement turns every future decision in this system from guess to evidence.
