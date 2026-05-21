@@ -103,7 +103,9 @@ This task changes nothing in the repo unless Step 3 fired. Continue to Task 1.
 
 **Why first:** Python cannot have `tools.py` and `tools/` coexist. Every later task that imports from `tools` depends on this. Existing imports (`from tools import jina_reader, tavily_search_tool, ...` in `agents/research_agent.py`; `from tools import tavily_search_tool, people_also_ask, google_trends` in `agents/seo_agent.py`) must keep working after this conversion.
 
-**Important:** `agents/seo_agent.py` imports `people_also_ask` and `google_trends` and won't be updated to drop them until Task 14. To prevent the repo from being import-broken for the entire Task 2–13 stretch, this task keeps **deprecation shims** for those two names in `tools/__init__.py` — they exist as callable stubs that raise `NotImplementedError` if invoked. The shims are deleted in Task 14 as part of the SEO agent's tool list swap.
+**Important — keep real implementations until Task 14:** `agents/seo_agent.py` imports `people_also_ask` and `google_trends` and won't be updated to drop them until Task 14. If this task replaced them with `NotImplementedError` stubs, `--mode weekly` would crash mid-batch for the entire Task 2–13 stretch, violating the plan's "independently shippable per step" goal.
+
+Instead, this task moves the **real working implementations** of `people_also_ask` (SerpAPI) and `google_trends` (pytrends) into `tools/__init__.py` unchanged. The pytrends and `google-search-results` dependencies stay in `pyproject.toml` until Task 14. Task 14 swaps the SEO agent's tool list AND deletes both the functions and the deps together — at that point the SEO agent no longer needs them and the deps are safe to remove.
 
 **Files:**
 - Delete: `tools.py`
@@ -121,13 +123,12 @@ Confirm it contains: `jina_reader`, `google_trends`, `people_also_ask`, `list_co
 Create `tests/test_tools_package.py`:
 
 ```python
-"""Confirms the tools/ package re-exports legacy names after the tools.py → tools/ conversion.
+"""Confirms the tools/ package exposes all the names tools.py exposed.
 
-The people_also_ask and google_trends shims exist but raise NotImplementedError
-when called. They are removed in Task 14 once the SEO agent stops importing them.
+The people_also_ask and google_trends real implementations live here until
+Task 14, when the SEO agent stops importing them and they're deleted along
+with their dependencies (pytrends, google-search-results).
 """
-
-import pytest
 
 
 def test_research_agent_imports_still_work():
@@ -138,49 +139,42 @@ def test_research_agent_imports_still_work():
     assert callable(read_codebase_file)
 
 
-def test_seo_agent_imports_resolve_to_shims():
-    """seo_agent.py still imports these until Task 14; the shims keep the import alive."""
+def test_seo_agent_imports_still_work():
+    """seo_agent.py still imports these until Task 14; they must be callable
+    tools, not stubs — `--mode weekly` would call them otherwise."""
     from tools import people_also_ask, google_trends
     assert callable(people_also_ask)
     assert callable(google_trends)
-
-
-def test_shims_raise_when_invoked():
-    """Calling a shim is a programmer error — the SEO agent's tool list is swapped in Task 14."""
-    from tools import people_also_ask, google_trends
-    with pytest.raises(NotImplementedError):
-        people_also_ask.invoke({"query": "x"})
-    with pytest.raises(NotImplementedError):
-        google_trends.invoke({"keyword": "x"})
 ```
 
 - [ ] **Step 3: Run the test to confirm current state**
 
 Run: `uv run pytest tests/test_tools_package.py -v`
-Expected: FAIL on `test_shims_raise_when_invoked` (current `tools.py` provides real implementations) and FAIL on `test_seo_agent_imports_resolve_to_shims` if pytest can't even import the test module because pytrends/SerpAPI aren't installed in your dev env — that's fine, the implementation step removes them.
+Expected: passes only after `tools.py` is converted to `tools/__init__.py` in Step 4. Currently fails with `ModuleNotFoundError` (no `tools/__init__.py` yet) — that's the correct red state.
 
 - [ ] **Step 4: Create the `tools/` directory and move keepable code**
 
 Run: `mkdir tools`
 
-Create `tools/__init__.py` with the kept functions PLUS deprecation shims:
+Create `tools/__init__.py` by moving the entire body of `tools.py` verbatim. All five `@tool` functions and the `tavily_search_tool` instance survive unchanged:
 
 ```python
-"""Tools package. Re-exports the research-agent tools.
+"""Tools package. Re-exports research-agent and (until Task 14) SEO-agent tools.
 
-DataForSEO tools live in `tools.dataforseo` and are imported by the SEO agent
-directly from that module after Task 14.
+DataForSEO tools (replacements for people_also_ask / google_trends) live in
+`tools.dataforseo`. They become the SEO agent's tool list in Task 14, at
+which point people_also_ask and google_trends are deleted from this file
+and pytrends + google-search-results are removed from pyproject.toml.
 
-The people_also_ask and google_trends shims below exist solely to keep
-`agents/seo_agent.py` importable between Tasks 2 and 13 (the SEO agent
-swaps its tool list in Task 14). They raise NotImplementedError when
-invoked — if anything actually calls them, that's a bug.
+Until then, the SerpAPI and pytrends implementations stay live so that
+`--mode weekly` continues to work through Tasks 1-13.
 """
 
 from pathlib import Path
 import httpx
 from langchain_core.tools import tool
 from langchain_tavily import TavilySearch
+from pytrends.request import TrendReq
 from config import settings
 
 
@@ -191,6 +185,43 @@ async def jina_reader(url: str) -> str:
         response = await client.get(f"https://r.jina.ai/{url}")
         response.raise_for_status()
         return response.text
+
+
+@tool
+def google_trends(keyword: str) -> str:
+    """Check Google Trends interest for a keyword. Returns: rising, stable, falling, or no_data.
+
+    DEPRECATED. Will be removed in Task 14 once the SEO agent stops using it.
+    """
+    pytrends = TrendReq(hl="en-US", tz=360)
+    pytrends.build_payload([keyword], timeframe="today 12-m")
+    df = pytrends.interest_over_time()
+    if df.empty or keyword not in df.columns:
+        return "no_data"
+    values = df[keyword].tolist()
+    mid = len(values) // 2
+    first_half = sum(values[:mid]) or 1
+    second_half = sum(values[mid:]) or 0
+    if second_half > first_half * 1.1:
+        return "rising"
+    if second_half < first_half * 0.9:
+        return "falling"
+    return "stable"
+
+
+@tool
+def people_also_ask(query: str) -> str:
+    """Get People Also Ask questions from Google for a query.
+
+    DEPRECATED. Will be removed in Task 14 once the SEO agent stops using it.
+    """
+    from serpapi import GoogleSearch
+    search = GoogleSearch({"q": query, "api_key": settings.serpapi_api_key})
+    results = search.get_dict()
+    questions = [q.get("question", "") for q in results.get("related_questions", [])[:10]]
+    if not questions:
+        return "No People Also Ask results found."
+    return "\n".join(questions)
 
 
 @tool
@@ -217,31 +248,11 @@ def read_codebase_file(relative_path: str) -> str:
 
 
 tavily_search_tool = TavilySearch(max_results=5)
-
-
-# --- Deprecation shims (deleted in Task 14) ---
-# Reason these exist at all: agents/seo_agent.py still does
-# `from tools import people_also_ask, google_trends`. If we delete those
-# names here in Task 1, the import fails until Task 14. The shims keep
-# the import alive but raise loudly if called.
-
-@tool
-def people_also_ask(query: str) -> str:
-    """DEPRECATED. Removed in Task 14 — SEO agent uses dfs_serp_live_advanced."""
-    raise NotImplementedError(
-        "people_also_ask was removed. The SEO agent should be calling "
-        "dfs_serp_live_advanced from tools.dataforseo (Task 14)."
-    )
-
-
-@tool
-def google_trends(keyword: str) -> str:
-    """DEPRECATED. Removed in Task 14 — SEO agent uses dfs_keyword_suggestions + dfs_bulk_keyword_data."""
-    raise NotImplementedError(
-        "google_trends was removed. The SEO agent should be calling "
-        "dfs_keyword_suggestions / dfs_bulk_keyword_data from tools.dataforseo (Task 14)."
-    )
 ```
+
+This is a pure file relocation. The pytrends/SerpAPI imports and the `serpapi_api_key` setting are unchanged. `--mode weekly` will continue to work identically through Task 13.
+
+Note: `config.py` currently has `serpapi_api_key: str` as a required setting. Do NOT remove it here — Task 14 removes it alongside the dep cleanup.
 
 - [ ] **Step 5: Delete the old `tools.py`**
 
@@ -255,98 +266,74 @@ Expected: both tests PASS.
 - [ ] **Step 7: Run the full test suite to verify nothing else broke**
 
 Run: `uv run pytest -x -q`
-Expected: existing tests that touched `people_also_ask` / `google_trends` (in `tests/test_tools.py`) now fail. That's expected; Task 2 fixes them. The rest must pass.
+Expected: all tests PASS, including the existing `tests/test_tools.py::test_google_trends_*` tests (they still hit the real implementations, just imported from `tools/__init__.py` instead of `tools.py`).
 
 - [ ] **Step 8: Commit**
 
 ```bash
 git add tools/ tests/test_tools_package.py
 git rm tools.py
-git commit -m "refactor: convert tools.py into tools/ package + shim deprecated tools
+git commit -m "refactor: convert tools.py into tools/ package (file move, no behaviour change)
 
 Python won't let tools.py and tools/ coexist; later tasks add
-tools/dataforseo.py. The package's __init__.py re-exports the
-research-agent tools so agents/research_agent.py keeps working.
+tools/dataforseo.py. This task is a pure file relocation: all
+@tool functions (jina_reader, google_trends, people_also_ask,
+list_codebase_files, read_codebase_file) and tavily_search_tool
+keep their original behaviour.
 
-people_also_ask and google_trends are stubs that raise
-NotImplementedError. They exist only to keep agents/seo_agent.py
-importable until Task 14 swaps its tool list. Deleted in Task 14."
+people_also_ask and google_trends, together with their pytrends
+and google-search-results deps, are deleted in Task 14 — once the
+SEO agent has been swapped to DataForSEO tools and no longer needs
+them. Keeping them live through Tasks 1-13 means --mode weekly
+continues to work the whole way through."
 ```
 
 ---
 
-## Task 2: Remove obsolete tests and dependencies
+## Task 2: Verify `--mode weekly` still works after the package conversion
 
-**Why now:** Task 1 left `tests/test_tools.py::test_google_trends_*` failing because the functions no longer exist. Clean them up immediately so the suite is green before adding new code.
+**Why now:** Task 1 moved the SEO-agent tools into the new package without changing their behaviour, but a refactor that looks identical can still subtly break under real load (lazy imports, circular deps, dependency-injection surprises). Catching it here, before code starts to diverge in Task 3+, makes the regression cheap to fix.
+
+**This task changes no source files.** It is one targeted smoke test of the agent loop.
 
 **Files:**
-- Modify: `tests/test_tools.py`
-- Modify: `pyproject.toml`
+- No source changes. Optionally adds one test file.
 
-- [ ] **Step 1: Remove the dead tests**
+- [ ] **Step 1: Confirm research_agent and seo_agent both import cleanly**
 
-Open `tests/test_tools.py`. Delete these test functions entirely:
-- `test_google_trends_rising`
-- `test_google_trends_no_data`
-
-Also remove the unused `import pandas as pd` lines inside those functions (they were local imports inside the test bodies — confirm none remain at module scope).
-
-Keep all other tests: `test_jina_reader_returns_text`, `test_list_codebase_files`, `test_read_codebase_file`, `test_read_codebase_file_not_found`.
-
-- [ ] **Step 2: Verify the file**
-
-Run: `grep -n "google_trends\|people_also_ask\|pytrends\|pandas" tests/test_tools.py`
-Expected: zero matches.
-
-- [ ] **Step 3: Verify pandas isn't used elsewhere**
-
-Run: `grep -rn "import pandas" --include='*.py' .`
-Expected: zero matches. (If pandas is imported anywhere else, stop and surface to the user — the dep removal in step 4 will break things.)
-
-- [ ] **Step 4: Update `pyproject.toml`**
-
-Open `pyproject.toml`. In the `[project] dependencies` list:
-- Remove `"google-search-results>=2.4"` (the SerpAPI client)
-- Remove `"pytrends>=4.9"`
-- Remove `"tavily-python>=0.3"` ONLY IF it's not used by `langchain-tavily` (verify with `grep -rn "import tavily" --include='*.py' .` — keep if found). The codebase uses `langchain_tavily`, which already pulls `tavily-python` transitively, but removal is out of scope for this task to avoid surprises.
-
-Result in the dependencies section:
-
-```toml
-dependencies = [
-    "langchain>=0.3",
-    "langchain-openai>=0.2",
-    "langchain-community>=0.3",
-    "langgraph>=0.2",
-    "tavily-python>=0.3",
-    "pydantic-settings>=2.0",
-    "aiofiles>=24.0",
-    "httpx>=0.27",
-    "python-dotenv>=1.0",
-    "langchain-tavily>=0.2.18",
-]
+Run:
+```bash
+uv run python -c "from agents.research_agent import run_setup_research, run_market_research; print('research ok')"
+uv run python -c "from agents.seo_agent import run_seo_agent; print('seo ok')"
 ```
+Expected: both lines print their `ok` message with no `ImportError`, no `ModuleNotFoundError`, no `AttributeError`.
 
-- [ ] **Step 5: Sync dependencies**
+- [ ] **Step 2: Confirm the tool decorator metadata is intact**
 
-Run: `uv sync`
-Expected: pyproject.lock updates; pandas/pytrends/google-search-results disappear from the lockfile.
-
-- [ ] **Step 6: Run the test suite to confirm green**
-
-Run: `uv run pytest -x -q`
-Expected: all tests PASS.
-
-- [ ] **Step 7: Commit**
+`@tool`-decorated functions should still be `StructuredTool` instances with their original names and docstrings. Run:
 
 ```bash
-git add tests/test_tools.py pyproject.toml uv.lock
-git commit -m "chore: remove pytrends and SerpAPI deps + their tests
-
-google_trends and people_also_ask are deleted (Task 1). pandas was
-only transitively pulled by pytrends and is unused elsewhere.
-SerpAPI's google-search-results goes too."
+uv run python -c "from tools import google_trends, people_also_ask, tavily_search_tool, jina_reader; print(google_trends.name, people_also_ask.name, type(tavily_search_tool).__name__, jina_reader.name)"
 ```
+Expected: prints `google_trends people_also_ask TavilySearch jina_reader`. If any name comes back wrong (e.g. `None` or `function`), the `@tool` decorator didn't survive the move.
+
+- [ ] **Step 3: Confirm the full test suite is still green**
+
+Run: `uv run pytest -x -q`
+Expected: every test that passed before Task 1 still passes. This is the strongest signal that the file move was behaviourally inert.
+
+- [ ] **Step 4: (Optional) Live-run smoke test**
+
+If you have real API credentials (Tavily, SerpAPI, OpenAI) and want belt-and-suspenders confidence:
+
+```bash
+uv run python main.py --mode weekly
+```
+Expected: produces 4 new calendar entries the same way it did before Task 1. This consumes a small amount of paid API budget. Skip if you're running this plan against a sandbox account or want to defer to your normal weekly cadence.
+
+- [ ] **Step 5: No commit**
+
+This task makes no source changes; no commit. If any step failed, fix the underlying issue in Task 1 before proceeding (the most common case is a missed import or a circular dep introduced by the file move). The `pytrends` / `google-search-results` deps and the deprecated tool functions are removed later, in Task 14, alongside the SEO agent's tool-list swap.
 
 ---
 
@@ -2139,13 +2126,20 @@ async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[Con
     return [_to_calendar_entry(plan) for plan in output.articles]
 ```
 
-- [ ] **Step 4: Remove the deprecation shims from `tools/__init__.py`**
+- [ ] **Step 4a: Delete the real `people_also_ask` and `google_trends` from `tools/__init__.py`**
 
-The SEO agent no longer imports `people_also_ask` or `google_trends` (the file you just wrote uses the DataForSEO tools instead). The shims in `tools/__init__.py` (Task 1) are now dead.
+The SEO agent no longer imports them (the file you just wrote uses DataForSEO tools instead). Their real implementations have been carried since Task 1 specifically to keep `--mode weekly` working through Tasks 1-13; now that constraint is gone.
 
-Open `tools/__init__.py`. Delete the entire "Deprecation shims" block at the bottom of the file (the two `@tool`-decorated functions for `people_also_ask` and `google_trends`, plus the comment header that explains them).
+Open `tools/__init__.py` and delete:
+- The `from pytrends.request import TrendReq` import.
+- The entire `@tool def google_trends(...)` function.
+- The entire `@tool def people_also_ask(...)` function.
 
-Also update `tests/test_tools_package.py`: delete `test_seo_agent_imports_resolve_to_shims` and `test_shims_raise_when_invoked`. Add their replacement:
+Keep everything else (`jina_reader`, `list_codebase_files`, `read_codebase_file`, `tavily_search_tool`, and the imports they need).
+
+- [ ] **Step 4b: Update `tests/test_tools_package.py`**
+
+Delete `test_seo_agent_imports_still_work` (those names are gone now). Add its replacement:
 
 ```python
 def test_orphaned_seo_tools_are_gone():
@@ -2155,8 +2149,50 @@ def test_orphaned_seo_tools_are_gone():
     assert not hasattr(tools, "google_trends")
 ```
 
-Run: `uv run pytest tests/test_tools_package.py -v`
-Expected: all PASS.
+- [ ] **Step 4c: Remove the dead tests from `tests/test_tools.py`**
+
+Delete these test functions entirely:
+- `test_google_trends_rising`
+- `test_google_trends_no_data`
+
+Confirm cleanup:
+```bash
+grep -n "google_trends\|people_also_ask\|pytrends" tests/test_tools.py
+```
+Expected: zero matches.
+
+- [ ] **Step 4d: Remove the dead deps from `pyproject.toml`**
+
+In `[project] dependencies`, remove:
+- `"google-search-results>=2.4"` (the SerpAPI client)
+- `"pytrends>=4.9"`
+
+Confirm pandas isn't used anywhere else before removing it transitively:
+```bash
+grep -rn "import pandas\|from pandas" --include='*.py' .
+```
+Expected: zero matches. If anything comes back, stop and surface — pandas was only pulled in through pytrends and the deleted tests, but the implementer needs to confirm that's still true.
+
+Then sync:
+```bash
+uv sync
+```
+Expected: lockfile updates; `pytrends`, `google-search-results`, and `pandas` disappear from `uv.lock`.
+
+- [ ] **Step 4e: Remove `serpapi_api_key` from `config.py`**
+
+Open `config.py`. In the `Settings` class, delete the line `serpapi_api_key: str`. Also remove `SERPAPI_API_KEY=...` from `.env` if it's present locally (the `.env.example` was already cleaned in Task 5).
+
+Confirm settings still import:
+```bash
+uv run python -c "from config import settings; print('settings ok')"
+```
+Expected: prints `settings ok`. If a `pydantic_settings` error fires complaining about a required field, the `.env` still has stale values — clean it.
+
+- [ ] **Step 4f: Run the full test suite**
+
+Run: `uv run pytest tests/test_tools_package.py tests/test_tools.py -v`
+Expected: all PASS, no skips.
 
 - [ ] **Step 5: Update the TOOLS section of `prompts/md/agents/seo_system.md`**
 
@@ -2189,16 +2225,23 @@ Expected: PASS (any old test that referenced the removed tools should already ha
 - [ ] **Step 8: Commit**
 
 ```bash
-git add agents/seo_agent.py prompts/md/agents/seo_system.md tools/__init__.py tests/test_seo_agent_budget.py tests/test_tools_package.py
-git commit -m "feat: switch SEO agent to DataForSEO tools + remove deprecation shims
+git add agents/seo_agent.py prompts/md/agents/seo_system.md tools/__init__.py tests/test_seo_agent_budget.py tests/test_tools_package.py tests/test_tools.py pyproject.toml uv.lock config.py
+git commit -m "feat: swap SEO agent to DataForSEO + remove pytrends/SerpAPI for good
 
 Tool list is now [dfs_serp_live_advanced, dfs_keyword_suggestions,
 dfs_bulk_keyword_data]. The agent caller catches
 DataForSEOBudgetExceeded around ainvoke and runs synthesis on
 partial data instead of crashing.
 
-Removes the Task 1 deprecation shims for people_also_ask and
-google_trends now that nothing imports them.
+Now that the SEO agent stops importing people_also_ask and
+google_trends, this commit also deletes:
+  - the two functions from tools/__init__.py (and the pytrends import),
+  - their tests (test_google_trends_*),
+  - the pytrends + google-search-results deps from pyproject.toml,
+  - serpapi_api_key from config.Settings.
+
+pandas was only transitively pulled by pytrends and is unused
+elsewhere — it disappears from uv.lock automatically.
 
 This is the spec's 'decision point' — run a real weekly batch and
 compare output to the last manual one before proceeding."
@@ -4314,6 +4357,57 @@ async def test_run_measure_surfaces_skipped_articles_missing_live_url():
     assert "missing live_url" in final.coverage_note or "live_url/published_at" in final.coverage_note
     # Article must NOT silently appear in per_article — it should be skipped.
     assert final.report.per_article == []
+
+
+async def test_run_measure_prepends_status_notes_before_llm_coverage():
+    """When both deterministic notes AND an LLM coverage_note exist, the
+    deterministic notes MUST come first so a failed data source can't be
+    softened or hidden by LLM phrasing (spec Section 6)."""
+    from agents import measurement_agent
+    from output_schemas import MeasurementBriefOutput
+
+    # GSC fetch fails; LLM still produces a coverage_note.
+    mock_output = MeasurementBriefOutput(
+        actions=[],
+        article_verdicts=[],
+        coverage_note="The remaining data sources look healthy this week.",
+    )
+
+    with patch("agents.measurement_agent.load_calendar", AsyncMock(return_value=[])), \
+         patch("agents.measurement_agent.gsc_client") as mock_gsc, \
+         patch("agents.measurement_agent.ga4_client") as mock_ga4, \
+         patch("agents.measurement_agent.get_dfs_client") as mock_get_dfs, \
+         patch("agents.measurement_agent.get_llm") as mock_get_llm, \
+         patch("agents.measurement_agent.file_service.read_text", AsyncMock(return_value="facts")):
+
+        # GSC raises — this becomes a status note.
+        mock_gsc.query_blog_performance = AsyncMock(side_effect=RuntimeError("403 Forbidden"))
+        mock_ga4.query_blog_engagement = AsyncMock(return_value=([], {}))
+
+        mock_dfs = MagicMock()
+        mock_dfs.ranked_keywords_for_site = AsyncMock(return_value=[])
+        mock_get_dfs.return_value = mock_dfs
+
+        mock_llm = MagicMock()
+        mock_chain = MagicMock()
+        mock_chain.ainvoke = AsyncMock(return_value=mock_output)
+        mock_llm.with_structured_output.return_value = mock_chain
+        mock_get_llm.return_value = mock_llm
+
+        final = await measurement_agent.run_measurement_agent(days=28)
+
+    # The deterministic GSC failure note must appear, AND it must appear
+    # BEFORE the LLM's coverage_note in the final string.
+    assert "GSC fetch failed" in final.coverage_note
+    assert "403 Forbidden" in final.coverage_note
+    assert "remaining data sources look healthy" in final.coverage_note
+
+    gsc_pos = final.coverage_note.index("GSC fetch failed")
+    llm_pos = final.coverage_note.index("remaining data sources look healthy")
+    assert gsc_pos < llm_pos, (
+        f"Deterministic status note must precede LLM coverage prose; "
+        f"got gsc_pos={gsc_pos}, llm_pos={llm_pos}"
+    )
 ```
 
 - [ ] **Step 2: Run to verify failure**
