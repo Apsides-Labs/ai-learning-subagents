@@ -106,11 +106,3 @@ If you want a quick decision tree, use this:
 5. Define what success looks like at the end of each week.
 
 That’s enough to start. It won’t look impressive in a notebook, and that’s fine. A real plan earns its keep by helping you decide what to do next when you’re tired, busy, or stuck.
-
-If you want help turning a topic into a real roadmap, Draft and Arc can draft a 12-week self-study plan with milestones, practice tasks, and weekly checks from a single prompt.
-
----
-
-## FACT-CHECK FLAGS
-
-- **UNSUPPORTED**: If you want help turning a topic into a real roadmap, Draft and Arc can draft a 12-week self-study plan with milestones, practice tasks, and weekly checks from a single prompt.

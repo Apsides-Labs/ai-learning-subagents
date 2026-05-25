@@ -113,7 +113,7 @@
   },
   {
     "id": "duolingo-quit-usefulness",
-    "status": "planned",
+    "status": "needs_review_flagged",
     "title": "Why People Quit Duolingo After a Huge Streak \u2014 and How to Tell When an App Has Stopped Helping You Learn",
     "primary_keyword": "why are so many people quitting duolingo",
     "secondary_keywords": [
@@ -134,12 +134,12 @@
     ],
     "cta_prompt": "Explore Draft and Arc for a better-structured language learning plan when your app stops moving you forward.",
     "blog_category": "Study Methods",
-    "draft_path": null,
+    "draft_path": "data/drafts/2026-05-25-duolingo-quit-usefulness.md",
     "pr_url": null
   },
   {
     "id": "language-app-speaking-gap",
-    "status": "planned",
+    "status": "needs_review_flagged",
     "title": "Why Language Apps Fail at Speaking and Listening \u2014 and What to Use Instead When You Want Real-World Output",
     "primary_keyword": "why language apps are bad for speaking",
     "secondary_keywords": [
@@ -160,7 +160,7 @@
     ],
     "cta_prompt": "Use Draft and Arc to build a language plan that prioritizes speaking practice, not just lesson completion.",
     "blog_category": "Study Methods",
-    "draft_path": null,
+    "draft_path": "data/drafts/2026-05-25-language-app-speaking-gap.md",
     "pr_url": null
   },
   {
@@ -319,6 +319,114 @@
       "How Draft and Arc can help you turn class material into a real plan"
     ],
     "cta_prompt": "Build me a 4-week plan to turn my language class into real progress with daily self-study that fits my schedule.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "anki-review-burnout",
+    "status": "planned",
+    "title": "Why People Quit Anki at Week 3 \u2014 and What to Do When Reviews Start Feeling Like Forced Labor",
+    "primary_keyword": "why are med students obsessed with anki",
+    "secondary_keywords": [
+      "is anki overhyped",
+      "anki burnout",
+      "why people quit anki"
+    ],
+    "search_intent": "informational",
+    "article_type": "standard",
+    "target_audience": "medical students, exam-focused learners, and Anki users who are starting to feel overwhelmed",
+    "angle": "Explain the emotional and practical reasons Anki stops working, especially when the review queue shifts from helpful repetition to obligation, and show how to reset expectations before quitting outright.",
+    "meta_description": "Why Anki starts feeling like forced labor, why learners quit around week 3, and how to tell whether your problem is the system, your settings, or your study load.",
+    "suggested_headings": [
+      "Why Anki feels great at first",
+      "The week-3 burnout pattern",
+      "When Anki becomes review debt",
+      "Signs you need to shrink, not quit",
+      "A better way to keep the benefits without the grind"
+    ],
+    "cta_prompt": "",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "anki-backlog-rescue",
+    "status": "planned",
+    "title": "How to Stop Anki Backlog Blowups Before They Swallow Your Study Day",
+    "primary_keyword": "how do i clear the backlog on anki",
+    "secondary_keywords": [
+      "how to decrease anki reviews",
+      "anki backlog",
+      "too many anki cards to review"
+    ],
+    "search_intent": "informational",
+    "article_type": "topic_teaser",
+    "target_audience": "students and self-learners with a growing Anki queue, especially med students and language learners",
+    "angle": "Give a practical triage framework for rescuing a damaged Anki queue without making the backlog worse, including what to pause, prune, and prioritize first.",
+    "meta_description": "A practical guide to clearing an Anki backlog without making it worse, with triage steps for overwhelmed learners who need to regain control fast.",
+    "suggested_headings": [
+      "First: stop the backlog from growing",
+      "Triage your due cards by value",
+      "What to suspend, bury, or delete",
+      "How to reset daily limits safely",
+      "A one-week recovery plan"
+    ],
+    "cta_prompt": "Build me a 7-day plan to clear my Anki backlog without burning out.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "self-study-plan-no-curriculum",
+    "status": "planned",
+    "title": "How to Build a Self-Study Plan When You Have No Curriculum, No Teacher, and Too Many Options",
+    "primary_keyword": "how to build a self study plan when you have no curriculum",
+    "secondary_keywords": [
+      "self-directed learning plan",
+      "how to structure self learning",
+      "self study roadmap"
+    ],
+    "search_intent": "informational",
+    "article_type": "topic_teaser",
+    "target_audience": "independent learners, career switchers, and hobbyists who want structure but do not have a course or instructor",
+    "angle": "Turn vague self-learning into a concrete starting system by showing how to define a goal, sequence topics, choose resources, and set a weekly rhythm.",
+    "meta_description": "Learn how to create a self-study plan from scratch when you have no curriculum, no teacher, and too many resources to choose from.",
+    "suggested_headings": [
+      "Why self-study stalls before it starts",
+      "Pick one outcome, not ten topics",
+      "Build a simple topic sequence",
+      "Choose resources without over-researching",
+      "Set a weekly study cadence"
+    ],
+    "cta_prompt": "Build me a 4-week self-study plan for [topic] with no teacher and a beginner-friendly sequence.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null
+  },
+  {
+    "id": "anki-source-mapping",
+    "status": "planned",
+    "title": "The Missing Link Between Your Notes and Your Flashcards: How to Study Without Breaking the Source Material Apart",
+    "primary_keyword": "flashcards from notes and readings",
+    "secondary_keywords": [
+      "anki source material",
+      "study without breaking notes apart",
+      "flashcards connected to source material"
+    ],
+    "search_intent": "informational",
+    "article_type": "standard",
+    "target_audience": "students who use notes, lectures, PDFs, and readings to make flashcards but feel their system has no coherence",
+    "angle": "Show how to keep flashcards anchored to the original source so recall stays connected to understanding instead of becoming isolated memorization.",
+    "meta_description": "Learn how to keep flashcards connected to your notes, lectures, and readings so your study system stays coherent instead of fragmenting.",
+    "suggested_headings": [
+      "Why flashcards feel disconnected",
+      "Map each card back to a source",
+      "Keep notes, questions, and context linked",
+      "When to make a card and when not to",
+      "A source-first workflow that scales"
+    ],
+    "cta_prompt": "",
     "blog_category": "Study Methods",
     "draft_path": null,
     "pr_url": null
