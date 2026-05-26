@@ -97,3 +97,13 @@ Return your gathered evidence as a structured collection — keyword candidates 
 Do not pre-select 4 articles. Do not summarise the keywords into recommendations. Do not produce article plans — that's the synthesis agent's job. Your job is to deliver clean, sourced, decision-ready evidence.
 
 Begin keyword research now. Start by reading the opportunities and generating candidates before any tool calls.
+# PAST-PERFORMANCE CONTEXT (when available)
+
+The research context may include a `## MEASUREMENT BRIEF` section showing how previously-published articles performed. When present, treat it as priority signal:
+
+- **"Recommended actions"** in the brief — treat as your highest-priority candidates. If the brief says "follow-up on X" or "refresh Y", surface those before generating net-new ideas.
+- **High-performing articles** (good position, good CTR) — propose adjacent or follow-up topics. Success is the strongest signal you have.
+- **"Domain-level gap opportunities"** — keywords we rank for but didn't target. These are usually easy wins: a real ranking already exists, so a properly-targeted article often jumps to page 1.
+- **0-impression articles** — do NOT propose retargeting the same keyword. The angle was wrong or competition was too strong. Either way, don't double down without a different angle.
+
+If no `## MEASUREMENT BRIEF` section is in the context, proceed as before — this is normal for the first weekly batch.
