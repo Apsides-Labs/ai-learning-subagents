@@ -97,3 +97,65 @@ async def dfs_keyword_suggestions(seed: str) -> str:
         diff = item.get("keyword_difficulty", "—")
         lines.append(f"  - {kw} (volume {vol}, difficulty {diff})")
     return "\n".join(lines)
+
+
+@tool
+async def dfs_bulk_keyword_data(keywords: list[str]) -> str:
+    """Get monthly search volume + keyword difficulty for a batch of keywords.
+
+    Wraps two DFS endpoints (Google Ads Search Volume + Labs Bulk Keyword
+    Difficulty) and merges results on the keyword string. Use once per
+    candidate batch (post-filtering) to identify obviously bad bets.
+    """
+    if not keywords:
+        return "No keywords provided."
+
+    client = get_client()
+
+    # Endpoint 1: search volume.
+    vol_payload = await client.post(
+        "/v3/keywords_data/google_ads/search_volume/live",
+        json_body=[{
+            "keywords": keywords,
+            "location_code": 2840,
+            "language_code": "en",
+        }],
+    )
+
+    # Endpoint 2: keyword difficulty.
+    diff_payload = await client.post(
+        "/v3/dataforseo_labs/google/bulk_keyword_difficulty/live",
+        json_body=[{
+            "keywords": keywords,
+            "location_code": 2840,
+            "language_code": "en",
+        }],
+    )
+
+    # Build per-keyword dictionaries.
+    volume_by_kw: dict[str, dict] = {}
+    try:
+        for row in vol_payload["tasks"][0]["result"]:
+            volume_by_kw[row["keyword"]] = row
+    except (KeyError, IndexError, TypeError):
+        pass
+
+    difficulty_by_kw: dict[str, int | None] = {}
+    try:
+        items = diff_payload["tasks"][0]["result"][0]["items"]
+        for row in items:
+            difficulty_by_kw[row["keyword"]] = row.get("keyword_difficulty")
+    except (KeyError, IndexError, TypeError):
+        pass
+
+    lines = [f"Bulk data for {len(keywords)} keywords:"]
+    for kw in keywords:
+        vol_row = volume_by_kw.get(kw, {})
+        vol = vol_row.get("search_volume", "—")
+        cpc = vol_row.get("cpc", "—")
+        comp = vol_row.get("competition", "—")
+        diff = difficulty_by_kw.get(kw, "—")
+        lines.append(
+            f"  - {kw}: volume={vol}, difficulty={diff}, cpc={cpc}, competition={comp}"
+        )
+    return "\n".join(lines)

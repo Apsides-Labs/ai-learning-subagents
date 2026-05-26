@@ -1,0 +1,19 @@
+{
+  "version": "0.1.20240101",
+  "status_code": 20000,
+  "cost": 0.0001,
+  "tasks": [
+    {
+      "id": "task-id-4",
+      "status_code": 20000,
+      "result": [
+        {
+          "items": [
+            {"keyword": "tutorial hell", "keyword_difficulty": 28},
+            {"keyword": "how to get rid of tutorial hell", "keyword_difficulty": 19}
+          ]
+        }
+      ]
+    }
+  ]
+}

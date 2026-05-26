@@ -66,3 +66,44 @@ async def test_dfs_keyword_suggestions_returns_compact_list():
     assert "tutorial hell programming" in result
     assert "480" in result   # search volume
     assert "22" in result    # difficulty
+
+
+async def test_dfs_bulk_keyword_data_merges_volume_and_difficulty():
+    from services import dataforseo_client as client_mod
+    from tools.dataforseo import dfs_bulk_keyword_data
+
+    client_mod._client = None
+    vol_payload = _load_fixture("dfs_search_volume_response.json")
+    diff_payload = _load_fixture("dfs_keyword_difficulty_response.json")
+
+    with patch.object(client_mod, "settings") as mock_settings:
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = client_mod.get_client()
+        client._http = MagicMock()
+
+        # First POST call returns volume, second returns difficulty.
+        responses = [vol_payload, diff_payload]
+
+        async def fake_post(path, json):
+            resp = MagicMock()
+            resp.raise_for_status = MagicMock()
+            resp.json = MagicMock(return_value=responses.pop(0))
+            return resp
+
+        client._http.post = AsyncMock(side_effect=fake_post)
+
+        result = await dfs_bulk_keyword_data.ainvoke({
+            "keywords": ["tutorial hell", "how to get rid of tutorial hell"]
+        })
+
+    assert "tutorial hell" in result
+    assert "880" in result        # volume
+    assert "28" in result         # difficulty
+    assert "how to get rid of tutorial hell" in result
+    assert "19" in result
+    # Two API calls counted in cost tracker.
+    assert client.tracker.total_calls == 2
