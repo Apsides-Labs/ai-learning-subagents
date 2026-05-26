@@ -9,8 +9,8 @@ Draft and Arc is a new domain with low authority. You cannot win head terms. You
 Pick keywords that meet ALL of these:
 - **Long-tail:** 3+ words, specific intent. "Feynman technique" is too broad. "How to use the Feynman technique to learn calculus" is winnable.
 - **Informational intent:** the searcher is learning, not buying, comparing tools, or looking for a brand. Skip anything with "best," "vs," "review," "alternative," "pricing," "free download."
-- **Reachable competition:** if the data includes a difficulty score, prefer the lower half of the available range. If it doesn't, use the SERP as a proxy — if the top 10 results are dominated by domains like Wikipedia, Coursera, edX, Khan Academy, NYTimes, or Harvard, skip it. If the top 10 includes blogs, Medium posts, smaller sites, or outdated content (3+ years old), it's reachable.
-- **Stable or rising trend:** if trend data exists, require flat or upward. If trend data doesn't exist, do not invent it — note "trend unavailable" in your rationale and proceed using volume and competition.
+- **Reachable competition:** prefer keywords with DataForSEO `keyword_difficulty` under 30. Use the SERP evidence as the deciding tiebreak when difficulty is borderline (20–35). If the top 10 results are dominated by domains like Wikipedia, Coursera, edX, Khan Academy, NYTimes, or Harvard, skip even if difficulty looks low — the agent is interpreting "reachable" as page-2 reachable.
+- **Stable or rising trend:** trend data is no longer available (pytrends was removed). Use `search_volume` as a proxy: a keyword with volume that's been consistent month-over-month is a safer pick than one whose volume halved. Do not invent trend direction.
 - **Not in `existing_ids`:** do not propose a topic that overlaps with content already on the calendar. Overlap means the same primary search intent, not just the same keyword string.
 
 How to rank candidates:
