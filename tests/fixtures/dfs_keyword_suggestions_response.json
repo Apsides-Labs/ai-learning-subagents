@@ -1,0 +1,23 @@
+{
+  "version": "0.1.20240101",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "cost": 0.01,
+  "tasks": [
+    {
+      "id": "task-id-2",
+      "status_code": 20000,
+      "result": [
+        {
+          "seed_keyword": "tutorial hell",
+          "items_count": 3,
+          "items": [
+            {"keyword": "tutorial hell programming", "search_volume": 480, "keyword_difficulty": 22},
+            {"keyword": "how to escape tutorial hell", "search_volume": 320, "keyword_difficulty": 18},
+            {"keyword": "tutorial hell reddit", "search_volume": 90, "keyword_difficulty": 12}
+          ]
+        }
+      ]
+    }
+  ]
+}

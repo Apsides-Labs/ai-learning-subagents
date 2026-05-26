@@ -39,3 +39,30 @@ async def test_dfs_serp_live_advanced_returns_formatted_summary():
     assert "reddit.com" in result
     assert "How do you escape tutorial hell?" in result  # PAA question, surfaced
     assert "rank 1" in result.lower() or "#1" in result
+
+
+async def test_dfs_keyword_suggestions_returns_compact_list():
+    from services import dataforseo_client as client_mod
+    from tools.dataforseo import dfs_keyword_suggestions
+
+    client_mod._client = None
+    payload = _load_fixture("dfs_keyword_suggestions_response.json")
+
+    with patch.object(client_mod, "settings") as mock_settings:
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = client_mod.get_client()
+        client._http = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.json = MagicMock(return_value=payload)
+        mock_resp.raise_for_status = MagicMock()
+        client._http.post = AsyncMock(return_value=mock_resp)
+
+        result = await dfs_keyword_suggestions.ainvoke({"seed": "tutorial hell"})
+
+    assert "tutorial hell programming" in result
+    assert "480" in result   # search volume
+    assert "22" in result    # difficulty

@@ -65,3 +65,35 @@ async def dfs_serp_live_advanced(query: str) -> str:
             lines.append(f"  - {q}")
 
     return "\n".join(lines)
+
+
+@tool
+async def dfs_keyword_suggestions(seed: str) -> str:
+    """Return long-tail keyword variants for a seed. Includes volume + difficulty.
+
+    Use once per content opportunity during candidate generation to surface
+    PAA-style phrasings the seed itself doesn't capture.
+    """
+    client = get_client()
+    payload = await client.post(
+        "/v3/dataforseo_labs/google/keyword_suggestions/live",
+        json_body=[{
+            "keyword": seed,
+            "location_code": 2840,
+            "language_code": "en",
+            "limit": 20,
+        }],
+    )
+
+    try:
+        items = payload["tasks"][0]["result"][0]["items"]
+    except (KeyError, IndexError):
+        return f"No keyword suggestions for {seed!r}."
+
+    lines = [f"Keyword suggestions for {seed!r} (top {min(len(items), 20)}):"]
+    for item in items[:20]:
+        kw = item.get("keyword", "")
+        vol = item.get("search_volume", "—")
+        diff = item.get("keyword_difficulty", "—")
+        lines.append(f"  - {kw} (volume {vol}, difficulty {diff})")
+    return "\n".join(lines)
