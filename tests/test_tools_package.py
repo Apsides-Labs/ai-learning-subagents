@@ -11,8 +11,8 @@ def test_research_agent_imports_still_work():
     assert _is_tool(read_codebase_file)
 
 
-def test_seo_agent_imports_still_work():
-    """seo_agent.py still imports these until Task 14; they must be real tools, not stubs."""
-    from tools import people_also_ask, google_trends
-    assert _is_tool(people_also_ask)
-    assert _is_tool(google_trends)
+def test_orphaned_seo_tools_are_gone():
+    """people_also_ask and google_trends are removed in Task 14 — they MUST NOT exist."""
+    import tools
+    assert not hasattr(tools, "people_also_ask")
+    assert not hasattr(tools, "google_trends")

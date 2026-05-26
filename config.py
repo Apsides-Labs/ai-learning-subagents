@@ -9,11 +9,10 @@ class Settings(BaseSettings):
     openai_api_key: str
     openai_model: str = "gpt-5.4-mini"
     tavily_api_key: str
-    serpapi_api_key: str
     codebase_path: str = "/Users/ilirgruda/Repo/Python/ai-learning"
     gh_repo: str = ""
 
-    # DataForSEO (replaces SerpAPI + pytrends — those go away in Task 14)
+    # DataForSEO (replaces the prior SerpAPI + pytrends tooling).
     dataforseo_login: str = ""
     dataforseo_password: str = ""
     dataforseo_max_cost_per_run: float = 1.00
@@ -23,6 +22,7 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",
     )
 
 

@@ -12,9 +12,15 @@ Treat each opportunity as a *seed*, not a finished keyword. Your job is to find 
 
 # TOOLS
 
-- `tavily_search(query)` — fetches real search results. Use for SERP inspection (what's ranking, who, how recently).
-- `people_also_ask(query)` — Google's PAA questions for a query. Use as your primary long-tail keyword engine — these are literally what users ask.
-- `google_trends(query)` — check if interest is rising, stable, or falling. Use sparingly, only on shortlisted keywords.
+- `dfs_serp_live_advanced(query)` — fetch real Google SERP for a query.
+  Returns top 10 organic + People Also Ask in one call. Use for SERP
+  inspection on shortlisted candidates.
+- `dfs_keyword_suggestions(seed)` — long-tail keyword variants for a seed,
+  with volume + difficulty. Use ONCE per content opportunity during
+  candidate generation to surface PAA-style phrasings.
+- `dfs_bulk_keyword_data(keywords)` — monthly search volume + keyword
+  difficulty for a batch of keywords. Use AFTER candidate generation to
+  filter obviously bad bets (zero volume, difficulty above 50).
 
 # WORKFLOW
 

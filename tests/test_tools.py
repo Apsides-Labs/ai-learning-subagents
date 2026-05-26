@@ -19,33 +19,6 @@ async def test_jina_reader_returns_text():
         assert "Competitor Homepage" in result
 
 
-def test_google_trends_rising():
-    from tools import google_trends
-    import pandas as pd
-    mock_df = pd.DataFrame({"test keyword": [10, 10, 20, 20, 30, 30]})
-
-    with patch("tools.TrendReq") as mock_trend_cls:
-        mock_trend = MagicMock()
-        mock_trend_cls.return_value = mock_trend
-        mock_trend.interest_over_time.return_value = mock_df
-
-        result = google_trends.invoke({"keyword": "test keyword"})
-        assert result == "rising"
-
-
-def test_google_trends_no_data():
-    from tools import google_trends
-    import pandas as pd
-
-    with patch("tools.TrendReq") as mock_trend_cls:
-        mock_trend = MagicMock()
-        mock_trend_cls.return_value = mock_trend
-        mock_trend.interest_over_time.return_value = pd.DataFrame()
-
-        result = google_trends.invoke({"keyword": "obscure keyword"})
-        assert result == "no_data"
-
-
 def test_list_codebase_files(tmp_path):
     import os
     os.environ.setdefault("OPENAI_API_KEY", "sk-test")
