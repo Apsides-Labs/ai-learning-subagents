@@ -1,4 +1,4 @@
-.PHONY: install test setup weekly article
+.PHONY: install test setup weekly article measure validate
 
 install:
 	uv sync
@@ -14,3 +14,9 @@ weekly:
 
 article:
 	uv run python main.py --mode article
+
+measure:
+	uv run python main.py --mode measure
+
+validate:
+	uv run python main.py --mode validate
