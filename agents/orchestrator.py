@@ -124,3 +124,30 @@ async def run_validate() -> int:
             all_ok = False
 
     return 0 if all_ok else 1
+
+
+async def run_measure(days: int = 28) -> tuple[Path, Path]:
+    """Run the measurement pipeline; write MD + HTML briefs. Returns the two paths."""
+    from agents.measurement_agent import run_measurement_agent
+    from renderers.measurement_md import render_md
+    from renderers.measurement_html import render_html
+    from services.dataforseo_client import get_client as get_dfs_client
+
+    try:
+        final = await run_measurement_agent(days=days)
+
+        md = render_md(final)
+        effective_note = "data finalized through " + final.report.window_end
+        html = render_html(final, effective_end_note=effective_note)
+
+        await file_service.atomic_write_text(file_service.MEASUREMENT_BRIEF_MD_PATH, md)
+        await file_service.atomic_write_text(file_service.MEASUREMENT_BRIEF_HTML_PATH, html)
+    finally:
+        # Close the httpx AsyncClient on the singleton DFS client to avoid
+        # 'unclosed transport' RuntimeWarning on process exit.
+        try:
+            await get_dfs_client().aclose()
+        except Exception:  # noqa: BLE001
+            pass
+
+    return file_service.MEASUREMENT_BRIEF_MD_PATH, file_service.MEASUREMENT_BRIEF_HTML_PATH

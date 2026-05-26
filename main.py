@@ -16,9 +16,15 @@ Examples:
     )
     parser.add_argument(
         "--mode",
-        choices=["setup", "weekly", "article", "validate"],
+        choices=["setup", "weekly", "article", "validate", "measure"],
         required=False,
-        help="setup | weekly | article | validate",
+        help="setup | weekly | article | validate | measure",
+    )
+    parser.add_argument(
+        "--days",
+        type=int,
+        default=28,
+        help="Days of measurement data to include (default: 28). Used with --mode measure.",
     )
     parser.add_argument(
         "--mark-published",
@@ -77,6 +83,14 @@ async def _run_validate() -> None:
     sys.exit(exit_code)
 
 
+async def _run_measure(days: int) -> None:
+    from agents.orchestrator import run_measure
+    md_path, html_path = await run_measure(days=days)
+    print(f"\nMeasurement brief written:")
+    print(f"  Agent-facing (MD):  {md_path}")
+    print(f"  Human dashboard:    {html_path}")
+
+
 async def _run_mark_published(article_id: str, url: str) -> None:
     from services.calendar_service import mark_published
     if not url:
@@ -104,6 +118,8 @@ def main() -> None:
         asyncio.run(_run_article())
     elif args.mode == "validate":
         asyncio.run(_run_validate())
+    elif args.mode == "measure":
+        asyncio.run(_run_measure(args.days))
 
 
 if __name__ == "__main__":
