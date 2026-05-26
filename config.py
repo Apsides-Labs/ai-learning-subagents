@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     dataforseo_max_cost_per_run: float = 1.00
     dataforseo_max_calls_per_run: int = 50
 
+    # Google measurement APIs (GSC + GA4)
+    google_application_credentials: str = ""
+    gsc_site_url: str = "sc-domain:draftandarc.com"
+    ga4_property_id: str = ""
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
