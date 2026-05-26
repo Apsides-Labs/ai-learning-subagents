@@ -98,6 +98,50 @@ class DataForSEOClient:
     async def aclose(self) -> None:
         await self._http.aclose()
 
+    async def ranked_keywords_for_site(
+        self,
+        target: str,
+        *,
+        url_substring: str = "",
+        limit: int = 1000,
+    ) -> list[dict]:
+        """All keywords the target domain currently ranks for.
+
+        Returns a list of dicts with keys: keyword, position, search_volume, url.
+        If `url_substring` is given, filters to ranked URLs containing it
+        (we use "/blog/" because the DFS endpoint takes a domain target, not
+        a path prefix — see spec Section 6).
+        """
+        payload = await self.post(
+            "/v3/dataforseo_labs/google/ranked_keywords/live",
+            json_body=[{
+                "target": target,
+                "location_code": 2840,
+                "language_code": "en",
+                "limit": limit,
+            }],
+        )
+
+        rows: list[dict] = []
+        try:
+            items = payload["tasks"][0]["result"][0]["items"]
+        except (KeyError, IndexError, TypeError):
+            return rows
+
+        for item in items:
+            kd = item.get("keyword_data") or {}
+            rse = item.get("ranked_serp_element") or {}
+            url = rse.get("url", "")
+            if url_substring and url_substring not in url:
+                continue
+            rows.append({
+                "keyword": kd.get("keyword", ""),
+                "position": rse.get("rank_absolute", 0),
+                "search_volume": kd.get("search_volume", 0),
+                "url": url,
+            })
+        return rows
+
 
 _client: Optional[DataForSEOClient] = None
 

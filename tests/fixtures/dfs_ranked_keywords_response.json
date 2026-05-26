@@ -1,0 +1,31 @@
+{
+  "version": "0.1.20240101",
+  "status_code": 20000,
+  "cost": 0.02,
+  "tasks": [
+    {
+      "id": "task-id-5",
+      "status_code": 20000,
+      "result": [
+        {
+          "target": "draftandarc.com",
+          "total_count": 3,
+          "items": [
+            {
+              "keyword_data": {"keyword": "tutorial hell python", "search_volume": 90},
+              "ranked_serp_element": {"rank_absolute": 28, "url": "https://www.draftandarc.com/blog/tutorial-hell-progress"}
+            },
+            {
+              "keyword_data": {"keyword": "how to escape tutorial hell", "search_volume": 320},
+              "ranked_serp_element": {"rank_absolute": 41, "url": "https://www.draftandarc.com/blog/tutorial-hell-progress"}
+            },
+            {
+              "keyword_data": {"keyword": "course platform", "search_volume": 1200},
+              "ranked_serp_element": {"rank_absolute": 87, "url": "https://www.draftandarc.com/"}
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

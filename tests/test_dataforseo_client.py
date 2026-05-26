@@ -111,3 +111,30 @@ async def test_post_records_cost_from_response():
         assert client.tracker.total_calls == 1
         assert client.tracker.total_cost == pytest.approx(0.002)
         assert result == response_json
+
+
+async def test_ranked_keywords_for_site_filters_to_blog_urls():
+    from services import dataforseo_client as mod
+    mod._client = None
+    payload = _load_fixture("dfs_ranked_keywords_response.json")
+
+    with patch.object(mod, "settings") as mock_settings:
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = mod.get_client()
+        client._http = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.json = MagicMock(return_value=payload)
+        mock_resp.raise_for_status = MagicMock()
+        client._http.post = AsyncMock(return_value=mock_resp)
+
+        rows = await client.ranked_keywords_for_site("draftandarc.com", url_substring="/blog/")
+
+    # Only blog URLs come back; the homepage row is filtered out.
+    assert len(rows) == 2
+    keywords = {r["keyword"] for r in rows}
+    assert "tutorial hell python" in keywords
+    assert "course platform" not in keywords  # filtered (homepage URL)
