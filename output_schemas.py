@@ -88,3 +88,21 @@ class MarketBriefOutput(_StrictModel):
     content_opportunities: list[ContentOpportunityOutput]
     tensions: list[str] = []
     data_coverage_note: str = ""
+
+
+class MeasurementActionOutput(_StrictModel):
+    priority: str                 # high | medium | low
+    action: str                   # 1–2 sentence imperative
+    affected_article_id: str      # calendar entry id, or "n/a" for net-new
+    rationale: str                # why this action, citing data
+
+
+class ArticleVerdictOutput(_StrictModel):
+    article_id: str               # must match a ScoredArticlePerformance id
+    verdict: str                  # one-line prose verdict
+
+
+class MeasurementBriefOutput(_StrictModel):
+    actions: list[MeasurementActionOutput]
+    article_verdicts: list[ArticleVerdictOutput]
+    coverage_note: str
