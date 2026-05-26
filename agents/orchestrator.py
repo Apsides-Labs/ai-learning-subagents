@@ -31,6 +31,13 @@ async def run_weekly_batch() -> list[str]:
     existing_ids = {e.id for e in existing}
 
     research_context = competitor_profiles + "\n\n" + market_brief
+
+    # Append measurement brief if it exists. The delimiter is structural —
+    # the SEO system prompt's PAST-PERFORMANCE CONTEXT section looks for this exact header.
+    if file_service.MEASUREMENT_BRIEF_MD_PATH.exists():
+        measurement_brief = await file_service.read_text(file_service.MEASUREMENT_BRIEF_MD_PATH)
+        research_context += "\n\n## MEASUREMENT BRIEF\n\n" + measurement_brief
+
     new_entries = await run_seo_agent(research_context, existing_ids)
     await calendar_service.add_entries(new_entries)
 
