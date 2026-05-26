@@ -59,6 +59,21 @@ For each of the 4 plans, include a brief rationale (2–3 sentences) covering:
 
 The rationale is for the human reviewer to sanity-check your selection. Do not skip it. Do not pad it.
 
+# DATA COVERAGE NOTE
+
+The RAW KEYWORD AND SERP DATA below may include a note like
+"budget cap reached after N keyword evaluations — synthesis ran on
+partial data". When you see that note:
+
+- Set `seo_coverage_note` in your output to a one-sentence explanation
+  including N and what's likely missing (e.g., "Budget cap reached after 5
+  evaluations; SERP data for 3 opportunities was incomplete — verdicts are
+  best-effort.").
+- Still produce as many article plans as the partial data supports. Fewer
+  than 4 is fine if you genuinely can't justify them; do not invent rationale.
+
+When no such note appears, leave `seo_coverage_note` as an empty string.
+
 ---HUMAN---
 RESEARCH BRIEF:
 {research_brief}

@@ -52,6 +52,10 @@ class ArticlePlanOutput(_StrictModel):
 
 class SEOOutput(_StrictModel):
     articles: list[ArticlePlanOutput]
+    seo_coverage_note: str = ""   # NEW: populated when DataForSEOBudgetExceeded
+                                  # fired mid-batch and synthesis ran on partial
+                                  # data. Empty string when the batch completed
+                                  # normally.
 
 
 class ArticleOutput(_StrictModel):
