@@ -1,0 +1,16 @@
+{
+  "rows": [
+    {
+      "dimensionValues": [{"value": "/blog/tutorial-hell-progress"}, {"value": "google / organic"}],
+      "metricValues": [{"value": "24"}, {"value": "18"}, {"value": "102.5"}]
+    },
+    {
+      "dimensionValues": [{"value": "/blog/tutorial-hell-progress"}, {"value": "twitter / referral"}],
+      "metricValues": [{"value": "3"}, {"value": "2"}, {"value": "45.0"}]
+    },
+    {
+      "dimensionValues": [{"value": "/blog/anki-review-queue-burnout"}, {"value": "(direct) / (none)"}],
+      "metricValues": [{"value": "1"}, {"value": "0"}, {"value": "8.0"}]
+    }
+  ]
+}
