@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "keys": ["https://www.draftandarc.com/blog/tutorial-hell-progress", "how to get rid of tutorial hell"],
+      "clicks": 8,
+      "impressions": 142,
+      "ctr": 0.0563,
+      "position": 9.2
+    },
+    {
+      "keys": ["https://www.draftandarc.com/blog/tutorial-hell-progress", "stop watching tutorials"],
+      "clicks": 3,
+      "impressions": 89,
+      "ctr": 0.0337,
+      "position": 14.1
+    },
+    {
+      "keys": ["https://www.draftandarc.com/blog/anki-review-queue-burnout", "anki backlog"],
+      "clicks": 0,
+      "impressions": 5,
+      "ctr": 0.0,
+      "position": 41.0
+    }
+  ],
+  "responseAggregationType": "byPage"
+}
