@@ -50,3 +50,29 @@ async def update_status(
             if pr_url is not None:
                 entry.pr_url = pr_url
     await save_calendar(entries)
+
+
+from datetime import date as _date_module
+
+
+async def mark_published(
+    entry_id: str,
+    *,
+    live_url: str,
+    published_on: Optional[str] = None,
+) -> None:
+    """Set status=published, published_at, and live_url on one calendar entry.
+
+    `published_on` defaults to today's ISO date.
+    Raises ValueError if `entry_id` is not in the calendar.
+    """
+    entries = await load_calendar()
+    target = next((e for e in entries if e.id == entry_id), None)
+    if target is None:
+        raise ValueError(f"Calendar entry {entry_id!r} not found")
+
+    target.status = ArticleStatus.published
+    target.published_at = published_on or _date_module.today().isoformat()
+    target.live_url = live_url
+
+    await save_calendar(entries)

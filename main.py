@@ -17,8 +17,18 @@ Examples:
     parser.add_argument(
         "--mode",
         choices=["setup", "weekly", "article", "validate"],
-        required=True,
+        required=False,
         help="setup | weekly | article | validate",
+    )
+    parser.add_argument(
+        "--mark-published",
+        metavar="ARTICLE_ID",
+        help="Mark a calendar entry as published. Requires --url.",
+    )
+    parser.add_argument(
+        "--url",
+        metavar="LIVE_URL",
+        help="Canonical URL of the published article (used with --mark-published).",
     )
     return parser
 
@@ -67,9 +77,24 @@ async def _run_validate() -> None:
     sys.exit(exit_code)
 
 
+async def _run_mark_published(article_id: str, url: str) -> None:
+    from services.calendar_service import mark_published
+    if not url:
+        raise SystemExit("--mark-published requires --url <canonical-url>")
+    await mark_published(article_id, live_url=url)
+    print(f"Marked {article_id!r} as published with URL {url}")
+
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
+
+    if args.mark_published:
+        asyncio.run(_run_mark_published(args.mark_published, args.url or ""))
+        return
+
+    if not args.mode:
+        parser.error("--mode is required unless --mark-published is given")
 
     if args.mode == "setup":
         asyncio.run(_run_setup())
