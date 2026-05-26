@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     codebase_path: str = "/Users/ilirgruda/Repo/Python/ai-learning"
     gh_repo: str = ""
 
+    # DataForSEO (replaces SerpAPI + pytrends — those go away in Task 14)
+    dataforseo_login: str = ""
+    dataforseo_password: str = ""
+    dataforseo_max_cost_per_run: float = 1.00
+    dataforseo_max_calls_per_run: int = 50
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

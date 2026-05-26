@@ -29,7 +29,7 @@ dev = [
 asyncio_mode = "auto"
 
 [tool.hatch.build.targets.wheel]
-packages = ["agents", "chains", "models", "prompts", "services", "tests"]
+packages = ["agents", "chains", "models", "prompts", "renderers", "services", "tests", "tools"]
 
 [build-system]
 requires = ["hatchling"]
