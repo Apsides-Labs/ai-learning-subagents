@@ -1,12 +1,16 @@
 """DataForSEO HTTP client + cost tracking.
 
-The full client (HTTP + endpoints) is added in Task 7. This file currently
-provides the CostTracker and DataForSEOBudgetExceeded exception, used by
-the HTTP wrapper to enforce per-run budget caps.
+Module-level singleton via get_client(). All @tool wrappers in
+tools/dataforseo.py call into the same instance so the CostTracker
+cap applies across one main.py invocation.
 """
 
 from collections import deque
 from dataclasses import dataclass, field
+from typing import Any, Optional
+
+import httpx
+from config import settings
 
 
 class DataForSEOBudgetExceeded(RuntimeError):
@@ -41,3 +45,70 @@ class CostTracker:
         self.total_cost = prospective_cost
         self.total_calls = prospective_calls
         self._recent.append(endpoint)
+
+
+class DataForSEOClient:
+    """Thin HTTP wrapper. Auth via HTTP Basic. Cost tracked per call.
+
+    Endpoints used by this project (in order of call frequency):
+      - POST /v3/serp/google/organic/live/advanced   (~$0.002/query)
+      - POST /v3/keywords_data/google_ads/search_volume/live   (~$0.05/1000 kw)
+      - POST /v3/dataforseo_labs/google/bulk_keyword_difficulty/live   (~$0.01/1000 kw)
+      - POST /v3/dataforseo_labs/google/keyword_suggestions/live   (~$0.01/task)
+      - POST /v3/dataforseo_labs/google/ranked_keywords/live   (~$0.02/task)
+      - GET  /v3/appendix/user_data   (free; used for --mode validate)
+
+    Pricing is the spec's Section 4 estimate; verify against the dashboard
+    during implementation Step 0 (see plan Task 0 in spec).
+    """
+
+    BASE_URL = "https://api.dataforseo.com"
+
+    def __init__(self) -> None:
+        if not settings.dataforseo_login or not settings.dataforseo_password:
+            raise RuntimeError(
+                "DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD must be set in .env"
+            )
+        self._http = httpx.AsyncClient(
+            base_url=self.BASE_URL,
+            auth=(settings.dataforseo_login, settings.dataforseo_password),
+            timeout=30.0,
+        )
+        self.tracker = CostTracker(
+            max_cost=settings.dataforseo_max_cost_per_run,
+            max_calls=settings.dataforseo_max_calls_per_run,
+        )
+
+    async def post(self, path: str, *, json_body: Any) -> dict:
+        response = await self._http.post(path, json=json_body)
+        response.raise_for_status()
+        payload = response.json()
+        cost = float(payload.get("cost", 0.0))
+        self.tracker.record(cost=cost, endpoint=path)
+        return payload
+
+    async def get(self, path: str) -> dict:
+        response = await self._http.get(path)
+        response.raise_for_status()
+        payload = response.json()
+        cost = float(payload.get("cost", 0.0))
+        self.tracker.record(cost=cost, endpoint=path)
+        return payload
+
+    async def aclose(self) -> None:
+        await self._http.aclose()
+
+
+_client: Optional[DataForSEOClient] = None
+
+
+def get_client() -> DataForSEOClient:
+    """Return the process-scoped singleton client.
+
+    The CostTracker on the instance is shared across all @tool calls
+    in one main.py invocation, so caps apply at the right granularity.
+    """
+    global _client
+    if _client is None:
+        _client = DataForSEOClient()
+    return _client

@@ -1,0 +1,42 @@
+{
+  "version": "0.1.20240101",
+  "status_code": 20000,
+  "status_message": "Ok.",
+  "time": "0.5 sec.",
+  "cost": 0.002,
+  "tasks_count": 1,
+  "tasks_error": 0,
+  "tasks": [
+    {
+      "id": "task-id-1",
+      "status_code": 20000,
+      "status_message": "Ok.",
+      "result": [
+        {
+          "keyword": "how to get rid of tutorial hell",
+          "location_code": 2840,
+          "language_code": "en",
+          "check_url": "https://www.google.com/search?q=...",
+          "items_count": 2,
+          "items": [
+            {
+              "type": "organic",
+              "rank_absolute": 1,
+              "domain": "reddit.com",
+              "title": "How do you escape tutorial hell?",
+              "description": "Discussion thread about escaping tutorial hell.",
+              "url": "https://www.reddit.com/r/learnprogramming/comments/abc/tutorial_hell/"
+            },
+            {
+              "type": "people_also_ask_element",
+              "items": [
+                {"title": "What is tutorial hell?"},
+                {"title": "How do you escape tutorial hell?"}
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
