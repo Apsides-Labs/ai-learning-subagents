@@ -68,3 +68,18 @@ def test_measurement_md_omits_glossary_and_score_badges():
     assert "Glossary" not in md
     assert "[GOOD]" not in md
     assert "[POOR]" not in md   # raw numbers only, no badges
+
+
+def test_measurement_html_renders_glossary_and_badges():
+    from renderers.measurement_html import render_html
+    html = render_html(_sample_final_report())
+
+    # Glossary is present (HTML only).
+    assert "Glossary" in html
+    assert "Click-Through Rate" in html
+    # Badges with colors.
+    assert "badge-borderline" in html
+    assert "badge-poor" in html
+    # Same data is present.
+    assert "tutorial-hell-progress" in html
+    assert "tutorial hell python" in html
