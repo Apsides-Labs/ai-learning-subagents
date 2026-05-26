@@ -98,6 +98,27 @@ class DataForSEOClient:
     async def aclose(self) -> None:
         await self._http.aclose()
 
+    async def validate(self) -> tuple[bool, str]:
+        """Cheap auth check via /v3/appendix/user_data (free endpoint).
+
+        Returns (ok, message). On success the message includes account balance.
+        On failure the message describes the auth or HTTP problem.
+        """
+        try:
+            payload = await self.get("/v3/appendix/user_data")
+        except httpx.HTTPStatusError as exc:
+            return False, f"HTTP {exc.response.status_code}: {exc.response.text[:200]}"
+        except Exception as exc:  # noqa: BLE001
+            return False, f"Request failed: {exc}"
+
+        try:
+            info = payload["tasks"][0]["result"][0]
+            balance = info.get("balance", "unknown")
+            login = info.get("login", "unknown")
+            return True, f"DataForSEO ok. Account: {login}. Balance: ${balance}"
+        except (KeyError, IndexError, TypeError):
+            return False, f"Unexpected response shape: {payload}"
+
     async def ranked_keywords_for_site(
         self,
         target: str,

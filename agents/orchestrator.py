@@ -73,3 +73,42 @@ async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path], Option
     )
 
     return final_status, draft_path, pr_url
+
+
+async def run_validate() -> int:
+    """Cheap end-to-end validation of external integrations.
+
+    GSC + GA4 checks are added in Task 19. For now, only DataForSEO is checked.
+    Returns 0 on full success, 1 if any check failed.
+
+    Each check is independent and degrades gracefully — a missing credential
+    must produce a clean [FAIL] line, not a Python traceback. That's the
+    entire point of validate mode.
+    """
+    from services.dataforseo_client import get_client, DataForSEOClient
+
+    results: list[tuple[str, bool, str]] = []
+
+    dfs_client: DataForSEOClient | None = None
+    try:
+        dfs_client = get_client()
+        ok, message = await dfs_client.validate()
+    except Exception as exc:  # noqa: BLE001
+        # Covers RuntimeError on missing credentials and any other init failure.
+        ok, message = False, f"Could not construct client: {exc}"
+    finally:
+        if dfs_client is not None:
+            try:
+                await dfs_client.aclose()
+            except Exception:  # noqa: BLE001
+                pass  # Cleanup failure shouldn't mask the real error.
+    results.append(("DataForSEO", ok, message))
+
+    all_ok = True
+    for name, ok, message in results:
+        status = "PASS" if ok else "FAIL"
+        print(f"[{status}] {name}: {message}")
+        if not ok:
+            all_ok = False
+
+    return 0 if all_ok else 1

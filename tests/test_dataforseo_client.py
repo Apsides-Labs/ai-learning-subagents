@@ -138,3 +138,52 @@ async def test_ranked_keywords_for_site_filters_to_blog_urls():
     keywords = {r["keyword"] for r in rows}
     assert "tutorial hell python" in keywords
     assert "course platform" not in keywords  # filtered (homepage URL)
+
+
+async def test_validate_calls_user_data_endpoint():
+    from services import dataforseo_client as mod
+    mod._client = None
+
+    with patch.object(mod, "settings") as mock_settings:
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = mod.get_client()
+        client._http = MagicMock()
+        mock_resp = MagicMock()
+        mock_resp.json = MagicMock(return_value={
+            "status_code": 20000,
+            "cost": 0.0,
+            "tasks": [{"result": [{"login": "u", "balance": 50.00}]}],
+        })
+        mock_resp.raise_for_status = MagicMock()
+        client._http.get = AsyncMock(return_value=mock_resp)
+
+        ok, message = await client.validate()
+
+    assert ok is True
+    assert "50.00" in message or "50.0" in message
+    client._http.get.assert_called_once_with("/v3/appendix/user_data")
+
+
+async def test_run_validate_handles_missing_credentials_cleanly(capsys):
+    """The exact case validate exists to diagnose: empty .env must produce
+    [FAIL] DataForSEO: ... not a traceback."""
+    from agents.orchestrator import run_validate
+    from services import dataforseo_client as mod
+
+    mod._client = None
+    with patch.object(mod, "settings") as mock_settings:
+        mock_settings.dataforseo_login = ""
+        mock_settings.dataforseo_password = ""
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        exit_code = await run_validate()
+
+    assert exit_code == 1
+    captured = capsys.readouterr()
+    assert "[FAIL] DataForSEO" in captured.out
+    assert "must be set" in captured.out.lower() or "could not construct" in captured.out.lower()

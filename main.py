@@ -8,16 +8,17 @@ def _build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  uv run python main.py --mode setup      First-time setup: extract product facts + crawl competitors
-  uv run python main.py --mode weekly     Refresh market data + plan 4 articles
-  uv run python main.py --mode article    Write the next planned article
+  uv run python main.py --mode setup       First-time setup
+  uv run python main.py --mode weekly      Plan 4 articles
+  uv run python main.py --mode article     Write the next planned article
+  uv run python main.py --mode validate    Check external API auth
         """,
     )
     parser.add_argument(
         "--mode",
-        choices=["setup", "weekly", "article"],
+        choices=["setup", "weekly", "article", "validate"],
         required=True,
-        help="setup: product facts + competitors | weekly: market refresh + SEO | article: write draft",
+        help="setup | weekly | article | validate",
     )
     return parser
 
@@ -59,6 +60,13 @@ async def _run_article() -> None:
         print(f"\nBlog PR created: {pr_url}")
 
 
+async def _run_validate() -> None:
+    from agents.orchestrator import run_validate
+    import sys
+    exit_code = await run_validate()
+    sys.exit(exit_code)
+
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
@@ -69,6 +77,8 @@ def main() -> None:
         asyncio.run(_run_weekly())
     elif args.mode == "article":
         asyncio.run(_run_article())
+    elif args.mode == "validate":
+        asyncio.run(_run_validate())
 
 
 if __name__ == "__main__":
