@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 import aiofiles
 from models.article import ArticleStatus, ContentCalendarEntry
+from services.file_service import atomic_write_text
 
 CALENDAR_PATH = Path("data/content_calendar.json")
 
@@ -16,9 +17,8 @@ async def load_calendar() -> list[ContentCalendarEntry]:
 
 
 async def save_calendar(entries: list[ContentCalendarEntry]) -> None:
-    CALENDAR_PATH.parent.mkdir(parents=True, exist_ok=True)
-    async with aiofiles.open(CALENDAR_PATH, "w", encoding="utf-8") as f:
-        await f.write(json.dumps([e.model_dump() for e in entries], indent=2))
+    content = json.dumps([e.model_dump() for e in entries], indent=2)
+    await atomic_write_text(CALENDAR_PATH, content)
 
 
 async def add_entries(new_entries: list[ContentCalendarEntry]) -> None:
