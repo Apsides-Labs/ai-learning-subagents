@@ -1,3 +1,13 @@
+"""Tools package. Re-exports research-agent and (until Task 14) SEO-agent tools.
+
+DataForSEO tools (replacements for people_also_ask / google_trends) live in
+`tools.dataforseo`. They become the SEO agent's tool list in Task 14, at
+which point people_also_ask and google_trends are deleted from this file
+and pytrends + google-search-results are removed from pyproject.toml.
+
+Until then, the SerpAPI and pytrends implementations stay live so that
+`--mode weekly` continues to work through Tasks 1-13.
+"""
 from pathlib import Path
 import httpx
 import requests.exceptions
