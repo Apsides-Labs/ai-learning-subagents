@@ -27,6 +27,8 @@ These are source-of-truth in `services/scoring.py`; this table mirrors them.
 | Engagement time | 2:00+ | 0:30–2:00 | <0:30 | (n/a) |
 | CTA click rate | 2%+ | 0.5–2% | <0.5% | <10 users |
 
+**About the CTA event.** The draftnarc Astro blog fires a `cta_click` event (in `src/layouts/Layout.astro`) when a visitor clicks any link tagged `data-cta-location` whose `href` includes `/register` or `/login`. The event carries a `destination` parameter (`'register'` or `'login'`) and a `location` parameter (where on the page the CTA was). Our GA4 client filters to `eventName == "cta_click"` and attributes counts per `pagePath` — so per-article CTA conversion is captured automatically. A future enhancement could add `article_slug` as a third event parameter for more explicit attribution; today we infer it from `pagePath`.
+
 ### Why these thresholds
 
 <!-- TODO: expand after first month of real data — calibrate with your actual baseline -->

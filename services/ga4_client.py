@@ -62,7 +62,10 @@ async def query_blog_engagement(
       engagement_rows: list of dicts with keys
         page_path, source_medium, active_users, engaged_sessions, avg_session_duration
 
-      cta_clicks_by_path: dict mapping page_path → total signup_cta_click count
+      cta_clicks_by_path: dict mapping page_path → total cta_click count
+        (the event name fired by the draftnarc Astro blog's Layout.astro;
+        see services/ga4_client.py for the filter and docs/playbooks/seo/
+        04-measurement-cheatsheet.md for the broader CTA story)
 
     Returning these separately (rather than denormalizing CTA into every
     engagement row) means downstream code doesn't have to dedupe a CTA
@@ -98,7 +101,7 @@ async def query_blog_engagement(
                 FilterExpression(filter=Filter(
                     field_name="eventName",
                     string_filter=Filter.StringFilter(
-                        value="signup_cta_click",
+                        value="cta_click",
                         match_type=Filter.StringFilter.MatchType.EXACT,
                     ),
                 )),
