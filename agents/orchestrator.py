@@ -29,6 +29,10 @@ async def run_weekly_batch() -> list[str]:
 
     existing = await calendar_service.load_calendar()
     existing_ids = {e.id for e in existing}
+    existing_coverage = "\n".join(
+        f"- {e.title} | primary: {e.primary_keyword} | secondary: {', '.join(e.secondary_keywords)}"
+        for e in existing
+    )
 
     research_context = competitor_profiles + "\n\n" + market_brief
 
@@ -38,7 +42,7 @@ async def run_weekly_batch() -> list[str]:
         measurement_brief = await file_service.read_text(file_service.MEASUREMENT_BRIEF_MD_PATH)
         research_context += "\n\n## MEASUREMENT BRIEF\n\n" + measurement_brief
 
-    new_entries = await run_seo_agent(research_context, existing_ids)
+    new_entries = await run_seo_agent(research_context, existing_ids, existing_coverage)
     await calendar_service.add_entries(new_entries)
 
     return [e.title for e in new_entries]

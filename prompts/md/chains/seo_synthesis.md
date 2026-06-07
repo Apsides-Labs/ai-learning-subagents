@@ -11,7 +11,7 @@ Pick keywords that meet ALL of these:
 - **Informational intent:** the searcher is learning, not buying, comparing tools, or looking for a brand. Skip anything with "best," "vs," "review," "alternative," "pricing," "free download."
 - **Reachable competition:** prefer keywords with DataForSEO `keyword_difficulty` under 30. Use the SERP evidence as the deciding tiebreak when difficulty is borderline (20–35). If the top 10 results are dominated by domains like Wikipedia, Coursera, edX, Khan Academy, NYTimes, or Harvard, skip even if difficulty looks low — the agent is interpreting "reachable" as page-2 reachable.
 - **Stable or rising trend:** trend data is no longer available (pytrends was removed). Use `search_volume` as a proxy: a keyword with volume that's been consistent month-over-month is a safer pick than one whose volume halved. Do not invent trend direction.
-- **Not in `existing_ids`:** do not propose a topic that overlaps with content already on the calendar. Overlap means the same primary search intent, not just the same keyword string.
+- **Not already covered:** do not propose a topic that overlaps with anything in EXISTING COVERAGE below. Overlap means the same tool, technique, concept, or primary search intent — not just the same keyword string. If Anki flashcards is already covered twice, the entire Anki/flashcard/spaced-repetition-app space is off-limits unless the new angle is genuinely orthogonal (e.g., a different audience, a different problem, a clearly distinct workflow).
 
 How to rank candidates:
 1. First filter: drop everything that fails any rule above.
@@ -91,8 +91,8 @@ When no such note appears, leave `seo_coverage_note` as an empty string.
 RESEARCH BRIEF:
 {research_brief}
 
-EXISTING CALENDAR IDS (do not duplicate these topics or their underlying intent):
-{existing_ids}
+EXISTING COVERAGE (titles + keywords already published or planned — do not overlap any of these topics, tools, or closely related subtopics):
+{existing_coverage}
 
 RAW KEYWORD AND SERP DATA:
 {gathered_data}

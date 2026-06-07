@@ -16,8 +16,9 @@ from tools.dataforseo import (
 SEO_AGENT_SYSTEM_PROMPT = load_system_prompt("agents/seo_system.md")
 SEO_KICKOFF = (
     "Research keywords and SERP data for 4 article ideas based on the context "
-    "provided. Avoid these existing topics: {existing_ids}. Use DataForSEO to "
-    "validate each idea."
+    "provided. Avoid ALL topics already covered (listed below). Use DataForSEO to "
+    "validate each idea.\n\nALREADY COVERED — do not overlap any of these topics, "
+    "keywords, or closely related subtopics:\n{existing_coverage}"
 )
 seo_synthesis_prompt = load_prompt("chains/seo_synthesis.md")
 
@@ -40,7 +41,7 @@ def _to_calendar_entry(plan) -> ContentCalendarEntry:
     )
 
 
-async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[ContentCalendarEntry]:
+async def run_seo_agent(research_brief: str, existing_ids: set[str], existing_coverage: str = "") -> list[ContentCalendarEntry]:
     """Run the SEO agent. Returns up to 4 new ContentCalendarEntry items.
 
     If DataForSEOBudgetExceeded fires mid-batch, falls through to synthesis with
@@ -57,7 +58,7 @@ async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[Con
     budget_note = ""
     try:
         result = await agent.ainvoke({
-            "messages": [HumanMessage(content=f"{research_brief}\n\n{SEO_KICKOFF.format(existing_ids=existing_ids or 'none')}")]
+            "messages": [HumanMessage(content=f"{research_brief}\n\n{SEO_KICKOFF.format(existing_coverage=existing_coverage or 'none')}")]
         })
         gathered_data = result["messages"][-1].content
     except DataForSEOBudgetExceeded as exc:
@@ -70,7 +71,7 @@ async def run_seo_agent(research_brief: str, existing_ids: set[str]) -> list[Con
     chain = seo_synthesis_prompt | get_llm().with_structured_output(SEOOutput, method="function_calling")
     output: SEOOutput = await chain.ainvoke({
         "research_brief": research_brief,
-        "existing_ids": ", ".join(existing_ids) if existing_ids else "none",
+        "existing_coverage": existing_coverage or "none",
         "gathered_data": gathered_data,
     })
 
