@@ -2,7 +2,7 @@
   {
     "id": "anki-review-queue-burnout",
     "status": "published",
-    "title": "Why most people quit Anki at week 3 \u2014 and how to redesign your review load before burnout hits",
+    "title": "Why most people quit Anki at week 3 — and how to redesign your review load before burnout hits",
     "primary_keyword": "Anki review queue too long",
     "secondary_keywords": [
       "how to reduce review time in Anki",
@@ -10,7 +10,7 @@
       "Anki backlog burnout",
       "spaced repetition overload"
     ],
-    "search_intent": "Informational \u2014 the reader wants to understand why Anki review piles become overwhelming and how to prevent burnout.",
+    "search_intent": "Informational — the reader wants to understand why Anki review piles become overwhelming and how to prevent burnout.",
     "article_type": "standard",
     "target_audience": "Students and self-learners using Anki who feel overwhelmed by a growing review queue after missing a few days.",
     "angle": "Focus on the emotional and workflow reasons people quit, then show how to redesign review load before the backlog becomes discouraging.",
@@ -26,13 +26,14 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-09-anki-review-queue-burnout.md",
     "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/18",
+    "serp_context": "",
     "published_at": "2026-05-09",
     "live_url": "https://www.draftandarc.com/blog/anki-review-queue-burnout"
   },
   {
     "id": "tutorial-hell-progress",
     "status": "published",
-    "title": "Tutorial hell is the real problem \u2014 here\u2019s how to turn passive YouTube learning into actual progress",
+    "title": "Tutorial hell is the real problem — here’s how to turn passive YouTube learning into actual progress",
     "primary_keyword": "how to get rid of tutorial hell",
     "secondary_keywords": [
       "what exactly is tutorial hell",
@@ -40,11 +41,11 @@
       "project-based learning from tutorials",
       "stop watching tutorials"
     ],
-    "search_intent": "Informational \u2014 the reader wants a concrete way to stop consuming tutorials passively and start making real progress.",
+    "search_intent": "Informational — the reader wants a concrete way to stop consuming tutorials passively and start making real progress.",
     "article_type": "standard",
     "target_audience": "Beginners and self-taught learners, especially in coding or technical skills, who feel stuck watching videos without building anything.",
     "angle": "Treat tutorial hell as a systems problem, not a motivation problem, and give readers a transition process from watching to doing.",
-    "meta_description": "Tutorial hell happens when watching feels productive but learning stalls. Here\u2019s how to turn tutorials into real skill-building progress.",
+    "meta_description": "Tutorial hell happens when watching feels productive but learning stalls. Here’s how to turn tutorials into real skill-building progress.",
     "suggested_headings": [
       "What tutorial hell actually is",
       "Why watching tutorials feels productive",
@@ -56,6 +57,7 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-04-27-tutorial-hell-progress.md",
     "pr_url": null,
+    "serp_context": "",
     "published_at": "2026-04-27",
     "live_url": "https://www.draftandarc.com/blog/tutorial-hell-progress"
   },
@@ -70,7 +72,7 @@
       "study plan without teacher",
       "how to self-learn a subject"
     ],
-    "search_intent": "Informational \u2014 the reader wants a practical framework for organizing independent study from scratch.",
+    "search_intent": "Informational — the reader wants a practical framework for organizing independent study from scratch.",
     "article_type": "topic_teaser",
     "target_audience": "Independent learners, career switchers, and students without formal guidance who need structure more than inspiration.",
     "angle": "Give readers a decision tree for turning a blank topic into a sequence of goals, resources, practice, and checkpoints.",
@@ -86,13 +88,14 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-09-self-study-roadmap.md",
     "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/19",
+    "serp_context": "",
     "published_at": "2026-05-09",
     "live_url": "https://www.draftandarc.com/blog/self-study-roadmap"
   },
   {
     "id": "coursera-practice-gap",
     "status": "published",
-    "title": "Coursera feels too theoretical \u2014 how to turn certificate lessons into real practice",
+    "title": "Coursera feels too theoretical — how to turn certificate lessons into real practice",
     "primary_keyword": "coursera feels too theoretical",
     "secondary_keywords": [
       "coursera certificate practical projects",
@@ -100,7 +103,7 @@
       "apply coursera lessons in real work",
       "coursera learning workflow"
     ],
-    "search_intent": "Informational \u2014 the reader wants to make Coursera coursework more practical and usable, not just finish videos and quizzes.",
+    "search_intent": "Informational — the reader wants to make Coursera coursework more practical and usable, not just finish videos and quizzes.",
     "article_type": "topic_teaser",
     "target_audience": "Career learners and certificate students who want Coursera courses to produce usable skills, portfolio pieces, or work-ready understanding.",
     "angle": "Show how to extract hands-on practice from theory-heavy lessons so the learner leaves with something they can actually do.",
@@ -116,13 +119,14 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-09-coursera-practice-gap.md",
     "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/20",
+    "serp_context": "",
     "published_at": "2026-05-09",
     "live_url": "https://www.draftandarc.com/blog/coursera-practice-gap"
   },
   {
     "id": "duolingo-quit-usefulness",
     "status": "needs_review_flagged",
-    "title": "Why People Quit Duolingo After a Huge Streak \u2014 and How to Tell When an App Has Stopped Helping You Learn",
+    "title": "Why People Quit Duolingo After a Huge Streak — and How to Tell When an App Has Stopped Helping You Learn",
     "primary_keyword": "why are so many people quitting duolingo",
     "secondary_keywords": [
       "duolingo quitting stories",
@@ -144,13 +148,14 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-25-duolingo-quit-usefulness.md",
     "pr_url": null,
+    "serp_context": "",
     "published_at": null,
     "live_url": null
   },
   {
     "id": "language-app-speaking-gap",
     "status": "needs_review_flagged",
-    "title": "Why Language Apps Fail at Speaking and Listening \u2014 and What to Use Instead When You Want Real-World Output",
+    "title": "Why Language Apps Fail at Speaking and Listening — and What to Use Instead When You Want Real-World Output",
     "primary_keyword": "why language apps are bad for speaking",
     "secondary_keywords": [
       "language app speaking practice",
@@ -160,7 +165,7 @@
     "search_intent": "Informational",
     "article_type": "standard",
     "target_audience": "Intermediate language learners who can complete app lessons but still freeze in real conversations",
-    "angle": "A practical explanation of why passive app success doesn\u2019t produce speaking fluency, with a clearer path toward output-focused practice.",
+    "angle": "A practical explanation of why passive app success doesn’t produce speaking fluency, with a clearer path toward output-focused practice.",
     "meta_description": "Language apps often teach recognition, not conversation. Find out why speaking lags behind and what kinds of practice close the gap faster.",
     "suggested_headings": [
       "Why app lessons produce recognition more than recall",
@@ -172,6 +177,7 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-25-language-app-speaking-gap.md",
     "pr_url": null,
+    "serp_context": "",
     "published_at": null,
     "live_url": null
   },
@@ -200,13 +206,14 @@
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-25-anki-flashcards-reading-workflow.md",
     "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/25",
+    "serp_context": "",
     "published_at": "2026-05-25",
     "live_url": "https://www.draftandarc.com/blog/anki-flashcards-reading-workflow"
   },
   {
     "id": "obsidian-minimum-setup",
     "status": "published",
-    "title": "Why Obsidian Feels Like Work Before It Feels Useful \u2014 and the Minimum Setup That Avoids the Rabbit Holes",
+    "title": "Why Obsidian Feels Like Work Before It Feels Useful — and the Minimum Setup That Avoids the Rabbit Holes",
     "primary_keyword": "does obsidian actually work",
     "secondary_keywords": [
       "obsidian beginner setup",
@@ -228,8 +235,39 @@
     "blog_category": "Productivity",
     "draft_path": "data/drafts/2026-05-25-obsidian-minimum-setup.md",
     "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/26",
+    "serp_context": "",
     "published_at": "2026-05-25",
     "live_url": "https://www.draftandarc.com/blog/obsidian-minimum-setup"
+  },
+  {
+    "id": "lecture-notes-verbatim",
+    "status": "planned",
+    "title": "Stop taking verbatim lecture notes: a faster system for students who can’t keep up in class",
+    "primary_keyword": "faster lecture note taking system",
+    "secondary_keywords": [
+      "how to take notes faster in class",
+      "stop writing everything down",
+      "lecture notes system"
+    ],
+    "search_intent": "Informational: the reader wants a better note-taking workflow for live classes without trying to capture every word.",
+    "article_type": "topic_teaser",
+    "target_audience": "Students who fall behind in lectures because they try to write down everything verbatim.",
+    "angle": "A beginner-friendly, non-technical note system that emphasizes listening, structure, and later review instead of transcription.",
+    "meta_description": "Can’t keep up with lecture notes? Learn a faster system that helps you stay present without missing the class.",
+    "suggested_headings": [
+      "Why verbatim notes slow you down",
+      "What to write instead of everything",
+      "A simple in-class capture system",
+      "How to clean up notes after class",
+      "How to know your notes are enough"
+    ],
+    "cta_prompt": "Build me a note-taking workflow for lectures that I can use even when I type slowly.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null,
+    "serp_context": "No SERP data available.",
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "ai-note-taking-human-cleanup",
@@ -257,64 +295,7 @@
     "blog_category": "AI & Learning",
     "draft_path": null,
     "pr_url": null,
-    "published_at": null,
-    "live_url": null
-  },
-  {
-    "id": "anki-work-full-time-burnout",
-    "status": "planned",
-    "title": "How to use Anki without burning out when you work full time",
-    "primary_keyword": "Anki burnout full time work reviews",
-    "secondary_keywords": [
-      "Anki fatigue after work",
-      "sustainable Anki habits",
-      "how to reduce Anki review load"
-    ],
-    "search_intent": "Informational",
-    "article_type": "topic_teaser",
-    "target_audience": "Working professionals and students who want to keep using Anki but keep falling behind on reviews",
-    "angle": "Show how to shrink the review queue, cap daily effort, and make Anki sustainable around a real job schedule instead of treating it like a guilt-based streak habit.",
-    "meta_description": "Keep Anki sustainable with a full-time job. Learn how to cap reviews, reduce queue pressure, and avoid the burnout cycle that makes people quit.",
-    "suggested_headings": [
-      "Why Anki breaks down after the first strong month",
-      "How to shrink the queue before it becomes guilt",
-      "Time-boxed review rules for busy weekdays",
-      "What to do when you miss several days",
-      "How Draft and Arc can build a realistic Anki plan"
-    ],
-    "cta_prompt": "Build me a 2-week Anki plan that fits around a full-time job and keeps daily reviews under 20 minutes.",
-    "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null,
-    "published_at": null,
-    "live_url": null
-  },
-  {
-    "id": "duolingo-grammar-serious-learners",
-    "status": "planned",
-    "title": "Why Duolingo feels pointless to serious learners \u2014 and what grammar support it is missing",
-    "primary_keyword": "Duolingo grammar support for serious learners",
-    "secondary_keywords": [
-      "why doesn't Duolingo do grammar",
-      "Duolingo grammar lessons",
-      "serious language learners Duolingo"
-    ],
-    "search_intent": "Informational",
-    "article_type": "standard",
-    "target_audience": "Intermediate language learners who have outgrown streak-based practice and want real grammar instruction",
-    "angle": "Critique the shallow-feeling parts of Duolingo for serious learners, then explain what kind of grammar support would make the app more useful without turning it into a textbook.",
-    "meta_description": "Duolingo can feel too shallow for serious learners. See what grammar support it already offers, what it still lacks, and how to supplement it effectively.",
-    "suggested_headings": [
-      "Why Duolingo starts to feel insufficient",
-      "What serious learners actually want from grammar support",
-      "What Duolingo already does and why it still feels thin",
-      "How to patch the gap without quitting entirely",
-      "How Draft and Arc can help you make a better study mix"
-    ],
-    "cta_prompt": "",
-    "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null,
+    "serp_context": "",
     "published_at": null,
     "live_url": null
   },
@@ -344,64 +325,7 @@
     "blog_category": "Study Methods",
     "draft_path": null,
     "pr_url": null,
-    "published_at": null,
-    "live_url": null
-  },
-  {
-    "id": "anki-review-burnout",
-    "status": "planned",
-    "title": "Why People Quit Anki at Week 3 \u2014 and What to Do When Reviews Start Feeling Like Forced Labor",
-    "primary_keyword": "why are med students obsessed with anki",
-    "secondary_keywords": [
-      "is anki overhyped",
-      "anki burnout",
-      "why people quit anki"
-    ],
-    "search_intent": "informational",
-    "article_type": "standard",
-    "target_audience": "medical students, exam-focused learners, and Anki users who are starting to feel overwhelmed",
-    "angle": "Explain the emotional and practical reasons Anki stops working, especially when the review queue shifts from helpful repetition to obligation, and show how to reset expectations before quitting outright.",
-    "meta_description": "Why Anki starts feeling like forced labor, why learners quit around week 3, and how to tell whether your problem is the system, your settings, or your study load.",
-    "suggested_headings": [
-      "Why Anki feels great at first",
-      "The week-3 burnout pattern",
-      "When Anki becomes review debt",
-      "Signs you need to shrink, not quit",
-      "A better way to keep the benefits without the grind"
-    ],
-    "cta_prompt": "",
-    "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null,
-    "published_at": null,
-    "live_url": null
-  },
-  {
-    "id": "anki-backlog-rescue",
-    "status": "planned",
-    "title": "How to Stop Anki Backlog Blowups Before They Swallow Your Study Day",
-    "primary_keyword": "how do i clear the backlog on anki",
-    "secondary_keywords": [
-      "how to decrease anki reviews",
-      "anki backlog",
-      "too many anki cards to review"
-    ],
-    "search_intent": "informational",
-    "article_type": "topic_teaser",
-    "target_audience": "students and self-learners with a growing Anki queue, especially med students and language learners",
-    "angle": "Give a practical triage framework for rescuing a damaged Anki queue without making the backlog worse, including what to pause, prune, and prioritize first.",
-    "meta_description": "A practical guide to clearing an Anki backlog without making it worse, with triage steps for overwhelmed learners who need to regain control fast.",
-    "suggested_headings": [
-      "First: stop the backlog from growing",
-      "Triage your due cards by value",
-      "What to suspend, bury, or delete",
-      "How to reset daily limits safely",
-      "A one-week recovery plan"
-    ],
-    "cta_prompt": "Build me a 7-day plan to clear my Anki backlog without burning out.",
-    "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null,
+    "serp_context": "",
     "published_at": null,
     "live_url": null
   },
@@ -431,35 +355,7 @@
     "blog_category": "Study Methods",
     "draft_path": null,
     "pr_url": null,
-    "published_at": null,
-    "live_url": null
-  },
-  {
-    "id": "anki-source-mapping",
-    "status": "planned",
-    "title": "The Missing Link Between Your Notes and Your Flashcards: How to Study Without Breaking the Source Material Apart",
-    "primary_keyword": "flashcards from notes and readings",
-    "secondary_keywords": [
-      "anki source material",
-      "study without breaking notes apart",
-      "flashcards connected to source material"
-    ],
-    "search_intent": "informational",
-    "article_type": "standard",
-    "target_audience": "students who use notes, lectures, PDFs, and readings to make flashcards but feel their system has no coherence",
-    "angle": "Show how to keep flashcards anchored to the original source so recall stays connected to understanding instead of becoming isolated memorization.",
-    "meta_description": "Learn how to keep flashcards connected to your notes, lectures, and readings so your study system stays coherent instead of fragmenting.",
-    "suggested_headings": [
-      "Why flashcards feel disconnected",
-      "Map each card back to a source",
-      "Keep notes, questions, and context linked",
-      "When to make a card and when not to",
-      "A source-first workflow that scales"
-    ],
-    "cta_prompt": "",
-    "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null,
+    "serp_context": "",
     "published_at": null,
     "live_url": null
   }
