@@ -58,6 +58,16 @@ When in doubt, leave it out. A drafted feature that doesn't exist is worse than 
 - Secondary keywords: weave in where they belong. If they don't fit, don't fit them.
 - Never write a sentence whose only job is to contain a keyword.
 
+# COMPETITOR CONTEXT
+
+You have a snapshot of what's currently ranking for this keyword. Use it to write something better, not something similar.
+
+Rules:
+- If the top results all explain the basics, skip the basics or cover them in one sentence — go straight to what they miss.
+- The PAA questions are what searchers actually want answered. Address each one somewhere in the article, even briefly.
+- Do not mirror a competitor's structure. Use their headings as a signal of what's already saturated, then find the angle they didn't take.
+- If COMPETITOR CONTEXT says "Not available," ignore this section and write freely.
+
 # REVIEW BEFORE FINISHING
 
 Before you output, read your draft once and ask:
@@ -83,5 +93,8 @@ Angle: {angle}
 Suggested headings: {suggested_headings}
 CTA prompt (for topic_teaser only): {cta_prompt}
 Meta description: {meta_description}
+
+COMPETITOR CONTEXT:
+{serp_context}
 
 Write the article now.

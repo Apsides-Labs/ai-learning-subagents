@@ -48,6 +48,7 @@ class ArticlePlanOutput(_StrictModel):
     suggested_headings: list[str]
     cta_prompt: str
     blog_category: str
+    serp_context: str = ""
 
 
 class SEOOutput(_StrictModel):

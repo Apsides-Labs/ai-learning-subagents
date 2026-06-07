@@ -33,5 +33,6 @@ class ContentCalendarEntry(BaseModel):
     blog_category: str = "Study Methods"
     draft_path: Optional[str] = None
     pr_url: Optional[str] = None
+    serp_context: str = ""               # SERP snapshot saved at planning time: top competitors, gaps, PAA questions
     published_at: Optional[str] = None   # ISO date set by --mark-published (Task 25)
     live_url: Optional[str] = None        # canonical URL set by --mark-published (Task 25)

@@ -19,5 +19,6 @@ async def run_writing_chain(entry: ContentCalendarEntry, product_facts: str) -> 
         "suggested_headings": "\n".join(entry.suggested_headings),
         "cta_prompt": entry.cta_prompt,
         "meta_description": entry.meta_description,
+        "serp_context": entry.serp_context or "Not available.",
     })
     return result

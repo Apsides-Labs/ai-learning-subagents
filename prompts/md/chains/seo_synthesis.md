@@ -59,6 +59,19 @@ For each of the 4 plans, include a brief rationale (2–3 sentences) covering:
 
 The rationale is for the human reviewer to sanity-check your selection. Do not skip it. Do not pad it.
 
+# SERP CONTEXT REQUIREMENT
+
+For each of the 4 plans, populate `serp_context` with a compact SERP snapshot for the writing agent. Use the SERP data you gathered. Format it as plain text, 5–8 lines max:
+
+```
+Top results: [domain1] — [what it covers in 6 words]; [domain2] — [what it covers]; [domain3] — [what it covers].
+Gaps: [what the top results fail to address or get wrong — be specific].
+PAA: [question 1]; [question 2]; [question 3].
+```
+
+If SERP data for this keyword wasn't fetched (budget ran out), write "No SERP data available." — do not invent.
+The writing agent will use this to differentiate the article and answer the right questions. Be honest about gaps, not flattering.
+
 # DATA COVERAGE NOTE
 
 The RAW KEYWORD AND SERP DATA below may include a note like
