@@ -25,7 +25,9 @@
     "cta_prompt": "Keep using Draft and Arc to turn your study notes into a lighter, more realistic review system.",
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-09-anki-review-queue-burnout.md",
-    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/18"
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/18",
+    "published_at": "2026-05-09",
+    "live_url": "https://www.draftandarc.com/blog/anki-review-queue-burnout"
   },
   {
     "id": "tutorial-hell-progress",
@@ -53,7 +55,9 @@
     "cta_prompt": "Use Draft and Arc to turn one tutorial into a small project plan, not another endless watch list.",
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-04-27-tutorial-hell-progress.md",
-    "pr_url": null
+    "pr_url": null,
+    "published_at": "2026-04-27",
+    "live_url": "https://www.draftandarc.com/blog/tutorial-hell-progress"
   },
   {
     "id": "self-study-roadmap",
@@ -81,7 +85,9 @@
     "cta_prompt": "Build me a 12-week self-study plan for [subject] with milestones, practice tasks, and weekly checks.",
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-09-self-study-roadmap.md",
-    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/19"
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/19",
+    "published_at": "2026-05-09",
+    "live_url": "https://www.draftandarc.com/blog/self-study-roadmap"
   },
   {
     "id": "coursera-practice-gap",
@@ -109,7 +115,9 @@
     "cta_prompt": "Build me a practice-first study plan for a Coursera course on [topic] so I finish with projects, not just notes.",
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-09-coursera-practice-gap.md",
-    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/20"
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/20",
+    "published_at": "2026-05-09",
+    "live_url": "https://www.draftandarc.com/blog/coursera-practice-gap"
   },
   {
     "id": "duolingo-quit-usefulness",
@@ -135,7 +143,9 @@
     "cta_prompt": "Explore Draft and Arc for a better-structured language learning plan when your app stops moving you forward.",
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-25-duolingo-quit-usefulness.md",
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "language-app-speaking-gap",
@@ -161,11 +171,13 @@
     "cta_prompt": "Use Draft and Arc to build a language plan that prioritizes speaking practice, not just lesson completion.",
     "blog_category": "Study Methods",
     "draft_path": "data/drafts/2026-05-25-language-app-speaking-gap.md",
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "anki-flashcards-reading-workflow",
-    "status": "planned",
+    "status": "published",
     "title": "The Fastest Way to Turn Reading Into Flashcards Without Turning Card Creation Into a Second Job",
     "primary_keyword": "what is the quickest way to make flashcards",
     "secondary_keywords": [
@@ -186,12 +198,14 @@
     ],
     "cta_prompt": "Build me a 2-week plan to turn my reading notes into high-quality flashcards without spending hours on card creation.",
     "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null
+    "draft_path": "data/drafts/2026-05-25-anki-flashcards-reading-workflow.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/25",
+    "published_at": "2026-05-25",
+    "live_url": "https://www.draftandarc.com/blog/anki-flashcards-reading-workflow"
   },
   {
     "id": "obsidian-minimum-setup",
-    "status": "planned",
+    "status": "published",
     "title": "Why Obsidian Feels Like Work Before It Feels Useful \u2014 and the Minimum Setup That Avoids the Rabbit Holes",
     "primary_keyword": "does obsidian actually work",
     "secondary_keywords": [
@@ -212,8 +226,10 @@
     ],
     "cta_prompt": "Use Draft and Arc to design a simple Obsidian note-taking system with the fewest possible moving parts.",
     "blog_category": "Productivity",
-    "draft_path": null,
-    "pr_url": null
+    "draft_path": "data/drafts/2026-05-25-obsidian-minimum-setup.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/26",
+    "published_at": "2026-05-25",
+    "live_url": "https://www.draftandarc.com/blog/obsidian-minimum-setup"
   },
   {
     "id": "ai-note-taking-human-cleanup",
@@ -240,7 +256,9 @@
     "cta_prompt": "",
     "blog_category": "AI & Learning",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "anki-work-full-time-burnout",
@@ -267,7 +285,9 @@
     "cta_prompt": "Build me a 2-week Anki plan that fits around a full-time job and keeps daily reviews under 20 minutes.",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "duolingo-grammar-serious-learners",
@@ -294,7 +314,9 @@
     "cta_prompt": "",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "language-class-progress-gap",
@@ -321,7 +343,9 @@
     "cta_prompt": "Build me a 4-week plan to turn my language class into real progress with daily self-study that fits my schedule.",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "anki-review-burnout",
@@ -348,7 +372,9 @@
     "cta_prompt": "",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "anki-backlog-rescue",
@@ -375,7 +401,9 @@
     "cta_prompt": "Build me a 7-day plan to clear my Anki backlog without burning out.",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "self-study-plan-no-curriculum",
@@ -402,7 +430,9 @@
     "cta_prompt": "Build me a 4-week self-study plan for [topic] with no teacher and a beginner-friendly sequence.",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   },
   {
     "id": "anki-source-mapping",
@@ -429,6 +459,8 @@
     "cta_prompt": "",
     "blog_category": "Study Methods",
     "draft_path": null,
-    "pr_url": null
+    "pr_url": null,
+    "published_at": null,
+    "live_url": null
   }
 ]

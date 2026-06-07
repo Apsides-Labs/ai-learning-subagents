@@ -91,14 +91,3 @@ You do not need to hate the app before you outgrow it. You only need to notice t
 If your daily practice still helps, keep it. If it only protects a number, stop pretending that number means much.
 
 That’s the real answer to **why are so many people quitting duolingo**: not because they hate learning, but because they finally notice when the app stops helping them learn.
-
-If you want a more structured next step, Draft and Arc gives you a learning setup built around courses, lessons, notes, and progress instead of a streak alone.
-
----
-
-## FACT-CHECK FLAGS
-
-- **VERIFIED**: For some learners, the fix is a more structured course with lessons, notes, quizzes, and time tracking tied to the work itself.
-- **SUBJECTIVE**: That kind of system gives you more than repetition.
-- **PARTIAL**: It gives you a record of what you studied, what you completed, and where you still need work.
-- **PARTIAL**: If you want a more structured next step, Draft and Arc gives you a learning setup built around courses, lessons, notes, and progress instead of a streak alone.
