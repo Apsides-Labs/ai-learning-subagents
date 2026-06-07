@@ -53,7 +53,19 @@ bash scripts/gcloud-adc-login.sh
 make validate
 ```
 
-## Weekly workflow
+## The repeating cycle
+
+```
+make measure → make weekly → make article → publish → make mark-published
+     ↑                                                         │
+     └──────────────────── wait ~1 week ──────────────────────┘
+```
+
+- `make measure` writes `data/measurement_brief.md`, which is automatically injected into the next `make weekly` so the SEO agent knows what's working
+- always run `make measure` right before `make weekly`, not before `make article`
+- wait at least a week after publishing before measuring — Google needs time to index and accumulate data
+
+## Commands
 
 ```bash
 make weekly    # research + plan 4 articles → data/content_calendar.json
@@ -67,13 +79,12 @@ Review the draft, merge the PR, publish to the blog.
 ```bash
 make mark-published ID=<slug>
 # Example:
-make mark-published ID=anki-review-queue-burnout
+make mark-published ID=lecture-notes-verbatim
 # Custom date (if published in the past):
 make mark-published ID=tutorial-hell-progress DATE=2026-04-27
 ```
 
-## Measurement
-
+**To see performance data:**
 ```bash
 make measure
 ```
