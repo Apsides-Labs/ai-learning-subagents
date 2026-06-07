@@ -40,3 +40,8 @@ htmlcov/
 .env
 !data/.gitkeep
 !data/drafts/.gitkeep
+
+# Generated runtime artifacts — regenerated on each run
+data/market_brief.md
+data/competitor_profiles.md
+data/product_facts.md
