@@ -86,8 +86,11 @@ async def dfs_keyword_suggestions(seed: str) -> str:
     )
 
     try:
-        items = payload["tasks"][0]["result"][0]["items"]
-    except (KeyError, IndexError):
+        items = payload["tasks"][0]["result"][0]["items"] or []
+    except (KeyError, IndexError, TypeError):
+        return f"No keyword suggestions for {seed!r}."
+
+    if not items:
         return f"No keyword suggestions for {seed!r}."
 
     lines = [f"Keyword suggestions for {seed!r} (top {min(len(items), 20)}):"]
