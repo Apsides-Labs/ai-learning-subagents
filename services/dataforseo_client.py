@@ -145,7 +145,7 @@ class DataForSEOClient:
 
         rows: list[dict] = []
         try:
-            items = payload["tasks"][0]["result"][0]["items"]
+            items = payload["tasks"][0]["result"][0]["items"] or []
         except (KeyError, IndexError, TypeError):
             return rows
 

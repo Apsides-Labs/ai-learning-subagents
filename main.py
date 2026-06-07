@@ -36,6 +36,11 @@ Examples:
         metavar="LIVE_URL",
         help="Canonical URL of the published article (used with --mark-published).",
     )
+    parser.add_argument(
+        "--date",
+        metavar="YYYY-MM-DD",
+        help="Publication date (used with --mark-published). Defaults to today.",
+    )
     return parser
 
 
@@ -91,12 +96,13 @@ async def _run_measure(days: int) -> None:
     print(f"  Human dashboard:    {html_path}")
 
 
-async def _run_mark_published(article_id: str, url: str) -> None:
+async def _run_mark_published(article_id: str, url: str, date: str | None) -> None:
     from services.calendar_service import mark_published
     if not url:
         raise SystemExit("--mark-published requires --url <canonical-url>")
-    await mark_published(article_id, live_url=url)
-    print(f"Marked {article_id!r} as published with URL {url}")
+    await mark_published(article_id, live_url=url, published_on=date)
+    date_str = date or "today"
+    print(f"Marked {article_id!r} as published on {date_str} with URL {url}")
 
 
 def main() -> None:
@@ -104,7 +110,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.mark_published:
-        asyncio.run(_run_mark_published(args.mark_published, args.url or ""))
+        asyncio.run(_run_mark_published(args.mark_published, args.url or "", args.date))
         return
 
     if not args.mode:
