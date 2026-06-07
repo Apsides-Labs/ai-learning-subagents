@@ -54,9 +54,22 @@ When in doubt, leave it out. A drafted feature that doesn't exist is worse than 
 
 # KEYWORD HANDLING
 
-- Primary keyword: use in the title (already provided), the first 100 words, and 2–4 more times naturally. Never force it into a sentence where it doesn't fit.
-- Secondary keywords: weave in where they belong. If they don't fit, don't fit them.
-- Never write a sentence whose only job is to contain a keyword.
+- **Primary keyword:** use in the title (already provided), within the first 100 words, and 2–4 more times naturally throughout. Never force it.
+- **Secondary keywords:** these are the subtopics Google expects to see covered. At least 3 out of 4 should appear as a section anchor (near a heading or at the start of a paragraph), not buried mid-sentence. If a secondary keyword doesn't belong anywhere, leave it out — but don't drop three of them because it's easier.
+- Never write a sentence whose only purpose is to contain a keyword. If it reads as stuffed, rewrite it.
+
+# SEARCH INTENT
+
+Let the search intent drive the article's structure, not just its topic:
+- **informational** — the reader wants to understand something. Lead with the concept, then explain why it matters, then show how it works.
+- **how-to / procedural** — the reader wants to do something. Get to the steps fast. Number them. Make each step independently actionable.
+- **comparative** — the reader is deciding between options. Be direct about trade-offs. Don't stall.
+
+Match the structure to the intent listed in ARTICLE PLAN. A how-to article written like an explainer loses readers who came to act.
+
+# META DESCRIPTION AS A CONTRACT
+
+The meta description is what the searcher sees before clicking. Your article must deliver exactly what it promises. If the meta description says "three ways to fix X," the article had better contain three concrete ways to fix X — not a vague exploration of X. Read it before you write the hook.
 
 # COMPETITOR CONTEXT
 
@@ -87,7 +100,9 @@ ARTICLE PLAN:
 Title: {title}
 Primary keyword: {primary_keyword}
 Secondary keywords: {secondary_keywords}
+Search intent: {search_intent}
 Article type: {article_type}
+Blog category: {blog_category}
 Target audience: {target_audience}
 Angle: {angle}
 Suggested headings: {suggested_headings}
