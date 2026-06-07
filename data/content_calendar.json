@@ -2,7 +2,7 @@
   {
     "id": "anki-review-queue-burnout",
     "status": "published",
-    "title": "Why most people quit Anki at week 3 — and how to redesign your review load before burnout hits",
+    "title": "Why most people quit Anki at week 3 \u2014 and how to redesign your review load before burnout hits",
     "primary_keyword": "Anki review queue too long",
     "secondary_keywords": [
       "how to reduce review time in Anki",
@@ -10,7 +10,7 @@
       "Anki backlog burnout",
       "spaced repetition overload"
     ],
-    "search_intent": "Informational — the reader wants to understand why Anki review piles become overwhelming and how to prevent burnout.",
+    "search_intent": "Informational \u2014 the reader wants to understand why Anki review piles become overwhelming and how to prevent burnout.",
     "article_type": "standard",
     "target_audience": "Students and self-learners using Anki who feel overwhelmed by a growing review queue after missing a few days.",
     "angle": "Focus on the emotional and workflow reasons people quit, then show how to redesign review load before the backlog becomes discouraging.",
@@ -33,7 +33,7 @@
   {
     "id": "tutorial-hell-progress",
     "status": "published",
-    "title": "Tutorial hell is the real problem — here’s how to turn passive YouTube learning into actual progress",
+    "title": "Tutorial hell is the real problem \u2014 here\u2019s how to turn passive YouTube learning into actual progress",
     "primary_keyword": "how to get rid of tutorial hell",
     "secondary_keywords": [
       "what exactly is tutorial hell",
@@ -41,11 +41,11 @@
       "project-based learning from tutorials",
       "stop watching tutorials"
     ],
-    "search_intent": "Informational — the reader wants a concrete way to stop consuming tutorials passively and start making real progress.",
+    "search_intent": "Informational \u2014 the reader wants a concrete way to stop consuming tutorials passively and start making real progress.",
     "article_type": "standard",
     "target_audience": "Beginners and self-taught learners, especially in coding or technical skills, who feel stuck watching videos without building anything.",
     "angle": "Treat tutorial hell as a systems problem, not a motivation problem, and give readers a transition process from watching to doing.",
-    "meta_description": "Tutorial hell happens when watching feels productive but learning stalls. Here’s how to turn tutorials into real skill-building progress.",
+    "meta_description": "Tutorial hell happens when watching feels productive but learning stalls. Here\u2019s how to turn tutorials into real skill-building progress.",
     "suggested_headings": [
       "What tutorial hell actually is",
       "Why watching tutorials feels productive",
@@ -72,7 +72,7 @@
       "study plan without teacher",
       "how to self-learn a subject"
     ],
-    "search_intent": "Informational — the reader wants a practical framework for organizing independent study from scratch.",
+    "search_intent": "Informational \u2014 the reader wants a practical framework for organizing independent study from scratch.",
     "article_type": "topic_teaser",
     "target_audience": "Independent learners, career switchers, and students without formal guidance who need structure more than inspiration.",
     "angle": "Give readers a decision tree for turning a blank topic into a sequence of goals, resources, practice, and checkpoints.",
@@ -95,7 +95,7 @@
   {
     "id": "coursera-practice-gap",
     "status": "published",
-    "title": "Coursera feels too theoretical — how to turn certificate lessons into real practice",
+    "title": "Coursera feels too theoretical \u2014 how to turn certificate lessons into real practice",
     "primary_keyword": "coursera feels too theoretical",
     "secondary_keywords": [
       "coursera certificate practical projects",
@@ -103,7 +103,7 @@
       "apply coursera lessons in real work",
       "coursera learning workflow"
     ],
-    "search_intent": "Informational — the reader wants to make Coursera coursework more practical and usable, not just finish videos and quizzes.",
+    "search_intent": "Informational \u2014 the reader wants to make Coursera coursework more practical and usable, not just finish videos and quizzes.",
     "article_type": "topic_teaser",
     "target_audience": "Career learners and certificate students who want Coursera courses to produce usable skills, portfolio pieces, or work-ready understanding.",
     "angle": "Show how to extract hands-on practice from theory-heavy lessons so the learner leaves with something they can actually do.",
@@ -126,7 +126,7 @@
   {
     "id": "duolingo-quit-usefulness",
     "status": "needs_review_flagged",
-    "title": "Why People Quit Duolingo After a Huge Streak — and How to Tell When an App Has Stopped Helping You Learn",
+    "title": "Why People Quit Duolingo After a Huge Streak \u2014 and How to Tell When an App Has Stopped Helping You Learn",
     "primary_keyword": "why are so many people quitting duolingo",
     "secondary_keywords": [
       "duolingo quitting stories",
@@ -155,7 +155,7 @@
   {
     "id": "language-app-speaking-gap",
     "status": "needs_review_flagged",
-    "title": "Why Language Apps Fail at Speaking and Listening — and What to Use Instead When You Want Real-World Output",
+    "title": "Why Language Apps Fail at Speaking and Listening \u2014 and What to Use Instead When You Want Real-World Output",
     "primary_keyword": "why language apps are bad for speaking",
     "secondary_keywords": [
       "language app speaking practice",
@@ -165,7 +165,7 @@
     "search_intent": "Informational",
     "article_type": "standard",
     "target_audience": "Intermediate language learners who can complete app lessons but still freeze in real conversations",
-    "angle": "A practical explanation of why passive app success doesn’t produce speaking fluency, with a clearer path toward output-focused practice.",
+    "angle": "A practical explanation of why passive app success doesn\u2019t produce speaking fluency, with a clearer path toward output-focused practice.",
     "meta_description": "Language apps often teach recognition, not conversation. Find out why speaking lags behind and what kinds of practice close the gap faster.",
     "suggested_headings": [
       "Why app lessons produce recognition more than recall",
@@ -213,7 +213,7 @@
   {
     "id": "obsidian-minimum-setup",
     "status": "published",
-    "title": "Why Obsidian Feels Like Work Before It Feels Useful — and the Minimum Setup That Avoids the Rabbit Holes",
+    "title": "Why Obsidian Feels Like Work Before It Feels Useful \u2014 and the Minimum Setup That Avoids the Rabbit Holes",
     "primary_keyword": "does obsidian actually work",
     "secondary_keywords": [
       "obsidian beginner setup",
@@ -241,8 +241,8 @@
   },
   {
     "id": "lecture-notes-verbatim",
-    "status": "planned",
-    "title": "Stop taking verbatim lecture notes: a faster system for students who can’t keep up in class",
+    "status": "published",
+    "title": "Stop taking verbatim lecture notes: a faster system for students who can\u2019t keep up in class",
     "primary_keyword": "faster lecture note taking system",
     "secondary_keywords": [
       "how to take notes faster in class",
@@ -253,7 +253,7 @@
     "article_type": "topic_teaser",
     "target_audience": "Students who fall behind in lectures because they try to write down everything verbatim.",
     "angle": "A beginner-friendly, non-technical note system that emphasizes listening, structure, and later review instead of transcription.",
-    "meta_description": "Can’t keep up with lecture notes? Learn a faster system that helps you stay present without missing the class.",
+    "meta_description": "Can\u2019t keep up with lecture notes? Learn a faster system that helps you stay present without missing the class.",
     "suggested_headings": [
       "Why verbatim notes slow you down",
       "What to write instead of everything",
@@ -263,10 +263,10 @@
     ],
     "cta_prompt": "Build me a note-taking workflow for lectures that I can use even when I type slowly.",
     "blog_category": "Study Methods",
-    "draft_path": null,
-    "pr_url": null,
+    "draft_path": "data/drafts/2026-06-07-lecture-notes-verbatim.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/29",
     "serp_context": "No SERP data available.",
-    "published_at": null,
-    "live_url": null
+    "published_at": "2026-06-07",
+    "live_url": "https://www.draftandarc.com/blog/lecture-notes-verbatim"
   }
 ]
