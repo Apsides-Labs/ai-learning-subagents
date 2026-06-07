@@ -3,11 +3,18 @@
 Uses google-analytics-data's async client (BetaAnalyticsDataAsyncClient).
 Runs two reports — engagement and conversion — and merges client-side on
 pagePath. See spec Section 5 for why a single report cannot do this.
+
+Auth strategy: same as gsc_client. Prefer service-account JSON when
+GOOGLE_APPLICATION_CREDENTIALS points at a real file; otherwise fall back
+to Application Default Credentials (typically from
+`gcloud auth application-default login`).
 """
 
+import os
 from datetime import date
 from typing import Any
 
+import google.auth
 from google.analytics.data_v1beta import BetaAnalyticsDataAsyncClient
 from google.analytics.data_v1beta.types import (
     DateRange,
@@ -27,15 +34,17 @@ SCOPES = ["https://www.googleapis.com/auth/analytics.readonly"]
 
 
 def _build_async_client() -> BetaAnalyticsDataAsyncClient:
-    if not settings.google_application_credentials:
-        raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS must be set in .env")
     if not settings.ga4_property_id:
         raise RuntimeError("GA4_PROPERTY_ID must be set in .env")
 
-    creds = service_account.Credentials.from_service_account_file(
-        settings.google_application_credentials,
-        scopes=SCOPES,
-    )
+    creds_path = settings.google_application_credentials
+    if creds_path and os.path.isfile(creds_path):
+        creds = service_account.Credentials.from_service_account_file(
+            creds_path, scopes=SCOPES,
+        )
+    else:
+        creds, _project = google.auth.default(scopes=SCOPES)
+
     return BetaAnalyticsDataAsyncClient(credentials=creds)
 
 

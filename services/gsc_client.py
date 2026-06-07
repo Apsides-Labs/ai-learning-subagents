@@ -3,12 +3,21 @@
 google-api-python-client is sync-only. The public query_* methods are async
 and wrap their sync helpers in asyncio.to_thread so the call doesn't block
 the event loop.
+
+Auth strategy:
+  - If GOOGLE_APPLICATION_CREDENTIALS points at a service-account JSON, use it.
+  - Otherwise, fall back to Application Default Credentials (ADC). The user
+    has typically run `gcloud auth application-default login` and granted
+    their own account access to the GSC property. This is the path used when
+    the Workspace org policy `iam.disableServiceAccountKeyCreation` blocks
+    service-account JSON keys.
 """
 
 import asyncio
 from datetime import date
 from typing import Any
 
+import google.auth
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
@@ -19,14 +28,24 @@ SCOPES = ["https://www.googleapis.com/auth/webmasters.readonly"]
 
 
 def _build_service():
-    """Build a Search Console service client using the service-account credentials."""
-    if not settings.google_application_credentials:
-        raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS must be set in .env")
+    """Build a Search Console service client.
 
-    creds = service_account.Credentials.from_service_account_file(
-        settings.google_application_credentials,
-        scopes=SCOPES,
-    )
+    Prefers service-account JSON when GOOGLE_APPLICATION_CREDENTIALS is set
+    AND the file actually exists; otherwise uses Application Default
+    Credentials.
+    """
+    import os
+
+    creds_path = settings.google_application_credentials
+    if creds_path and os.path.isfile(creds_path):
+        creds = service_account.Credentials.from_service_account_file(
+            creds_path, scopes=SCOPES,
+        )
+    else:
+        # ADC: picks up `gcloud auth application-default login` credentials
+        # from ~/.config/gcloud/application_default_credentials.json
+        creds, _project = google.auth.default(scopes=SCOPES)
+
     return build("searchconsole", "v1", credentials=creds, cache_discovery=False)
 
 
@@ -90,7 +109,7 @@ def _validate_sync() -> tuple[bool, str]:
     response = service.sites().list().execute()
     sites = [s.get("siteUrl", "") for s in response.get("siteEntry", [])]
     if not sites:
-        return False, "Service account has no GSC properties — check permission grant."
+        return False, "No GSC properties accessible — check that your account / service account has access."
     if settings.gsc_site_url not in sites:
         return False, (
             f"GSC_SITE_URL={settings.gsc_site_url!r} not in accessible properties: {sites}"
