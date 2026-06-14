@@ -1,4 +1,4 @@
-.PHONY: install test setup weekly article measure validate mark-published list-calendar
+.PHONY: install test setup propose weekly article measure validate mark-published list-calendar
 
 install:
 	uv sync
@@ -8,6 +8,9 @@ test:
 
 setup:
 	uv run python main.py --mode setup
+
+propose:
+	uv run python main.py --mode propose $(if $(COUNT),--count $(COUNT),)
 
 weekly:
 	uv run python main.py --mode weekly

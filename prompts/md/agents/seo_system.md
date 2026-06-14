@@ -29,7 +29,7 @@ Treat each opportunity as a *seed*, not a finished keyword. Your job is to find 
 For each content opportunity from the input, generate 3–6 keyword candidates before searching anything. Use these candidate shapes:
 
 - **The angle as-is**, lightly cleaned into a search-shaped query.
-- **The underlying topic**, broader than the angle (e.g., angle "Why most people quit Anki at week 3" → topic "anki review queue overwhelming").
+- **The underlying topic**, broader than the angle (e.g., angle "Why most people quit their flashcard habit at week 3" → topic "spaced-repetition review overwhelm").
 - **Question-shaped variants** ("how to," "why does," "what to do when").
 - **Modifier variants** ("for beginners," "in [timeframe]," "without [common obstacle]").
 - **PAA expansion** — run `people_also_ask` on the topic *once per opportunity* during candidate generation, before any SERP calls. Harvest 2–4 of the most relevant questions as additional candidates. PAA questions are often the strongest long-tail picks because they're authentic user phrasing, not keyword-tool abstractions. Do not run PAA again during SERP inspection — it's a candidate-generation tool, not a validation tool.

@@ -162,30 +162,7 @@ async def test_writing_agent_saves_draft(tmp_data_dir, sample_calendar_entry, sa
     assert article.markdown_content == fake_article.markdown_content
 
 
-def test_remove_em_dashes_space_both_sides():
-    from agents.writing_agent import _remove_em_dashes
-    assert _remove_em_dashes("learning — which") == "learning, which"
-
-
-def test_remove_em_dashes_no_spaces():
-    from agents.writing_agent import _remove_em_dashes
-    assert _remove_em_dashes("learning—which") == "learning, which"
-
-
-def test_remove_em_dashes_space_before_only():
-    from agents.writing_agent import _remove_em_dashes
-    assert _remove_em_dashes("learning —which") == "learning, which"
-
-
-def test_remove_em_dashes_multiple():
-    from agents.writing_agent import _remove_em_dashes
-    result = _remove_em_dashes("fast — effective — proven")
-    assert result == "fast, effective, proven"
-
-
-def test_remove_em_dashes_no_emdash():
-    from agents.writing_agent import _remove_em_dashes
-    assert _remove_em_dashes("no emdash here") == "no emdash here"
+# Em-dash cleanup now lives in services.text_cleanup — see tests/test_text_cleanup.py.
 
 
 async def test_writing_agent_strips_em_dashes_from_saved_draft(tmp_data_dir, sample_calendar_entry, sample_product_facts):

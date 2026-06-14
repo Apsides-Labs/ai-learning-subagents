@@ -113,6 +113,122 @@ async def test_post_records_cost_from_response():
         assert result == response_json
 
 
+async def test_post_retries_transient_timeout_then_succeeds():
+    """A ReadTimeout on the first attempt should be retried, not fatal."""
+    import httpx
+    from services import dataforseo_client as mod
+    mod._client = None
+
+    response_json = _load_fixture("dfs_serp_response.json")
+    ok_response = MagicMock()
+    ok_response.json = MagicMock(return_value=response_json)
+    ok_response.raise_for_status = MagicMock()
+
+    with patch.object(mod, "settings") as mock_settings, \
+         patch.object(mod.asyncio, "sleep", new=AsyncMock()) as mock_sleep:
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = mod.get_client()
+        client._http = MagicMock()
+        client._http.post = AsyncMock(side_effect=[httpx.ReadTimeout("slow"), ok_response])
+
+        result = await client.post("/v3/serp/google/organic/live/advanced", json_body=[{"keyword": "x"}])
+
+    assert result == response_json
+    assert client._http.post.call_count == 2
+    assert client.tracker.total_calls == 1     # only the successful attempt is counted
+    mock_sleep.assert_awaited_once()
+
+
+async def test_post_raises_after_exhausting_retries():
+    """If every attempt times out, the underlying httpx error propagates."""
+    import httpx
+    from services import dataforseo_client as mod
+    mod._client = None
+
+    with patch.object(mod, "settings") as mock_settings, \
+         patch.object(mod.asyncio, "sleep", new=AsyncMock()):
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = mod.get_client()
+        client._http = MagicMock()
+        client._http.post = AsyncMock(side_effect=httpx.ReadTimeout("slow"))
+
+        with pytest.raises(httpx.ReadTimeout):
+            await client.post("/v3/serp/google/organic/live/advanced", json_body=[{"keyword": "x"}])
+
+    assert client._http.post.call_count == mod._MAX_RETRIES + 1
+    assert client.tracker.total_calls == 0
+
+
+def _status_error(code: int):
+    import httpx
+    req = httpx.Request("POST", "https://api.dataforseo.com/x")
+    resp = httpx.Response(code, request=req)
+    return httpx.HTTPStatusError(f"HTTP {code}", request=req, response=resp)
+
+
+async def test_post_retries_retryable_status_then_succeeds():
+    """A 503 should be retried; a transient gateway error must not be fatal."""
+    from services import dataforseo_client as mod
+    mod._client = None
+
+    response_json = _load_fixture("dfs_serp_response.json")
+    fail = MagicMock()
+    fail.raise_for_status = MagicMock(side_effect=_status_error(503))
+    ok = MagicMock()
+    ok.json = MagicMock(return_value=response_json)
+    ok.raise_for_status = MagicMock()
+
+    with patch.object(mod, "settings") as mock_settings, \
+         patch.object(mod.asyncio, "sleep", new=AsyncMock()):
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = mod.get_client()
+        client._http = MagicMock()
+        client._http.post = AsyncMock(side_effect=[fail, ok])
+
+        result = await client.post("/v3/serp/google/organic/live/advanced", json_body=[{"keyword": "x"}])
+
+    assert result == response_json
+    assert client._http.post.call_count == 2
+
+
+async def test_post_does_not_retry_nonretryable_status():
+    """A 400 is deterministic — it should raise immediately, no retries."""
+    from services import dataforseo_client as mod
+    mod._client = None
+
+    fail = MagicMock()
+    fail.raise_for_status = MagicMock(side_effect=_status_error(400))
+
+    with patch.object(mod, "settings") as mock_settings, \
+         patch.object(mod.asyncio, "sleep", new=AsyncMock()):
+        mock_settings.dataforseo_login = "u"
+        mock_settings.dataforseo_password = "p"
+        mock_settings.dataforseo_max_cost_per_run = 1.0
+        mock_settings.dataforseo_max_calls_per_run = 50
+
+        client = mod.get_client()
+        client._http = MagicMock()
+        client._http.post = AsyncMock(return_value=fail)
+
+        import httpx
+        with pytest.raises(httpx.HTTPStatusError):
+            await client.post("/v3/serp/google/organic/live/advanced", json_body=[{"keyword": "x"}])
+
+    assert client._http.post.call_count == 1
+
+
 async def test_ranked_keywords_for_site_filters_to_blog_urls():
     from services import dataforseo_client as mod
     mod._client = None

@@ -51,6 +51,20 @@ class ArticlePlanOutput(_StrictModel):
     serp_context: str = ""
 
 
+class CandidateOutput(_StrictModel):
+    """One proposed article idea (pre-SEO, pre-approval). Written to candidates.md."""
+    title: str
+    segment: str            # the specific learner segment this targets
+    angle: str              # one-line framing
+    primary_keyword: str    # best-guess keyword; SEO data is attached downstream
+    article_type: str       # "standard" | "topic_teaser"
+    blog_category: str
+
+
+class CandidateBatchOutput(_StrictModel):
+    candidates: list[CandidateOutput]
+
+
 class SEOOutput(_StrictModel):
     articles: list[ArticlePlanOutput]
     seo_coverage_note: str = ""   # NEW: populated when DataForSEOBudgetExceeded

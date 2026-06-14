@@ -1,13 +1,15 @@
 from pathlib import Path
 from typing import Optional
 
+from agents.propose_agent import run_propose_agent
 from agents.research_agent import run_setup_research, run_market_research
 from agents.seo_agent import run_seo_agent
 from agents.writing_agent import run_writing_agent
 from chains.fact_check_chain import run_fact_check_chain
 from config import settings
 from models.article import ArticleStatus
-from services import calendar_service, file_service
+from services import calendar_service, candidates_service, file_service
+from services.dedup import covered_tools, filter_duplicates
 from services.publish_service import create_blog_pr
 
 
@@ -18,21 +20,40 @@ async def run_setup() -> None:
     await file_service.write_text(file_service.COMPETITOR_PROFILES_PATH, competitor_profiles)
 
 
+def _coverage_lines(entries) -> str:
+    return "\n".join(
+        f"- {e.title} | primary: {e.primary_keyword} | secondary: {', '.join(e.secondary_keywords)}"
+        for e in entries
+    )
+
+
+async def run_propose(n: int = 12) -> tuple[int, str]:
+    """Propose `n` segment-anchored candidates with SEO data → write candidates.md.
+
+    Returns (count, path). The human ticks the ones to write; `produce` mode
+    (TODO) drafts the ticked candidates.
+    """
+    editorial_focus = await file_service.read_text(file_service.EDITORIAL_FOCUS_PATH)
+    existing = await calendar_service.load_calendar()
+    scored = await run_propose_agent(editorial_focus, _coverage_lines(existing), n=n)
+    path = await candidates_service.write_candidates(scored)
+    return len(scored), str(path)
+
+
 async def run_weekly_batch() -> list[str]:
     """Refresh market data + plan 4 articles. Returns planned article titles."""
     if not file_service.PRODUCT_FACTS_PATH.exists() or not file_service.COMPETITOR_PROFILES_PATH.exists():
         await run_setup()
 
-    competitor_profiles = await file_service.read_text(file_service.COMPETITOR_PROFILES_PATH)
-    market_brief = await run_market_research(competitor_profiles)
-    await file_service.write_text(file_service.MARKET_BRIEF_PATH, market_brief)
-
     existing = await calendar_service.load_calendar()
     existing_ids = {e.id for e in existing}
-    existing_coverage = "\n".join(
-        f"- {e.title} | primary: {e.primary_keyword} | secondary: {', '.join(e.secondary_keywords)}"
-        for e in existing
-    )
+    existing_coverage = _coverage_lines(existing)
+
+    competitor_profiles = await file_service.read_text(file_service.COMPETITOR_PROFILES_PATH)
+    # Steer market research away from tools we've already covered, so the SEO
+    # stage isn't fed the same saturated topics week after week.
+    market_brief = await run_market_research(competitor_profiles, covered_tools(existing))
+    await file_service.write_text(file_service.MARKET_BRIEF_PATH, market_brief)
 
     research_context = competitor_profiles + "\n\n" + market_brief
 
@@ -43,9 +64,16 @@ async def run_weekly_batch() -> list[str]:
         research_context += "\n\n## MEASUREMENT BRIEF\n\n" + measurement_brief
 
     new_entries = await run_seo_agent(research_context, existing_ids, existing_coverage)
-    await calendar_service.add_entries(new_entries)
 
-    return [e.title for e in new_entries]
+    # Hard dedup guard. The SEO prompt's "no overlap" rule is honor-system and
+    # the LLM has violated it (repeat Anki/Duolingo articles, duplicate
+    # keywords). Enforce it in code so a violating entry never lands.
+    kept, rejected = filter_duplicates(existing, new_entries)
+    for entry, reason in rejected:
+        print(f"  dropped duplicate: {entry.title!r} — {reason}")
+    await calendar_service.add_entries(kept)
+
+    return [e.title for e in kept]
 
 
 async def run_article() -> tuple[Optional[ArticleStatus], Optional[Path], Optional[str]]:

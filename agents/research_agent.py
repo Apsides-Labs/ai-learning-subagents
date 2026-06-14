@@ -76,14 +76,30 @@ async def run_setup_research(codebase_path: str) -> tuple[str, str]:
     return _format_product_facts(output), _format_competitor_profiles(output)
 
 
-async def run_market_research(competitor_profiles: str) -> str:
+async def run_market_research(competitor_profiles: str, saturated_tools: set[str] | None = None) -> str:
     """Entry point for --mode weekly (step 1). Search for current pain points and content opportunities.
-    Returns market_brief_md. Run weekly for fresh market data."""
+    Returns market_brief_md. Run weekly for fresh market data.
+
+    `saturated_tools` are tools already covered by published/planned articles. They
+    are injected into the kickoff so the agent steers away from re-surfacing them,
+    rather than relying on the downstream dedup filter to drop them after the fact.
+    """
     tools = [tavily_search_tool]
     agent = create_agent(get_llm(), tools=tools, system_prompt=RESEARCH_MARKET_SYSTEM_PROMPT)
 
+    kickoff = RESEARCH_MARKET_KICKOFF
+    if saturated_tools:
+        tool_list = ", ".join(sorted(saturated_tools))
+        kickoff += (
+            f"\n\nALREADY SATURATED — we have published or planned articles about "
+            f"these tools: {tool_list}. Do not center pain points or opportunities "
+            f"on them. Find fresher ground: a different tool, scenario, or learner "
+            f"segment. Passing mentions are fine; a new article focused on any of "
+            f"these is not."
+        )
+
     result = await agent.ainvoke({
-        "messages": [HumanMessage(content=f"COMPETITOR CONTEXT:\n{competitor_profiles}\n\n{RESEARCH_MARKET_KICKOFF}")]
+        "messages": [HumanMessage(content=f"COMPETITOR CONTEXT:\n{competitor_profiles}\n\n{kickoff}")]
     })
     gathered_data = result["messages"][-1].content
 

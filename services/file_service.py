@@ -10,6 +10,7 @@ COMPETITOR_PROFILES_PATH = DATA_DIR / "competitor_profiles.md"
 MARKET_BRIEF_PATH = DATA_DIR / "market_brief.md"
 MEASUREMENT_BRIEF_MD_PATH = DATA_DIR / "measurement_brief.md"
 MEASUREMENT_BRIEF_HTML_PATH = DATA_DIR / "measurement_brief.html"
+EDITORIAL_FOCUS_PATH = DATA_DIR / "editorial_focus.md"
 
 
 async def read_text(path: Path) -> str:

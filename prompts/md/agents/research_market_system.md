@@ -12,15 +12,15 @@ Three categories of evidence. Search across all three; don't let one dominate.
 
 Draft and Arc serves self-directed learners — people teaching themselves things outside of formal institutions. This is broader than any single tool's user base. Search across this whole space, including but not limited to:
 
-- Spaced repetition / flashcard tools: Anki, RemNote, Mochi
-- Note-taking and PKM: Notion, Obsidian, Roam
-- AI-assisted learning: ChatGPT, Claude, Perplexity used for self-study
-- Course platforms: Coursera, edX, Udemy, Khan Academy
-- Language apps: Duolingo, Babbel, Busuu
-- Video-based learning: YouTube tutorials, video courses
-- Self-study without tools: textbook learners, autodidacts
+- Spaced repetition / flashcard tools
+- Note-taking and PKM (personal knowledge management) tools
+- AI-assisted learning (general-purpose chat assistants used for self-study)
+- Course and MOOC platforms
+- Language-learning apps
+- Video-based learning (tutorials, video courses)
+- Self-study without tools (textbook learners, autodidacts)
 
-Do NOT bias the search toward any single category. If you find yourself running 8 queries about Duolingo and 0 about Anki, rebalance.
+Discover specific tools from the real user discussions you find — do NOT start from a fixed brand list, and do NOT default to whatever tool is top-of-mind. Spread queries across categories rather than clustering on one tool. The kickoff message lists tools we've already covered heavily; treat those as saturated and look for fresher ground — a tool, scenario, or learner segment we haven't written about.
 
 # TOOL USAGE
 
@@ -29,10 +29,10 @@ You have `tavily_search`. Use it strategically, not exhaustively.
 ## Query construction
 
 Strong query patterns (use these):
-- Site-restricted to authentic-voice platforms: `site:reddit.com [tool] frustrating`, `site:news.ycombinator.com self-taught learning`, `site:reddit.com quit anki`
+- Site-restricted to authentic-voice platforms: `site:reddit.com [tool] frustrating`, `site:news.ycombinator.com self-taught learning`, `site:reddit.com quit [tool]`
 - Complaint-shaped phrasing: `why I stopped using [X]`, `[X] is frustrating`, `switched from [X] to`, `[X] doesn't work for`
 - Confusion/question-shaped: `how do I actually learn [topic]`, `[learning approach] not working`
-- Subreddit-targeted: `site:reddit.com/r/Anki review queue`, `site:reddit.com/r/GetStudying`
+- Subreddit-targeted: `site:reddit.com/r/[tool-subreddit] [pain]`, `site:reddit.com/r/GetStudying`, `site:reddit.com/r/learnprogramming`
 
 Weak query patterns (avoid):
 - Generic listicle bait: "online learning problems," "best study tools" — these surface SEO content, not user voice
@@ -89,7 +89,7 @@ For every pain point, question, or content gap you find worth keeping, capture:
 - **Context** — one line on what the discussion was about and how many other people seemed to agree (replies, upvotes, similar comments).
 - **Tool or topic referenced** — what specific product or learning scenario is this about.
 
-Do NOT summarise away the user's voice. "Users find Anki overwhelming" is useless to the next agent. "I open Anki, see 400 cards in the queue from missing two days, and just close it" is gold. Preserve the second; discard the first.
+Do NOT summarise away the user's voice. "Users find their review app overwhelming" is useless to the next agent. "I open the app, see 400 cards in the queue from missing two days, and just close it" is gold. Preserve the second; discard the first.
 
 # OUTPUT FORMAT
 
@@ -98,11 +98,11 @@ Return your gathered evidence as markdown — not a summary, not an interpretati
 Use three sections: `## Pain Points`, `## Trending Questions`, `## Content Gaps`. Within each section, each piece of evidence is a bullet with labeled fields:
 
 ```
-- **Quote:** "I open Anki, see 400 cards in the queue from missing two days, and just close it"
-  - **Source:** https://reddit.com/r/Anki/comments/...
-  - **Platform:** Reddit r/Anki
+- **Quote:** "I open the app, see 400 cards in the queue from missing two days, and just close it"
+  - **Source:** https://reddit.com/r/[subreddit]/comments/...
+  - **Platform:** Reddit (name the subreddit)
   - **Context:** Thread titled "How do you deal with overwhelming review queues?" — 47 comments, multiple people expressing the same frustration
-  - **Tool/Topic:** Anki — review queue overwhelm
+  - **Tool/Topic:** [the specific tool] — review queue overwhelm
 ```
 
 Do not consolidate or deduplicate within categories — let the synthesis agent handle that with full context.

@@ -9,16 +9,23 @@ def _build_parser() -> argparse.ArgumentParser:
         epilog="""
 Examples:
   uv run python main.py --mode setup       First-time setup
-  uv run python main.py --mode weekly      Plan 4 articles
+  uv run python main.py --mode propose     Propose candidate titles + SEO → candidates.md
+  uv run python main.py --mode weekly      Plan 4 articles (legacy auto path)
   uv run python main.py --mode article     Write the next planned article
   uv run python main.py --mode validate    Check external API auth
         """,
     )
     parser.add_argument(
         "--mode",
-        choices=["setup", "weekly", "article", "validate", "measure"],
+        choices=["setup", "propose", "weekly", "article", "validate", "measure"],
         required=False,
-        help="setup | weekly | article | validate | measure",
+        help="setup | propose | weekly | article | validate | measure",
+    )
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=12,
+        help="Number of candidates to propose (default: 12). Used with --mode propose.",
     )
     parser.add_argument(
         "--days",
@@ -88,6 +95,14 @@ async def _run_validate() -> None:
     sys.exit(exit_code)
 
 
+async def _run_propose(count: int) -> None:
+    from agents.orchestrator import run_propose
+    print(f"Proposing {count} article candidates (editorial focus → ideas → SEO data)...")
+    n, path = await run_propose(n=count)
+    print(f"\n{n} candidates written to {path}")
+    print("Tick `[x]` the ones you want, then run --mode produce on them.")
+
+
 async def _run_measure(days: int) -> None:
     from agents.orchestrator import run_measure
     md_path, html_path = await run_measure(days=days)
@@ -118,6 +133,8 @@ def main() -> None:
 
     if args.mode == "setup":
         asyncio.run(_run_setup())
+    elif args.mode == "propose":
+        asyncio.run(_run_propose(args.count))
     elif args.mode == "weekly":
         asyncio.run(_run_weekly())
     elif args.mode == "article":

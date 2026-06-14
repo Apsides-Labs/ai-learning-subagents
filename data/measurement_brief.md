@@ -1,9 +1,9 @@
-## Measurement Brief — 2026-06-04
-Window: 2026-05-07 to 2026-06-04
+## Measurement Brief — 2026-06-11
+Window: 2026-05-14 to 2026-06-11
 
 ### Headline
-- Articles published: 6
-- Impressions: 1 | Clicks: 0 | CTR: 0.0% | Avg position: 28.0
+- Articles published: 7
+- Impressions: 0 | Clicks: 0 | CTR: 0.0% | Avg position: 0.0
 
 ### Per-article performance
 
@@ -14,7 +14,7 @@ URL: https://www.draftandarc.com/blog/anki-review-queue-burnout
 - impressions: 0
 - engagement: no data
 - cta_rate: no users
-- Verdict: Published 26 days ago with zero impressions, so there is still no visibility signal to judge beyond the current index uncertainty.
+- Verdict: Published long enough to expect some visibility, but the page still has zero impressions and no position signal, so discovery is the issue rather than performance tuning.
 
 #### tutorial-hell-progress (published 2026-04-27)
 URL: https://www.draftandarc.com/blog/tutorial-hell-progress
@@ -23,7 +23,7 @@ URL: https://www.draftandarc.com/blog/tutorial-hell-progress
 - impressions: 0
 - engagement: no data
 - cta_rate: no users
-- Verdict: Published 38 days ago with zero impressions, which points to a visibility problem rather than a performance problem.
+- Verdict: Long past initial publish timing yet still invisible in search, which points to an indexing or crawlability problem before any content optimization can help.
 
 #### self-study-roadmap (published 2026-05-09)
 URL: https://www.draftandarc.com/blog/self-study-roadmap
@@ -32,7 +32,7 @@ URL: https://www.draftandarc.com/blog/self-study-roadmap
 - impressions: 0
 - engagement: no data
 - cta_rate: no users
-- Verdict: Published 26 days ago with zero impressions and no engagement data, so it remains unproven in search.
+- Verdict: Published long enough to expect some search exposure, but the page remains unmeasured in search and needs discovery clarified.
 
 #### coursera-practice-gap (published 2026-05-09)
 URL: https://www.draftandarc.com/blog/coursera-practice-gap
@@ -41,18 +41,16 @@ URL: https://www.draftandarc.com/blog/coursera-practice-gap
 - impressions: 0
 - engagement: no data
 - cta_rate: no users
-- Verdict: Published 26 days ago with zero impressions, leaving the page effectively unseen in the measurement window.
+- Verdict: Old enough to judge on visibility, but the page has not earned any search impressions, so the current problem is upstream of engagement.
 
 #### anki-flashcards-reading-workflow (published 2026-05-25)
 URL: https://www.draftandarc.com/blog/anki-flashcards-reading-workflow
-- position: pos 28.0
+- position: pos 0.0
 - ctr: 0.0%
-- impressions: 1
-- engagement: 0:02
-- cta_rate: 1/1
-- Top surfacing queries:
-  - "how long does it take to make flashcards" — 1 impr / 0 clicks / 0.0% CTR / pos 28.0
-- Verdict: Borderline ranking at position 28.0 with weak engagement and zero CTR — the angle is getting a small amount of search exposure but not converting.
+- impressions: 0
+- engagement: no data
+- cta_rate: no users
+- Verdict: Recent enough that search lag is plausible, but the complete lack of impressions means visibility is not yet established.
 
 #### obsidian-minimum-setup (published 2026-05-25)
 URL: https://www.draftandarc.com/blog/obsidian-minimum-setup
@@ -61,24 +59,36 @@ URL: https://www.draftandarc.com/blog/obsidian-minimum-setup
 - impressions: 0
 - engagement: no data
 - cta_rate: no users
-- Verdict: Published 10 days ago with no impressions yet; it is too early to judge.
+- Verdict: Recent enough to still be in the ramp-up phase, but the absence of impressions suggests it is not yet surfacing in search.
+
+#### lecture-notes-verbatim (published 2026-06-07)
+URL: https://www.draftandarc.com/blog/lecture-notes-verbatim
+- position: pos 0.0
+- ctr: 0.0%
+- impressions: 0
+- engagement: no data
+- cta_rate: no users
+- Verdict: Too early to judge because it is only 4 days old and still inside the early measurement window.
 
 ### Recommended actions
-HIGH: Use index coverage validation to confirm whether the published articles with zero impressions are actually indexed and eligible to surface.
+HIGH: Check indexing and crawlability for articles with zero impressions older than 14 days; if they are indexed, refresh titles and intros to clarify search intent.
    (affects: anki-review-queue-burnout)
-   Rationale: Published 26 days ago with zero impressions, zero CTR, and no engagement data; if indexing is the blocker, this resolves the unknown quickly.
-HIGH: Use index coverage validation to confirm whether the published articles with zero impressions are actually indexed and eligible to surface.
+   Rationale: Published 33 days ago with zero impressions and no useful position signal, so resolving whether the page is indexed is the fastest way to separate discovery issues from content issues.
+HIGH: Check indexing and crawlability for articles with zero impressions older than 14 days; if they are indexed, refresh titles and intros to clarify search intent.
    (affects: tutorial-hell-progress)
-   Rationale: Published 38 days ago with zero impressions and no click data; indexing status is the fastest way to distinguish a crawl/index issue from a content issue.
-HIGH: Use index coverage validation to confirm whether the published articles with zero impressions are actually indexed and eligible to surface.
+   Rationale: Published 45 days ago with zero impressions and no useful position signal, making indexing the highest-leverage unknown to resolve first.
+HIGH: Check indexing and crawlability for articles with zero impressions older than 14 days; if they are indexed, refresh titles and intros to clarify search intent.
    (affects: self-study-roadmap)
-   Rationale: Published 26 days ago with zero impressions and no visibility; checking indexing is the highest-leverage next step because the article is beyond the early discovery period.
-HIGH: Use index coverage validation to confirm whether the published articles with zero impressions are actually indexed and eligible to surface.
+   Rationale: Published 33 days ago with zero impressions and no useful position signal, so the main question is whether search engines can actually surface it.
+HIGH: Check indexing and crawlability for articles with zero impressions older than 14 days; if they are indexed, refresh titles and intros to clarify search intent.
    (affects: coursera-practice-gap)
-   Rationale: Published 26 days ago with zero impressions and no click activity; an indexing check will determine whether search can even test the page.
-HIGH: Rewrite the title and search snippet for the page already ranking in the high twenties to better match the query intent and lift CTR.
+   Rationale: Published 33 days ago with zero impressions and no useful position signal, so indexing verification is the clearest next step.
+HIGH: Check indexing and crawlability for articles with zero impressions older than 14 days; if they are indexed, refresh titles and intros to clarify search intent.
    (affects: anki-flashcards-reading-workflow)
-   Rationale: It has a good enough surface to earn a first impression at position 28.0, but CTR is still zero and engagement is very short; the title/snippet is the clearest leverage point if impressions continue.
+   Rationale: Published 17 days ago and already showing zero impressions, so confirming index status will determine whether this is a visibility problem or just early lag.
 
 ### Coverage note
-All three data sources reporting normally; 6 articles in measurement window. One caveat: two articles are only 10 days old, so early visibility data is still immature, and the low-impression articles may simply not be indexed yet.
+Data-source / coverage notes (deterministic):
+  - GSC fetch failed: Reauthentication is needed. Please run `gcloud auth application-default login` to reauthenticate.
+  - GA4 fetch failed: 503 Getting metadata from plugin failed with error: Reauthentication is needed. Please run `gcloud auth application-default login` to reauthenticate.
+GSC and GA4 both failed due to reauthentication being needed, while DataForSEO is reporting normally; with that caveat, the measurement window covers 7 articles and the search data is currently incomplete on first-party sources.

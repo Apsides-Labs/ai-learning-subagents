@@ -46,3 +46,45 @@ async def test_run_seo_agent_falls_through_on_budget_exceeded():
     assert result == []  # No articles produced (consistent with empty SEOOutput).
     # The synthesis chain WAS called (i.e. we did not crash on the cap).
     fake_chain.ainvoke.assert_called_once()
+
+
+async def test_synthesize_with_retry_resamples_on_validation_error():
+    """A transient malformed-JSON ValidationError should be retried, not fatal."""
+    from agents import seo_agent
+    from output_schemas import SEOOutput
+    from pydantic import ValidationError
+
+    good = SEOOutput(articles=[], seo_coverage_note="")
+    # First call raises (as if the LLM emitted invalid JSON), second succeeds.
+    try:
+        SEOOutput(articles="not-a-list")  # provoke a real ValidationError instance
+    except ValidationError as exc:
+        validation_error = exc
+
+    fake_chain = MagicMock()
+    fake_chain.ainvoke = AsyncMock(side_effect=[validation_error, good])
+
+    result = await seo_agent._synthesize_with_retry(fake_chain, {}, attempts=3)
+
+    assert result is good
+    assert fake_chain.ainvoke.call_count == 2
+
+
+async def test_synthesize_with_retry_raises_after_exhausting_attempts():
+    """If every attempt fails, surface a RuntimeError rather than the raw parse error."""
+    from agents import seo_agent
+    from output_schemas import SEOOutput
+    from pydantic import ValidationError
+
+    try:
+        SEOOutput(articles="not-a-list")
+    except ValidationError as exc:
+        validation_error = exc
+
+    fake_chain = MagicMock()
+    fake_chain.ainvoke = AsyncMock(side_effect=validation_error)
+
+    with pytest.raises(RuntimeError, match="failed to produce valid output after 2 attempts"):
+        await seo_agent._synthesize_with_retry(fake_chain, {}, attempts=2)
+
+    assert fake_chain.ainvoke.call_count == 2

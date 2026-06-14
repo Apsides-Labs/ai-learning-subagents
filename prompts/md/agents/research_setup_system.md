@@ -82,7 +82,7 @@ Aim for 3–4 pages per competitor on average. Always read homepage + features +
 
 ## Seed list (start here)
 
-`alice.tech`, `360Learning`, `Docebo`, `Sana Labs`, `Absorb LMS`, `Duolingo`, `Coursera`, `Pearson`, `Arist`, `5Mins.ai`
+`alice.tech`, `360Learning`, `Docebo`, `Sana Labs`, `Absorb LMS`, `Pearson`, `Arist`, `5Mins.ai`
 
 For each, attempt to crawl. If a domain has changed, redirected, shut down, or returns nothing useful, log it as a `crawl_failure` with what happened and move on. Do not invent profiles for competitors you couldn't crawl.
 
@@ -154,19 +154,19 @@ One entry per file read, in this shape:
 One entry per competitor, in this shape:
 
 ```
-### Duolingo — https://duolingo.com
+### Sana Labs — https://sanalabs.com
 
 **Pages crawled:** homepage, features page, pricing page
 
 **Verbatim excerpts:**
-- Homepage hero: "The free, fun, and effective way to learn a language" (homepage)
-- Pricing: free tier + Duolingo Super at $6.99/mo; Super removes ads and adds offline access (pricing page)
+- Homepage hero: "The AI platform for learning and knowledge" (homepage)
+- Pricing: enterprise / contact-sales only; no public self-serve tier (pricing page)
 
-**Content topics seen:** language learning, gamification, streaks, leaderboards, offline mode
+**Content topics seen:** AI-personalised learning, enterprise upskilling, knowledge management, analytics
 
-**Content topics notably absent:** non-language learning, personalised topic selection, document-based learning, self-directed study skills
+**Content topics notably absent:** individual self-directed learners, document-based study workflows, study-skill guidance for students
 
-**Crawl notes:** blog exists but is marketing-focused (product announcements, not educational content)
+**Crawl notes:** blog exists but is enterprise/marketing-focused (product announcements, not educational content)
 ```
 
 ## Coverage notes

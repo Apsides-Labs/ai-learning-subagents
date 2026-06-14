@@ -1,5 +1,8 @@
+import httpx
 from langchain.agents import create_agent
+from langchain_core.exceptions import OutputParserException
 from langchain_core.messages import HumanMessage
+from pydantic import ValidationError
 
 from models.article import ArticleType, ContentCalendarEntry
 from output_schemas import SEOOutput
@@ -21,6 +24,27 @@ SEO_KICKOFF = (
     "keywords, or closely related subtopics:\n{existing_coverage}"
 )
 seo_synthesis_prompt = load_prompt("chains/seo_synthesis.md")
+
+
+async def _synthesize_with_retry(chain, payload: dict, attempts: int = 3) -> SEOOutput:
+    """Run the structured-output synthesis, re-sampling on malformed output.
+
+    The LLM occasionally emits invalid JSON in its tool call (e.g. a stray
+    delimiter between article objects), which the strict SEOOutput schema
+    rejects with a ValidationError. Re-sampling almost always fixes a transient
+    malformation, so retry a few times before surfacing the failure — otherwise
+    one bad generation crashes the whole weekly batch.
+    """
+    last_exc: Exception | None = None
+    for attempt in range(1, attempts + 1):
+        try:
+            return await chain.ainvoke(payload)
+        except (ValidationError, OutputParserException) as exc:
+            last_exc = exc
+            print(f"  SEO synthesis returned invalid output (attempt {attempt}/{attempts}); re-sampling...")
+    raise RuntimeError(
+        f"SEO synthesis failed to produce valid output after {attempts} attempts"
+    ) from last_exc
 
 
 def _to_calendar_entry(plan) -> ContentCalendarEntry:
@@ -67,9 +91,19 @@ async def run_seo_agent(research_brief: str, existing_ids: set[str], existing_co
             f"Reason: {exc}"
         )
         budget_note = "Budget exceeded mid-batch"
+    except httpx.HTTPError as exc:
+        # A DataForSEO request failed terminally even after the client's
+        # retries (e.g. the API is down or persistently timing out). Fall
+        # through to synthesis on whatever the agent gathered rather than
+        # crashing the whole weekly batch.
+        gathered_data = (
+            f"DataForSEO request failed during tool calls — synthesis ran on "
+            f"partial data. Reason: {type(exc).__name__}: {exc}"
+        )
+        budget_note = "DataForSEO request failed mid-batch"
 
     chain = seo_synthesis_prompt | get_llm().with_structured_output(SEOOutput, method="function_calling")
-    output: SEOOutput = await chain.ainvoke({
+    output: SEOOutput = await _synthesize_with_retry(chain, {
         "research_brief": research_brief,
         "existing_coverage": existing_coverage or "none",
         "gathered_data": gathered_data,

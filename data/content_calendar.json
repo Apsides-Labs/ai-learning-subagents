@@ -268,5 +268,226 @@
     "serp_context": "No SERP data available.",
     "published_at": "2026-06-07",
     "live_url": "https://www.draftandarc.com/blog/lecture-notes-verbatim"
+  },
+  {
+    "id": "2",
+    "status": "needs_review_flagged",
+    "title": "Why Notion makes note-taking feel impossible for some people \u2014 and the simplest way to get unstuck",
+    "primary_keyword": "notion too slow note taking",
+    "secondary_keywords": [
+      "how to make notion faster for note taking",
+      "notion slow note taking",
+      "notion note-taking workflow",
+      "why notion feels slow"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Students, researchers, and personal knowledge workers who want a low-friction note-taking system",
+    "angle": "Focus on the emotional and workflow cost of slow note-taking in Notion, then show a minimum viable setup that avoids endless tweaking.",
+    "meta_description": "If Notion feels too slow for note-taking, this guide shows why that happens and the simplest way to get a usable workflow fast.",
+    "suggested_headings": [
+      "Why Notion feels slow even when it works",
+      "The hidden cost of over-customizing notes",
+      "A minimum setup for fast capture",
+      "When to stop optimizing and start using it",
+      "How to know if Notion is the wrong tool for you"
+    ],
+    "cta_prompt": "Use Draft and Arc to turn scattered notes into a simpler, faster study workflow.",
+    "blog_category": "Productivity",
+    "draft_path": "data/drafts/2026-06-14-2.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/31",
+    "serp_context": "Top results: reddit.com \u2014 complaint threads about Notion speed; medium.com \u2014 optimization opinions; notion.com \u2014 official help and docs.\nGaps: Most results offer speed tweaks, not a real explanation of why note-taking feels impossible or how to redesign the workflow.\nPAA: No PAA data available.",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "art-1",
+    "status": "planned",
+    "title": "Why most people quit spaced repetition at week 3 \u2014 and how to design a review habit that doesn't feel like a wall",
+    "primary_keyword": "spaced repetition burnout",
+    "secondary_keywords": [
+      "review queue burnout",
+      "how to keep using spaced repetition",
+      "spaced repetition study habit"
+    ],
+    "search_intent": "Learn why spaced repetition routines fail and how to make them sustainable.",
+    "article_type": "standard",
+    "target_audience": "Students and self-learners who start flashcard systems enthusiastically but fall off once the reviews pile up.",
+    "angle": "A practical diagnosis of the week-3 dropoff, focusing on habit design, review load, and making repetition feel manageable instead of endless.",
+    "meta_description": "Why spaced repetition burns people out around week 3\u2014and how to build a review habit you can actually keep.",
+    "suggested_headings": [
+      "Why spaced repetition starts to feel unbearable",
+      "The week-3 burnout pattern",
+      "How to reduce friction without quitting",
+      "A review habit that survives busy weeks",
+      "When to simplify instead of optimize"
+    ],
+    "cta_prompt": "Try Draft and Arc to turn your notes into a lighter, more manageable review workflow.",
+    "blog_category": "Learning Science",
+    "draft_path": null,
+    "pr_url": null,
+    "serp_context": "Top results: Reddit r/GetStudying \u2014 burnout from spaced repetition; University of Arizona Thrive Center \u2014 adding spaced repetition to your toolkit; PMC \u2014 research on spaced repetition.\nGaps: Results explain the method or discuss burnout, but few give a concrete redesign for queue fatigue, motivation, and sustainable cadence.\nPAA: No PAA data available.",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "art-2",
+    "status": "planned",
+    "title": "Tutorial hell explained: why watching coding tutorials doesn't turn into real skill, and what to do instead",
+    "primary_keyword": "tutorial hell coding",
+    "secondary_keywords": [
+      "escape tutorial hell",
+      "why tutorials don't work",
+      "coding tutorial dependency"
+    ],
+    "search_intent": "Understand why tutorial-heavy learning stalls and what skill-building should replace it.",
+    "article_type": "standard",
+    "target_audience": "Beginner programmers and self-taught learners who feel productive while consuming tutorials but are not getting independent.",
+    "angle": "A contrarian take that explains the hidden failure mode of tutorial-based learning and shows how to shift from imitation to problem-solving.",
+    "meta_description": "Tutorial hell makes learning feel productive without building real skill. Here\u2019s why it happens and what to do instead.",
+    "suggested_headings": [
+      "What tutorial hell actually is",
+      "Why tutorials create false confidence",
+      "Signs you are stuck in passive learning",
+      "The shift from watching to solving",
+      "A simple practice loop that works"
+    ],
+    "cta_prompt": "Use Draft and Arc to turn tutorial notes into a practice-first learning plan.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null,
+    "serp_context": "Top results: Reddit r/learnprogramming \u2014 what tutorial hell means; wbscodingschool.com \u2014 how to get out of tutorial hell; dev.to \u2014 escape tutorial hell.\nGaps: Many results repeat the same advice and stay generic; few explain the psychology of passive learning or give a concrete transition from watching to doing.\nPAA: No PAA data available.",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "art-3",
+    "status": "planned",
+    "title": "How to self-learn anything when you don't know how to study: a simple workflow for planning, recall, and practice",
+    "primary_keyword": "how to study on your own when you don't know where to start",
+    "secondary_keywords": [
+      "self learn a subject",
+      "study plan without teacher",
+      "how to start self studying"
+    ],
+    "search_intent": "Learn a first-principles workflow for starting self-study when you have no structure or teacher.",
+    "article_type": "topic_teaser",
+    "target_audience": "Adult self-learners, career switchers, and students who are motivated but overwhelmed by where to begin.",
+    "angle": "A concrete beginner-friendly workflow that turns vague motivation into a sequence: define the scope, plan retrieval practice, and schedule deliberate exercises.",
+    "meta_description": "If you want to self-learn but do not know where to start, this workflow shows you how to plan, recall, and practice effectively.",
+    "suggested_headings": [
+      "Why self-study feels harder than it should",
+      "Step 1: define the smallest useful scope",
+      "Step 2: build recall into the plan",
+      "Step 3: practice before you feel ready",
+      "How to know what to do next"
+    ],
+    "cta_prompt": "Build me a 4-week self-study plan for [topic] with planning, recall, and practice built in.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null,
+    "serp_context": "Top results: Reddit r/GetStudying \u2014 I don't know how to study; Quora \u2014 where do I start studying; UNC Learning Center \u2014 study smarter guidance.\nGaps: The SERP mixes forums and generic study tips, but it lacks a single actionable workflow for someone starting from zero and trying to study independently.\nPAA: No PAA data available.",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "art-4",
+    "status": "planned",
+    "title": "The beginner-to-intermediate gap in language learning apps: what to do when the app stops helping",
+    "primary_keyword": "best language learning app for intermediate spanish",
+    "secondary_keywords": [
+      "intermediate language learning apps",
+      "what to do when language app stops helping",
+      "language app after beginner stage"
+    ],
+    "search_intent": "Figure out how to keep progressing after a language app stops being enough for intermediate learning.",
+    "article_type": "topic_teaser",
+    "target_audience": "Language learners who have outgrown beginner lessons and need a better path through the intermediate stage.",
+    "angle": "A specific, contrarian guide focused on the mid-level plateau: why apps stall, what skills they skip, and how to keep moving with a better study plan.",
+    "meta_description": "When language apps stop helping after the basics, here is how to bridge the beginner-to-intermediate gap and keep progressing.",
+    "suggested_headings": [
+      "Why language apps stall after the basics",
+      "What intermediate learners actually need",
+      "The grammar gap most apps skip",
+      "How to rebuild your routine past A2",
+      "When to use an app and when to move on"
+    ],
+    "cta_prompt": "Build me a 6-week plan to move from beginner to intermediate Spanish with lessons, grammar, and speaking practice.",
+    "blog_category": "Study Methods",
+    "draft_path": null,
+    "pr_url": null,
+    "serp_context": "Top results: Medium \u2014 apps for advanced Spanish learners; Reddit r/Spanish \u2014 intermediate to advanced language apps; lexody.com \u2014 intermediate-advanced Spanish apps.\nGaps: Results lean toward listicles, forum threads, or advanced-app roundups; they do not clearly address the beginner-to-intermediate transition or what a learner should do when progress stalls.\nPAA: No PAA data available.",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "claude-code-subagents",
+    "status": "ready_for_review",
+    "title": "Claude Code subagents: when they're worth it",
+    "primary_keyword": "claude code subagents",
+    "secondary_keywords": [
+      "how to use subagents in claude code",
+      "awesome claude code subagents"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Developers building or using agents in Claude Code",
+    "angle": "When a subagent is worth the overhead vs. staying single-agent",
+    "meta_description": "Claude Code subagents give you a clean context window, not a smarter model. When a subagent actually helps, when to skip it, and how to set one up.",
+    "suggested_headings": [],
+    "cta_prompt": "",
+    "blog_category": "Claude Code",
+    "draft_path": "data/drafts/2026-06-14-claude-code-subagents.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/34",
+    "serp_context": "vol 2900 / diff 18; SERP mixed (anthropic, reddit, github)",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "claude-code-slash-commands",
+    "status": "ready_for_review",
+    "title": "Claude Code slash commands: stop repeating prompts",
+    "primary_keyword": "claude code slash commands",
+    "secondary_keywords": [
+      "claude code custom slash commands",
+      "claude code slash commands github"
+    ],
+    "search_intent": "Informational",
+    "article_type": "topic_teaser",
+    "target_audience": "Claude Code users repeating the same prompts by hand",
+    "angle": "When a repeated prompt should become a slash command, and how to make a good one",
+    "meta_description": "If you paste the same prompt into Claude Code twice, it should be a slash command. How to build custom slash commands that save real time \u2014 and which to skip.",
+    "suggested_headings": [],
+    "cta_prompt": "",
+    "blog_category": "Claude Code",
+    "draft_path": "data/drafts/2026-06-14-claude-code-slash-commands.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/35",
+    "serp_context": "vol 880 / diff 32; SERP mixed (claude docs, reddit, youtube)",
+    "published_at": null,
+    "live_url": null
+  },
+  {
+    "id": "mcp-servers-claude-code",
+    "status": "ready_for_review",
+    "title": "MCP servers for Claude Code: when you actually need one",
+    "primary_keyword": "mcp servers for claude code",
+    "secondary_keywords": [
+      "slack mcp for claude code",
+      "supabase mcp for claude code",
+      "mcp for claude code"
+    ],
+    "search_intent": "Informational",
+    "article_type": "standard",
+    "target_audience": "Claude Code users deciding whether to connect an external system via MCP",
+    "angle": "When an MCP server earns its place vs. a one-off script, and how to add one safely",
+    "meta_description": "Most Claude Code tasks don't need an MCP server. When an MCP server actually earns its place, when a plain script is better, and how to add one safely.",
+    "suggested_headings": [],
+    "cta_prompt": "",
+    "blog_category": "Claude Code",
+    "draft_path": "data/drafts/2026-06-14-mcp-servers-claude-code.md",
+    "pr_url": "https://github.com/Apsides-Labs/draftnarc/pull/36",
+    "serp_context": "vol 170 / diff 17; SERP reachable (reddit, claude docs, marketplace)",
+    "published_at": null,
+    "live_url": null
   }
 ]
